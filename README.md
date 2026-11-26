@@ -5,7 +5,7 @@ Formerly **Pitch Panchayat**. Folder, database and other internal names still us
 Three ways to surface objections to a startup idea, streamed live, so you know what to test with real people:
 
 - **Sharks**: 5 invented investor characters (Meera, Arjun, Ananya, Vikram, Farah) debate your pitch over 3 rounds, in their own voices with some Hinglish. You answer between rounds, and from round 2 a shark can say "I'm out". If you give an ask (amount and equity), the sharks still in make offers (equity, debt, royalty), team up or outbid each other, and you accept one, counter once or walk away. Valuations and offer limits are enforced in code (`backend/app/debates/deals.py`); offers have their own token cap (`DEAL_RESERVE_TOKENS`). Ends in a scored verdict with risks and 30-day next steps. The characters must stay original: don't model them on real TV judges. The scored verdict is a simulation; it does not predict whether the business will raise money.
-- **Janta**: a crowd of 25, 50 or 100 Indian personas reacts in 2 rounds (round 2 hears round 1), votes, and says whether they would **pay**. The verdict breaks it down by city tier, age and attitude. Treat the counts as simulated reactions, not demand numbers: see `docs/05-experiments-and-findings.md`.
+- **Janta**: a crowd of 25, 50 or 100 Indian personas reacts in 2 rounds (round 2 hears round 1), votes, and says whether they would **pay**. If the pitch names a city (or the "Who is it for?" line names a kind of customer), 70% of the crowd is drawn from that market and the rest is a comparison group from across India; the verdict shows the two separately (`app/targeting.py`). The verdict breaks it down by city tier, age and attitude. Treat the counts as simulated reactions, not demand numbers: see `docs/05-experiments-and-findings.md`.
 - **Roast**: 6 influencer personas review a landing-page URL, score clarity / trust / design / CTA, and name the fixes.
 
 Every finished run gets a share link (`/d/<id>`) that replays it.
@@ -44,7 +44,7 @@ Put the same `DATABASE_URL` in `web/.env.local` and `backend/.env` (see the `.en
 
 ### Neon
 
-Both halves point at Neon (`neondb`, Postgres 18). Four things to know, each learned the hard way:
+Both halves point at Neon (`neondb`, Postgres 18). Since 27 Nov 2026 that is a Neon project in **AWS Singapore (ap-southeast-1)**, the closest Neon region to India (Neon has no Mumbai). It was started empty; the earlier Ohio (us-east-2) project still holds the old test accounts and runs. Measured from India: a query takes ~61 ms (Ohio 245-870 ms), opening a connection ~0.45 s (Ohio ~3 s), login 0.35 s (Ohio 8.3 s), dashboard pages 0.13-0.23 s (Ohio 0.55-1.1 s). Host the app servers in Singapore or Mumbai too, or the distance comes back. Four things to know, each learned the hard way:
 
 - **Use the UNPOOLED host** — the one *without* `-pooler`. Both halves keep their own connection pool, so they gain nothing from Neon's pooler, and the pooler actively breaks two things. It runs PgBouncer in transaction mode and does not reset session state between clients, so one `SET` leaks to everyone afterwards: restoring a `pg_dump` through it left `search_path` empty on every pooled connection, which made every unqualified query fail. It also rejects `options=-c search_path=...` outright, so that leak cannot be worked around from the client.
 - **`search_path`** is set as a role default: `ALTER ROLE neondb_owner IN DATABASE neondb SET search_path = "$user", public`. Queries in `web/lib/` are unqualified and rely on it; `engine.debates` is always written out in full.
@@ -200,7 +200,7 @@ cd backend
 .venv/bin/python -m pytest -q
 ```
 
-55 tests across `test_deals.py`, `test_internal_auth.py`, `test_numbers.py`, `test_prototype.py`, and `test_store.py` (51 on the fake AI provider + file store, plus 4 Postgres persistence tests when `pitch_panchayat_test` is present): personas, speaking-order supervisor, rupee arithmetic & anti-repetition checks, deal-table terms & counters, all three modes end to end, batched crowds, quality rules against real bad replies, SSRF scraper guards, internal token auth, and HTTP API + share-link replay.
+110 tests in `backend/tests/` (all on the fake AI provider and file store, plus 4 Postgres persistence tests when `pitch_panchayat_test` is present): personas, speaking-order supervisor, rupee arithmetic & anti-repetition checks, deal-table terms & counters, all three modes end to end, batched crowds, quality rules against real bad replies, SSRF scraper guards, internal token auth, HTTP API + share-link replay, and the fixes from the first real web run (`test_p1_fixes.py`: crowd matched to the target market, verdict reasons that follow the votes, no "never described" for something the founder said, at most 2 shark walk-outs per round).
 
 ### Web (`web/`)
 ```bash
@@ -250,7 +250,7 @@ backend/
     api.py, main.py
   personas/         sharks/, roasters/, janta/dimensions.yaml
   scripts/          model_bakeoff.py, crowd_label_test.py, crowd_sensitivity_test.py
-  tests/            55 pytest unit & integration tests
+  tests/            110 pytest unit & integration tests
 db/migrations/      PostgreSQL schema (public.* and engine.*)
 docs/               Architecture, data flow, API, pricing, and experiments (+ pdf/)
 reports/            Live run evaluations and quality-fix reports

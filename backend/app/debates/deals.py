@@ -11,18 +11,19 @@ agreed. An accepted counter uses the founder's numbers, never a model's retellin
 """
 import asyncio
 import logging
+import re
 import time
 
 from .. import prompts
 from ..budget import BudgetExceeded, TokenBudget
 from ..llm.base import LLMError, complete_typed
 from ..llm.factory import LLMs
-from ..llm.quality import repeats_point, require_text
+from ..llm.quality import ignores_record, record_error, repeats_point, require_text
 from ..models import OfferTerms, SharkCounterReply, SharkOffer, SharkRaise
 from ..personas import Persona
 from ..sessions import DebateSession
 from ..settings import Settings
-from . import numbers
+from . import metrics, numbers
 
 log = logging.getLogger(__name__)
 
@@ -67,6 +68,33 @@ def check_terms(t: dict, ask: dict) -> None:
         raise ValueError(f"interest can be at most {MAX_INTEREST}% a year")
 
 
+# A sentence that calls the valuation too high, in English or Hinglish.
+_VALUATION = re.compile(r"\bvaluations?\b|\bvaluing\b", re.IGNORECASE)
+_TOO_HIGH = re.compile(
+    r"too (high|much|rich|steep)|\bhigh\b|\bsteep\b|inflated|crazy|unjustified|"
+    r"not justified|out of line|\bexpensive\b|\bpagalpan\b|\bbakwaas\b|\bgalat\b|"
+    r"\bzyada\b|\bmehe?nga\b|nahi maan|can'?t accept|cannot accept|\brisky\b",
+    re.IGNORECASE)
+
+
+def calls_valuation_too_high(message: str) -> bool:
+    return any(_VALUATION.search(s) and _TOO_HIGH.search(s)
+               for s in re.split(r"(?<=[.!?।])\s+", message))
+
+
+def check_valuation_stance(message: str, terms: dict, ask: dict) -> None:
+    """A shark who calls the founder's valuation too high must offer a lower one. In the
+    deal-table replay (27 Nov 2026), 4 of 6 offers kept the ₹5 crore valuation the same
+    sharks had just called "pagalpan" and only raised the money."""
+    worth = prompts.valuation_lakh(terms["investment_lakh"], terms["equity_pct"])
+    if worth and worth >= ask["valuation_lakh"] and calls_valuation_too_high(message):
+        raise ValueError(
+            f"you said the valuation is too high, but your offer values the company at "
+            f"{prompts.money(worth)}, no lower than the founder's "
+            f"{prompts.money(ask['valuation_lakh'])}. Ask for more equity for your money, or "
+            "say why the price is acceptable to you after all")
+
+
 def is_better(new: dict, old: dict) -> bool:
     """Better for the founder: nothing got worse and something got better."""
     def score(t: dict) -> tuple[float, ...]:  # every entry: higher is better for the founder
@@ -74,6 +102,29 @@ def is_better(new: dict, old: dict) -> bool:
                 -t["royalty_pct"], -t["debt_interest_pct"], -t["royalty_until_lakh"])
     pairs = list(zip(score(new), score(old), strict=True))
     return all(n >= o for n, o in pairs) and any(n > o for n, o in pairs)
+
+
+_TERM_LABELS = {"investment_lakh": "equity money (lakh)", "equity_pct": "equity %",
+                "debt_lakh": "debt (lakh)", "debt_interest_pct": "interest %",
+                "royalty_pct": "royalty %", "royalty_until_lakh": "royalty cap (lakh)"}
+
+
+def check_between(revised: dict, original: dict, counter: dict) -> None:
+    """A revised offer after the founder's counter must sit between the shark's original
+    offer and the counter, term by term. On the first real counter that got an answer
+    (27 Nov 2026) Farah's "final offer" was 40 lakh for 20%, worse for the founder than her
+    original 16%, after a counter of 10%."""
+    if all(revised[k] == original[k] for k in TERM_KEYS):
+        raise ValueError("that is your original offer unchanged: choose \"hold\" instead")
+    if all(revised[k] == counter[k] for k in TERM_KEYS):
+        raise ValueError("those are exactly the founder's terms: choose \"accept\" instead")
+    for k in TERM_KEYS:
+        low, high = sorted((original[k], counter[k]))
+        if not low <= revised[k] <= high:
+            raise ValueError(
+                f"a revised offer must sit between your offer and the founder's counter on "
+                f"every term, but your {_TERM_LABELS[k]} is {revised[k]:g}, outside "
+                f"{low:g} to {high:g}. Meet the founder part of the way, or choose \"hold\"")
 
 
 def terms_values(terms: dict) -> set[float]:
@@ -100,11 +151,15 @@ class Table:
         self.sharks = {p.id: p for p in sharks}
         self.pitch, self.ask, self.transcript = pitch, ask, transcript
         # Figures established in the debate. No maths happens here, so this only grows with
-        # what the offers themselves put on the table.
-        self.allowed = set(allowed or ())
+        # what the offers and the founder's counter put on the table. Shared with the caller
+        # (not copied), so the judge may quote them: on the first real deal (27 Nov 2026) the
+        # verdict said "Rs 36 lakh" for the accepted offer, was rejected 3 times as an unknown
+        # figure, and the run fell back to a generic verdict.
+        self.allowed = allowed if allowed is not None else set()
         self.said: list[tuple[str, str]] = []  # (shark id, message) at the table
         self.offers: dict[str, dict] = {}
         self.stances: dict[str, str] = {}  # facts for the verdict
+        self.debate_stances: dict[str, str] = {}  # where each shark ended the debate
         self.budget = TokenBudget(s.deal_reserve_tokens)
         session.budgets.append(self.budget)
 
@@ -123,6 +178,19 @@ class Table:
         for offer in (*self.standing, *proposed):
             allowed |= terms_values(offer)
         numbers.check_message(out.message, allowed)
+        topic = ignores_record(out.message, [self.pitch, *self.answers])
+        if topic:
+            raise ValueError(record_error(topic))
+        mixup = numbers.unit_mixup(out.message, [self.pitch, *self.answers])
+        if mixup:
+            raise ValueError(mixup)
+        wrong_payback = metrics.payback_error(out.message, [self.pitch, *self.answers])
+        if wrong_payback:
+            raise ValueError(wrong_payback)
+
+    @property
+    def answers(self) -> list[str]:
+        return [text for who, text in self.transcript if who == "Founder"]
 
     async def ask_shark(self, shark: Persona, user: str, output, check):
         """One deal-table call. None if the model couldn't produce a valid move."""
@@ -161,11 +229,13 @@ class Table:
                 terms = tidy(out.terms.model_dump())
                 if out.decision == "offer":
                     check_terms(terms, self.ask)
+                    check_valuation_stance(out.message, terms, self.ask)
                 self.speech_check(shark, out, terms)
 
             out = await self.ask_shark(
-                shark, prompts.offer_user(self.pitch, self.ask, self.transcript,
-                                          self.standing, shark.name), SharkOffer, check)
+                shark, prompts.offer_user(self.pitch, self.ask, self.transcript, self.standing,
+                                          shark.name, self.debate_stances.get(shark.id)),
+                SharkOffer, check)
             if out is None:
                 await self.session.emit("notice", text=f"{shark.name} didn't make a move.")
                 continue
@@ -268,6 +338,7 @@ class Table:
                       "royalty_until_lakh": offer["royalty_until_lakh"]
                       or move["investment_lakh"]}))
             await self.session.emit("founder_deal", action="counter", offer=counter)
+            self.allowed |= terms_values(counter)
             self.transcript.append(("Founder", f"My counter to {' and '.join(offer['names'])}: "
                                                f"{prompts.terms_text(counter)}."))
             if await self.answer_counter(offer, counter):
@@ -282,7 +353,13 @@ class Table:
             revised = tidy(out.terms.model_dump())
             if out.decision == "revise":
                 check_terms(revised, self.ask)
-            self.speech_check(shark, out, revised if out.decision == "revise" else counter)
+                check_between(revised, {k: offer[k] for k in TERM_KEYS},
+                              {k: counter[k] for k in TERM_KEYS})
+            # The founder's counter is on the table whatever the shark decides: on the first
+            # real counter (27 Nov 2026) a revising shark quoted its "₹3 crore" valuation and
+            # the reply was rejected, because only the revised terms counted.
+            proposed = (counter, revised) if out.decision == "revise" else (counter,)
+            self.speech_check(shark, out, *proposed)
 
         try:
             out = await self.ask_shark(
@@ -312,7 +389,10 @@ class Table:
     async def close(self, reason: str, offer: dict | None = None) -> None:
         await self.session.emit("deal", outcome="deal" if offer else "no_deal",
                                 reason=reason, offer=offer)
-        self.transcript.append(("Result", f"Deal: {prompts.terms_text(offer)}" if offer
+        # Name whose offer it was: with only the terms, the judge gave Farah's accepted deal to
+        # Vikram as his reason (first real deal, 27 Nov 2026).
+        self.transcript.append(("Result", f"Deal with {' and '.join(offer['names'])}: "
+                                          f"{prompts.terms_text(offer)}" if offer
                                 else f"No deal ({reason})."))
 
 
@@ -323,6 +403,7 @@ async def run_table(session: DebateSession, llms: LLMs, s: Settings,
     """Runs the whole deal stage, appending to `transcript`. Returns the stances that are now
     facts: invest for sharks with an offer, pass for those who declined or withdrew."""
     table = Table(session, llms, s, sharks, pitch, ask, transcript, allowed)
+    table.debate_stances = dict(stances)
     still_in = [p for p in sharks if p.id not in gone]
     still_in.sort(key=lambda p: KEENEST_FIRST.get(stances.get(p.id, "maybe"), 1))
     if still_in:

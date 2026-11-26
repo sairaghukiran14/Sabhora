@@ -27,12 +27,19 @@ const cols = [
       { href: "/forgot-password", label: "Reset password" },
     ],
   },
+  {
+    title: "Legal",
+    links: [
+      { href: "/terms", label: "Terms of use" },
+      { href: "/privacy", label: "Privacy policy" },
+    ],
+  },
 ];
 
 export default function Footer() {
   return (
     <footer className="border-t border-edge bg-surface">
-      <Container className="grid gap-10 py-12 sm:py-16 md:grid-cols-[1.4fr_repeat(3,1fr)]">
+      <Container className="grid gap-10 py-12 sm:py-16 md:grid-cols-[1.4fr_repeat(4,1fr)]">
         <div className="max-w-xs">
           <Logo />
           <p className="mt-4 text-sm leading-relaxed text-muted">

@@ -108,3 +108,130 @@ def require_text(field: str, *texts: str, min_words: int = 3) -> None:
         if not is_real_text(t, min_words):
             raise ValueError(f"{field} must be real, specific content written for this case, "
                              "not a placeholder or a repeat of the instructions")
+
+
+# ---------- "You never told us X" when the record says X ----------
+# On the first real web run (26 Nov 2026) the founder answered "Kitchens are FSSAI
+# registered" and gave food and delivery cost per meal, yet a shark kept calling the
+# compliance process and the unit economics "a black box", the judge listed "no FSSAI
+# process was described" as a top risk, and the shark repeated it in chat.
+
+# Words that claim something is missing, in English and Hinglish.
+_MISSING = re.compile(
+    r"\bnot (?:been |yet )?(?:described|mentioned|shared|explained|given|provided|disclosed|told)\b"
+    r"|\b(?:didn'?t|did not|haven'?t|have not|never) (?:say|share|mention|explain|describe|give|tell|show)"
+    r"|\bno (?:clear |real |hard )?(?:data|details?|information|clarity|breakdown|numbers|proof)\b"
+    r"|\b(?:was|were|has been|have been) (?:not )?(?:described|mentioned|shared)\b"
+    r"|\bblack box\b|\bbina\b|\bwithout\b|\bmissing\b|\bunknown\b|\black(?:s|ing)?\b"
+    r"|\bnahi[n]? (?:bataya|batayi|bataye|diya|di|dikha|dikhaya|samjhaya|pata)\b"
+    r"|\bkoi (?:data|process|breakdown|proof) nahi",
+    re.IGNORECASE)
+# Topics a shark calls missing, and words that show the record covers them. Retention,
+# churn and repeat purchase are left out on purpose: replaying the real runs, "no repeat
+# data outside the IT parks" and "retention strategy is a black box" were fair points that
+# a month-2 renewal figure does not answer.
+_TOPICS = {
+    "unit economics": ("margin", "cost", "per meal", "per order", "per unit", "cac", "payback"),
+    "margin": ("margin",),
+    "payback": ("payback", "paid back", "pays back"),
+    "revenue": ("revenue", "mrr", "arr", "sales"),
+}
+_ACRONYM = re.compile(r"\b[A-Z]{3,6}\b")
+_NOT_TOPICS = {"AND", "THE", "NOT", "YOU", "OUT", "BUT", "FOR"}
+_WINDOW = 60  # characters either side of the "missing" words
+
+
+def record_error(topic: str) -> str:
+    return (f"the founder already covered {topic} in the pitch or their answers. Quote what "
+            "they said and say whether it convinces you, instead of calling it missing")
+
+
+def ignores_record(text: str, record: Iterable[str]) -> str | None:
+    """The topic `text` calls missing although `record` (the pitch, the founder's answers)
+    covers it, or None. A topic quoted with its number ("CAC of 900") is a reference, not a
+    claim that it is missing, so it doesn't count."""
+    rec = " ".join(record).lower()
+    for m in _MISSING.finditer(text):
+        lo, hi = max(0, m.start() - _WINDOW), m.end() + _WINDOW
+        window = text[lo:hi]
+        for a in _ACRONYM.finditer(window):
+            term = a.group()
+            after = window[a.end():a.end() + 15]
+            if term in _NOT_TOPICS or re.search(r"\d", after):
+                continue
+            if re.search(rf"\b{term.lower()}\b", rec):
+                return term
+        low = window.lower()
+        for topic, evidence in _TOPICS.items():
+            at = low.find(topic)
+            if at < 0 or re.search(r"\d", low[at + len(topic):at + len(topic) + 15]):
+                continue
+            if any(e in rec for e in evidence):
+                return topic
+    return None
+
+
+# ---------- the same objection from the whole panel ----------
+# Third real run (27 Nov 2026): four of five sharks said "zero switching cost against Swiggy
+# and Zomato". repeats_point compares whole turns, so one shared argument inside otherwise
+# different turns got through. A general phrase-overlap rule flagged 12 of 22 real turns
+# (mostly harmless shared words), so this is a short list of objection catchphrases seen on
+# real runs: once two sharks have made one, a third may not.
+
+OBJECTIONS = {
+    "switching cost": r"switching cost|zero lock-?in",
+    "moat": r"\bmoat\b|defensib",
+    "wrapper": r"\bwrapper\b",
+    "easy to copy": r"copy kar|can copy|copy (?:it|this|you|your)",
+    "single point of failure": r"single[- ]point[- ]of[- ]failure",
+    "black box": r"black box",
+    "one-city limit": r"travel kar|beyond (?:one|the first|your first) city|ek hi city|single[- ]city",
+}
+MAX_SHARKS_PER_OBJECTION = 2
+
+
+def taken_objections(transcript: Iterable[tuple[str, str]]) -> dict[str, set[str]]:
+    """Objection -> the sharks who already made it (the founder raising it doesn't count)."""
+    used: dict[str, set[str]] = {}
+    for who, text in transcript:
+        if who == "Founder":
+            continue
+        for name, rx in OBJECTIONS.items():
+            if re.search(rx, text, re.IGNORECASE):
+                used.setdefault(name, set()).add(who)
+    return used
+
+
+def crowded_objection(text: str, speaker: str, transcript: list[tuple[str, str]]) -> str | None:
+    """An error message if `speaker` makes an objection that two other sharks already made."""
+    founder = " ".join(t for w, t in transcript if w == "Founder")
+    for name, sharks in taken_objections(transcript).items():
+        others = sharks - {speaker}
+        rx = OBJECTIONS[name]
+        if len(others) >= MAX_SHARKS_PER_OBJECTION and re.search(rx, text, re.IGNORECASE) \
+                and not re.search(rx, founder, re.IGNORECASE):
+            return (f"'{name}' has already been argued by {' and '.join(sorted(others))}. Leave "
+                    "it to them and judge this pitch through what you personally care about")
+    return None
+
+
+# ---------- places nobody mentioned ----------
+# Real runs: Ananya named "Indore aur Patna" (from her old persona example) and later "Meerut ya
+# Kochi" in a Pune-only pitch, even after a prompt rule against it. A shark may name a city
+# only if the pitch or the founder did.
+INDIAN_CITIES = (
+    "Mumbai Delhi Bengaluru Bangalore Chennai Hyderabad Kolkata Pune Ahmedabad Surat Jaipur "
+    "Lucknow Kanpur Nagpur Indore Bhopal Patna Vadodara Ludhiana Agra Nashik Meerut Rajkot "
+    "Varanasi Srinagar Aurangabad Amritsar Ranchi Coimbatore Madurai Kochi Cochin Vijayawada "
+    "Visakhapatnam Guwahati Bhubaneswar Chandigarh Mysuru Mysore Gwalior Jodhpur Raipur Kota "
+    "Bareilly Dehradun Noida Gurgaon Gurugram Thane Siliguri Guntur Rohtak Udaipur Jabalpur "
+    "Allahabad Prayagraj Thiruvananthapuram Mangaluru Mangalore Hubli Belgaum Goa Shimla"
+).split()
+
+
+def unmentioned_city(text: str, record: Iterable[str]) -> str | None:
+    rec = " ".join(record).lower()
+    for city in INDIAN_CITIES:
+        if re.search(rf"\b{city}\b", text) and city.lower() not in rec:
+            return city
+    return None

@@ -234,10 +234,13 @@ def crowd_batch_model(ids: list[str]) -> type[BaseModel]:
 
 
 class JantaSummary(BaseModel):
-    reasons_for: list[Point] = Field(min_length=3, max_length=3,
-                                     description="Top 3 reasons people agreed")
-    reasons_against: list[Point] = Field(min_length=3, max_length=3,
-                                         description="Top 3 reasons people disagreed")
+    # 0-3, not exactly 3: with 0 agrees, a fixed 3 made the judge invent "reasons people
+    # agreed" from unsure and disagreeing people (real run, 26 Nov 2026). janta.summary_check
+    # ties each count to how many people actually voted that way.
+    reasons_for: list[Point] = Field(min_length=0, max_length=3, description=(
+        "Up to 3 reasons from people who voted agree. Empty if nobody agreed"))
+    reasons_against: list[Point] = Field(min_length=0, max_length=3, description=(
+        "Up to 3 reasons from people who voted disagree. Empty if nobody disagreed"))
     advice: list[Point] = Field(min_length=3, max_length=3,
                                 description="Top 3 changes the crowd suggested")
     headline: str = Field(min_length=15, description="One-line verdict of the crowd, written last")

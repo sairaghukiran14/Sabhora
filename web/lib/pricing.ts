@@ -64,8 +64,8 @@ export const PLANS = [
     price: "₹499",
     period: "per month",
     blurb: "For founders testing ideas every week.",
-    features: ["600 credits every month", "Janta with up to 100 people", "Bring your own API key", "Priority runs"],
-    cta: "Go Pro",
+    features: ["600 credits every month", "Janta with up to 100 people", "Bring your own API key (coming soon)"],
+    cta: "Coming soon",
     featured: true,
   },
   {
@@ -74,8 +74,8 @@ export const PLANS = [
     price: "₹1,999",
     period: "per month",
     blurb: "For studios and accelerators.",
-    features: ["3,000 credits every month", "Deep segment breakdowns", "Early access to new rooms"],
-    cta: "Go Deep",
+    features: ["3,000 credits every month", "Janta with up to 100 people", "Early access to new rooms"],
+    cta: "Coming soon",
   },
 ];
 

@@ -2,18 +2,41 @@ import type { Metadata } from "next";
 import NextLink from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
+import { cache } from "react";
 import { getPublicRun } from "@/lib/dal";
+import { sharePreview } from "@/lib/share";
 import { ROOMS } from "@/lib/pricing";
 import RunView from "@/components/app/RunView";
 import { Arrow } from "@/components/icons";
 import { btn, Container, formatDate, Logo, RoomBadge } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Shared verdict · Sabhora", robots: { index: false } };
+// One database read per request, shared by generateMetadata and the page. Safe to cache:
+// getPublicRun reads no cookies.
+const publicRun = cache(getPublicRun);
+
+/** What WhatsApp, LinkedIn and X show when the link is pasted. These crawlers get the
+ * metadata in <head> before the page streams (Next's htmlLimitedBots list). The preview
+ * image is ./opengraph-image.tsx. Share pages stay out of search engines. */
+export async function generateMetadata({ params }: { params: Promise<{ shareId: string }> }): Promise<Metadata> {
+  const run = await publicRun((await params).shareId);
+  if (!run) return { title: "Shared verdict · Sabhora", robots: { index: false } };
+  const p = sharePreview(run);
+  const title = `${p.room}: ${p.title}`;
+  const description = [p.figure && `${p.figure} ${p.figureNote}.`, p.line, "AI-simulated panel on Sabhora."]
+    .filter(Boolean).join(" ");
+  return {
+    title: `${title} · Sabhora`,
+    description,
+    robots: { index: false },
+    openGraph: { title, description, type: "article", siteName: "Sabhora", locale: "en_IN" },
+    twitter: { card: "summary_large_image", title, description },
+  };
+}
 
 export default async function SharedVerdict({ params }: { params: Promise<{ shareId: string }> }) {
   await connection();
   const { shareId } = await params;
-  const run = await getPublicRun(shareId);
+  const run = await publicRun(shareId);
   if (!run) notFound();
 
   return (

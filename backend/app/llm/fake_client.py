@@ -174,10 +174,14 @@ class FakeClient:
                 return one(*people[0][1:]) if people else one("30", "shopper", "Pune")
             return {pid: one(age, job, city) for pid, age, job, city in people}
         if kind == "JantaSummary":
+            def count(vote: str) -> int:  # one reason per voter, up to 3 (like the real rule)
+                found = re.search(rf"'{vote}': (\d+)", user)
+                return min(3, int(found.group(1))) if found else 3
             return {"headline": "The crowd is split: useful, but price-sensitive.",
-                    "reasons_for": ["It saves people time", "Solves a real daily pain", "Easy to explain quickly"],
+                    "reasons_for": ["It saves people time", "Solves a real daily pain",
+                                    "Easy to explain quickly"][:count("agree")],
                     "reasons_against": ["People hate more subscriptions", "They don't trust it yet",
-                                        "Offline habits are strong"],
+                                        "Offline habits are strong"][:count("disagree")],
                     "advice": ["Offer a free tier first", "Add proper Hindi language support", "Start in just one city"]}
         if kind == "RoastReview":
             def score() -> int:

@@ -19,6 +19,7 @@ from .llm.factory import LLMs
 from .llm.quality import require_text
 from .models import ChatRequest, chat_reply_model
 from .personas import generate_crowd, load_roasters, load_sharks
+from .targeting import find_target
 
 # Things a persona must never say about themselves
 _BREAKS_CHARACTER = re.compile(r"\b(as an ai|language model|i am an ai|i'm an ai|simulation|"
@@ -39,7 +40,7 @@ def _events(snapshot: dict, type_: str) -> list[dict]:
     return [e for e in snapshot["events"] if e["type"] == type_]
 
 
-def find_persona(snapshot: dict, persona_id: str) -> ChatPersona:
+def find_persona(snapshot: dict, persona_id: str, show_attitude: bool = False) -> ChatPersona:
     """Build the persona and their memory of the debate. Raises LookupError if not found."""
     mode = snapshot["mode"]
     if mode == "janta":
@@ -47,7 +48,10 @@ def find_persona(snapshot: dict, persona_id: str) -> ChatPersona:
         stored = next((p for p in start.get("crowd", []) if p["id"] == persona_id), None)
         if stored is None:
             raise LookupError(persona_id)
-        person = next(p for p in generate_crowd(start["size"]) if p.id == persona_id)
+        # Rebuild the same crowd the debate used: targeted at the pitch's market, if any
+        target = find_target(snapshot.get("request", {}).get("pitch", ""))
+        person = next(p for p in generate_crowd(start["size"], cities=target.cities,
+                                               jobs=target.jobs) if p.id == persona_id)
         # The debate's own record wins for the basics (older runs predate age fixes)
         person = person.model_copy(update={k: stored[k] for k in ("name", "age", "city",
                                                                   "occupation") if k in stored})
@@ -55,7 +59,7 @@ def find_persona(snapshot: dict, persona_id: str) -> ChatPersona:
                 if e["persona_id"] == persona_id]
         return ChatPersona("crowd", persona_id, person.name,
                            f"{person.age}, {person.occupation}, {person.city}",
-                           prompts.chat_system_crowd(person.one_line(), said),
+                           prompts.chat_system_crowd(person.one_line(show_attitude=show_attitude), said),
                            said[-1][1] if said else None)
     if mode == "sharks":
         shark = next((s for s in load_sharks() if s.id == persona_id), None)

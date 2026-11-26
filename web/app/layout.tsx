@@ -23,9 +23,19 @@ const deva = Noto_Sans_Devanagari({
 });
 
 export const metadata: Metadata = {
+  // Absolute base for preview images and links. Set SITE_URL to the public address in production.
+  metadataBase: new URL(process.env.SITE_URL || "http://localhost:3100"),
   title: "Sabhora — hear the doubts before you build",
   description:
-    "Put your idea before an AI panel. Sharks debate it, a simulated crowd reacts, and reviewers critique your landing page. A fast way to find the objections to test with real people."
+    "Put your idea before an AI panel. Sharks debate it, a simulated crowd reacts, and reviewers critique your landing page. A fast way to find the objections to test with real people.",
+  openGraph: {
+    title: "Sabhora — hear the doubts before you build",
+    description: "AI investor, crowd and reviewer personas tell you what may push back on your idea, before you test it with real people.",
+    siteName: "Sabhora",
+    locale: "en_IN",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 // Light is the hard default; dark is a persisted opt-in. This runs before paint

@@ -119,7 +119,7 @@ async def test_janta_crowd_of_30(settings):
     assert t.count("reaction") == 30 + round2["asked"]
     verdict = next(e for e in session.events if e["type"] == "verdict")
     assert verdict["tally"]["total"] == 30
-    assert set(verdict["segments"]) == {"City tier", "Age", "Attitude", "Phone use"}
+    assert set(verdict["segments"]) == {"City tier", "Age", "Phone use"}  # attitude hidden by default
     assert len(verdict["summary"]["advice"]) == 3  # the judge's summary, not the fallback
     assert "error" not in t
 
@@ -169,7 +169,7 @@ def test_quality_checks_reject_bad_replies():
                 "I pause, looking at the founder with a calm, analytical gaze."):
         with pytest.raises(ValueError):  # model_construct: test the check, not the schema
             check(SharkTurn.model_construct(message=bad, stance="maybe", confidence=5))
-    check(SharkTurn(message="Forty shops in one city is a pilot, not traction. Show me Patna.",
+    check(SharkTurn(message="Forty shops in one city is a pilot, not traction. Show me a second city.",
                     out=False, stance="pass", confidence=8))
     assert clean_message("Your margin is pocket change. Stance: Pass Confidence: 9/10") == \
         "Your margin is pocket change."

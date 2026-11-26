@@ -130,3 +130,46 @@ def test_nobody_takes_a_position_in_round_one():
     round_check(1, base)(turn("How many of the 40 shops reordered twice without a reminder?"))
     round_check(2, base)(turn("Still no proof of a second order, so I am passing on this.",
                               stance="pass"))
+
+
+# ---------- second real web run (27 Nov 2026) ----------
+# 5 of 15 shark turns were dropped for CORRECT figures done in the head, and two sharks
+# called 25 meals of payback "25 months" and "25 weeks".
+
+DABBA = ("DabbaDost: tiffins for working professionals in Pune. Rs 3,200 a month for 22 "
+         "lunches. 180 paying subscribers after 5 months, 64% renew month 2. Food cost Rs 85 "
+         "per meal, delivery Rs 18 per meal.")
+DABBA_ANSWER = ("Unit economics: revenue per meal is Rs 145 (3200/22). Food 85 + delivery 18 + "
+                "packaging 6 = Rs 109, so Rs 36 gross margin per meal. CAC is Rs 900.")
+
+
+def dabba_allowed() -> set[float]:
+    arjun = Calc(expression="180 * 0.64", value=115.2)  # his shown working, said as "115"
+    return (numbers.established(DABBA, [DABBA_ANSWER], ASK) | numbers.check_calcs([arjun]))
+
+
+@pytest.mark.parametrize("said", ["₹5,76,000 a month", "576000 rupees", "6480 rupees margin",
+                                  "₹4,140 a month", "about ₹6,500 a month"])
+def test_correct_mental_arithmetic_on_the_record_passes(said):
+    numbers.check_message(said, dabba_allowed())  # 180x3200, 180x36, 115x36, ~180x36
+
+
+def test_invented_figures_still_fail_one_step_matching():
+    allowed = numbers.established(PITCH, [ANSWER], ASK)
+    with pytest.raises(ValueError):
+        numbers.check_message("₹4,812 a month", allowed)  # 18 x 299 is 5,382
+    numbers.check_message("₹5,382 a month", allowed)
+    with pytest.raises(ValueError):
+        numbers.check_message("₹6,483 a month", dabba_allowed())  # precise, but not 6,480
+
+
+def test_meals_called_months_are_caught():
+    record = [DABBA, DABBA_ANSWER]
+    for wrong in ["Rs 36 gross margin per meal mein Rs 900 CAC nikalne par payback period "
+                  "25 months banta hai",
+                  "900 / 36 = 25 meals banta hai, matlab 25 weeks, not 5 weeks."]:
+        assert "number of meals" in numbers.unit_mixup(wrong, record)
+    for fine in ["25 / 22 = 1.14 months, yaani lagbhag 5 weeks hai",  # Farah, correct
+                 "After 5 months you have 180 subscribers",
+                 "36% churn ka matlab hai 8 mahine mein aadha customer chala jayega"]:
+        assert numbers.unit_mixup(fine, record) is None, fine

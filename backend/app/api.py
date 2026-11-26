@@ -155,7 +155,7 @@ async def chat(debate_id: str, body: ChatRequest, request: Request) -> dict:
         raise HTTPException(503, "Today's free capacity is used up. Add your own API key, "
                                  "or come back tomorrow.")
     try:
-        persona = find_persona(snapshot, body.persona_id)
+        persona = find_persona(snapshot, body.persona_id, s.janta_show_attitude)
     except LookupError as err:
         raise HTTPException(404, "Nobody with that id took part in this debate") from err
     try:

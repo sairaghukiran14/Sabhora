@@ -41,19 +41,27 @@ class CrowdPersona(BaseModel):
     pains: list[str] = []
     phone: str = ""
     phone_label: str = ""
+    # Set only when the pitch names a market (app/targeting.py): is this person in it?
+    in_market: bool | None = None
 
-    def one_line(self) -> str:
+    def one_line(self, show_attitude: bool = True) -> str:
         """The profile used in prompts. Starts '[id] Name, age, job in City' (the fake
         provider parses that); attitude comes LAST and as a tendency, so the facts about
-        the person's life carry more weight than the label."""
+        the person's life carry more weight than the label.
+
+        show_attitude=False leaves the label out (the app's default, JANTA_SHOW_ATTITUDE):
+        shown, it decided most votes in docs/05 (early adopters gave 59 of 90 agrees, 9 of
+        90 hidden). The attitude still shaped the person's phone habits."""
         base = (f"[{self.id}] {self.name}, {self.age}, {self.occupation} in {self.city} "
                 f"(tier {self.city_tier}), {self.income}.")
         if not self.household:
-            return f"{base} {self.attitude}: {self.attitude_hint}"
-        return (f"{base} Home: {self.household}. Work: {self.work}. "
-                f"Already pays for: {self.pays_for}. Phone: {self.phone}. "
-                f"Pain points: {'; '.join(self.pains)}. "
-                f"General tendency: {self.attitude.lower()} ({self.attitude_hint}).")
+            return f"{base} {self.attitude}: {self.attitude_hint}" if show_attitude else base
+        facts = (f"{base} Home: {self.household}. Work: {self.work}. "
+                 f"Already pays for: {self.pays_for}. Phone: {self.phone}. "
+                 f"Pain points: {'; '.join(self.pains)}.")
+        if not show_attitude:
+            return facts
+        return f"{facts} General tendency: {self.attitude.lower()} ({self.attitude_hint})."
 
     @property
     def age_band(self) -> str:
@@ -90,17 +98,33 @@ def load_roasters() -> tuple[Persona, ...]:
 
 
 @lru_cache
-def generate_crowd(size: int = 50, seed: int = 42) -> tuple[CrowdPersona, ...]:
-    """Mix the building blocks into `size` personas. Same seed -> same crowd."""
+def generate_crowd(size: int = 50, seed: int = 42, cities: tuple[str, ...] = (),
+                   jobs: tuple[str, ...] = ()) -> tuple[CrowdPersona, ...]:
+    """Mix the building blocks into `size` personas. Same seed -> same crowd.
+
+    With target `cities` and/or `jobs` (from app/targeting.py), the slots that
+    targeting.in_target picks are moved into them; everyone else is the usual even spread.
+    Without a target the crowd is exactly what it always was."""
+    from .targeting import in_target  # here, not at the top: targeting imports this module
     with open(PERSONAS_DIR / "janta" / "dimensions.yaml", encoding="utf-8") as f:
         dims = yaml.safe_load(f)
     rng = random.Random(seed)
     low, high = dims["age_range"]
     phone_levels = dims["phone_levels"]
     crowd = []
+    city_by_name = {c["name"]: c for c in dims["cities"]}
+    job_by_title = {o["title"]: o for o in dims["occupations"]}
     for i in range(size):
         city = dims["cities"][i % len(dims["cities"])]  # spread evenly across cities
         job = rng.choice(dims["occupations"])
+        targeted = bool(cities or jobs) and in_target(i)
+        if targeted:
+            # A separate generator, so the untargeted people keep their usual draws.
+            pick = random.Random(f"{seed}-target-{i}")
+            if cities:
+                city = city_by_name[cities[i % len(cities)]]
+            if jobs:
+                job = job_by_title[pick.choice(jobs)]
         attitude = dims["attitudes"][i % len(dims["attitudes"])]  # balanced attitudes
         age = rng.randint(18, 23) if job["title"] == "College student" else rng.randint(low, high)
         name = rng.choice(dims["first_names"][city["region"]])
@@ -121,6 +145,10 @@ def generate_crowd(size: int = 50, seed: int = 42) -> tuple[CrowdPersona, ...]:
             income=job["income"],
             attitude=attitude["label"],
             attitude_hint=attitude["hint"],
+            # From where they actually live and work: someone in the comparison group
+            # can still land in the target city by the usual spread.
+            in_market=((not cities or city["name"] in cities)
+                       and (not jobs or job["title"] in jobs)) if (cities or jobs) else None,
         )
         band = person.age_band
         weights = list(dims["phone_weights"][band])  # [power, daily, basic, feature]

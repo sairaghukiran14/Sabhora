@@ -44,8 +44,15 @@ export function SignupForm() {
         error={fe.terms}
         label={
           <>
-            I agree to the <span className="text-ink underline underline-offset-2">terms</span> and{" "}
-            <span className="text-ink underline underline-offset-2">privacy policy</span>.
+            I agree to the{" "}
+            <NextLink href="/terms" target="_blank" className="text-ink underline underline-offset-2">
+              terms
+            </NextLink>{" "}
+            and{" "}
+            <NextLink href="/privacy" target="_blank" className="text-ink underline underline-offset-2">
+              privacy policy
+            </NextLink>
+            , and I&apos;m 18 or older.
           </>
         }
       />

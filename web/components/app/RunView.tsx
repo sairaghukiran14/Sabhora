@@ -115,6 +115,8 @@ function ProgressBar({ value, label, onSkip }: { value: number; label: string; o
   );
 }
 
+type VerdictList = { title: string; items: string[]; tone: "good" | "risk" | "step" };
+
 function VerdictCard({
   figure,
   figureNote,
@@ -127,7 +129,7 @@ function VerdictCard({
   figureNote: string;
   label: string;
   summary?: string;
-  lists: { title: string; items: string[]; tone: "good" | "risk" | "step" }[];
+  lists: VerdictList[];
   children?: React.ReactNode;
 }) {
   return (
@@ -495,11 +497,12 @@ function JantaView({ state, active, verdictTop, chat }: ViewProps & { chat: Chat
       figure={`${final.would_pay_pct}%`}
       figureNote="would pay"
       label={summary.headline}
-      lists={[
-        { title: "Why people agreed", items: summary.reasons_for, tone: "good" },
-        { title: "Why people disagreed", items: summary.reasons_against, tone: "risk" },
-        { title: "What the crowd suggests", items: summary.advice, tone: "step" },
-      ]}
+      // A side nobody voted for has no reasons (the engine sends an empty list), so hide it.
+      lists={([
+        { title: "Why people agreed", items: summary.reasons_for ?? [], tone: "good" },
+        { title: "Why people disagreed", items: summary.reasons_against ?? [], tone: "risk" },
+        { title: "What the crowd suggests", items: summary.advice ?? [], tone: "step" },
+      ] satisfies VerdictList[]).filter((l) => l.items.length > 0)}
     >
       <VoteBar agree={final.agree} neutral={final.neutral} disagree={final.disagree} />
     </VerdictCard>
@@ -801,6 +804,12 @@ export default function RunView({ runId, mode, status, events: saved, error, cos
           </span>
         </p>
       )}
+      {/* Every run, live or shared: the panel is AI (IT Rules 2021 as amended in 2026 ask for
+          AI-generated content to be labelled; /terms promises this label). */}
+      <p className="flex items-center gap-1.5 text-[12px] text-faint">
+        <Info size={13} className="shrink-0" />
+        AI-generated. The panel is fictional personas, and the result is a simulation, not advice.
+      </p>
       {active && (
         <ProgressBar value={progress.value} label={(live && CONNECTION[connection]) || progress.label} onSkip={replay.playing ? replay.skip : undefined} />
       )}

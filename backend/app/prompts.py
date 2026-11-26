@@ -60,6 +60,10 @@ def facts_block(pitch: str, founder_answers: list[str], ask: dict | None) -> str
                      f"equity, which values the company at {money(ask['valuation_lakh'])}.")
     for i, answer in enumerate(founder_answers, 1):
         lines.append(f"- The founder answered after round {i}: {answer}")
+    from .debates.metrics import payback  # here: debates imports this module
+    pb = payback([pitch, *founder_answers])
+    if pb:
+        lines.append(f"- {pb.fact()}. Quote this; don't work out a payback another way.")
     return ("ESTABLISHED FACTS, all of it already said:\n" + "\n".join(lines) +
             "\nNever call any of this missing, unknown or not given, and never ask again "
             "for something answered here.\n")
@@ -78,7 +82,9 @@ def shark_system(shark: Persona, tone: str) -> str:
         "expression \"18 * 299\" with value 5382, then use that number in your message. "
         "Your arithmetic is recomputed here and the turn is rejected if it is wrong or if "
         "you state a figure you never established, so never estimate a total in your head. "
-        "A payback period is months, not a verdict: work it out before calling it long.\n"
+        "A payback period is months, not a verdict: work it out before calling it long. "
+        "Dividing by a per-meal (or per-order) figure gives a number of meals, not months: "
+        "turn it into time with how many a customer buys each month.\n"
         "- Be specific to THIS pitch: name the exact assumption, number, customer or "
         "competitor you doubt. Never give advice that would fit any startup.\n"
         "- Do not flatter. Your stance must follow from what the pitch and the conversation "
@@ -88,6 +94,8 @@ def shark_system(shark: Persona, tone: str) -> str:
         "- Add a point nobody has made yet. Another shark's doubt is not evidence and not "
         "your line: judge the pitch yourself, and never restate someone else's objection in "
         "your own words.\n"
+        "- Only name a city, region or customer group that the pitch or the founder "
+        "mentioned. A competitor may be named if it really operates in this market.\n"
         f"- Tone: {TONES.get(tone, TONES['roast'])}\n"
         "- Use your own way of speaking. Where it includes Hinglish, write it in Latin "
         "script, mix it naturally and keep business terms in English. You are an original "
@@ -97,6 +105,9 @@ def shark_system(shark: Persona, tone: str) -> str:
         "- out: set true only if you are leaving this pitch for good. Never in round 1. When "
         "you leave, say \"I'm out\" and give the one specific reason, and set stance to "
         "pass. Leave only when you truly could not invest on any terms.\n"
+        "- Other sharks leaving is not a reason for you to leave. Good investors often find "
+        "their deal exactly where others pass, and a weak point can be priced into the terms "
+        "(more equity, debt or a royalty) instead of ending the conversation.\n"
         "Return your message, whether you are out, your current stance (invest, maybe or "
         "pass) and your confidence in that stance from 1 to 10."
     )
@@ -104,10 +115,15 @@ def shark_system(shark: Persona, tone: str) -> str:
 
 def shark_user(pitch: str, transcript: list[tuple[str, str]], rnd: int, rounds: int,
                shark_name: str, ask: dict | None = None) -> str:
+    from .llm.quality import MAX_SHARKS_PER_OBJECTION, taken_objections
     convo = "\n".join(f"{who}: {text}" for who, text in transcript) or "(nobody has spoken yet)"
     answers = [text for who, text in transcript if who == "Founder"]
+    taken = [f"{name} ({', '.join(sorted(who))})" for name, who in taken_objections(transcript).items()
+             if len(who - {shark_name}) >= MAX_SHARKS_PER_OBJECTION]
+    closed = (f"POINTS ALREADY MADE BY TWO SHARKS (do not make them again): {'; '.join(taken)}\n\n"
+              if taken else "")
     return (f"{facts_block(pitch, answers, ask)}\nROUND {rnd} of {rounds}.\n\n"
-            f"CONVERSATION SO FAR:\n{convo}\n\n"
+            f"CONVERSATION SO FAR:\n{convo}\n\n{closed}"
             f"Now reply as {shark_name}, with the exact words you say to the founder.")
 
 
@@ -118,8 +134,13 @@ def deal_system(shark: Persona) -> str:
         f"{_persona_block(shark)}\nRisk appetite: {shark.risk_appetite}.\n\n"
         "The questioning on Sabhora is over and the sharks are now talking money.\n"
         "Rules:\n"
-        "- Decide as yourself, from your thesis and from what this debate actually showed. "
-        "Going out is a good answer if your doubts were not resolved.\n"
+        "- Decide as yourself, from your thesis and from what this debate actually showed.\n"
+        "- Real investors rarely accept the founder's valuation as it is. If the business is "
+        "real but the price, the risk or the founder's plan worries you, make an offer that "
+        "prices that in: more equity for the same money, part of it as debt, or a royalty "
+        "until you are paid back. Go out only if you would not invest at ANY valuation.\n"
+        "- If you think the valuation is too high, your offer must value the company lower "
+        "than the founder's ask: ask for more equity, do not just put in more money.\n"
         "- All money is in lakh rupees (1 crore = 100 lakh). Fill every number; use 0 for "
         "any part your deal does not have, and 0 everywhere if you are not offering.\n"
         "- The total money (equity plus debt) must be between half and one and a half times "
@@ -149,10 +170,14 @@ def _table_text(offers: list[dict]) -> str:
 
 
 def offer_user(pitch: str, ask: dict, transcript: list[tuple[str, str]], offers: list[dict],
-               shark_name: str) -> str:
+               shark_name: str, last_stance: str | None = None) -> str:
     joinable = ", ".join(o["id"] for o in offers if len(o["sharks"]) == 1) or "none"
+    # Third real run: a shark ended the debate at "invest" and went out at the table without
+    # a word about why. Remind them where they stood.
+    where = (f"You ended the debate at stance {last_stance}. If you now decide differently, say "
+             "in your message what changed your mind.\n\n" if last_stance else "")
     return (f"{_deal_context(pitch, ask, transcript)}OFFERS ON THE TABLE:\n{_table_text(offers)}\n"
-            f"JOINABLE OFFER IDS: {joinable}\n\n"
+            f"JOINABLE OFFER IDS: {joinable}\n\n{where}"
             f"Your move, {shark_name}. Choose one: \"offer\" (your own terms; you may try to "
             "beat the offers above), \"join\" (team up on a joinable offer, on its exact "
             "terms, and put its id in partner_id) or \"out\" (say why).")
@@ -175,9 +200,12 @@ def counter_user(pitch: str, ask: dict, transcript: list[tuple[str, str]], mine:
             f"THE FOUNDER COUNTERS: {terms_text(counter)}\n"
             f"YOUR_NUMBERS: {_numbers(mine)}\n\n"
             f"{shark_name}, answer the counter. Choose one: \"accept\" (take the founder's "
-            "terms exactly), \"revise\" (one final offer of your own, between the two, with "
-            "its numbers filled in), \"hold\" (your original offer stands) or \"out\" (you "
-            "withdraw completely). The founder cannot counter again.")
+            "terms exactly), \"revise\" (one final offer of your own that meets the founder "
+            "part of the way: every number between YOUR OFFER and THE FOUNDER COUNTERS, "
+            f"for example equity between {mine['equity_pct']:g}% and {counter['equity_pct']:g}%, "
+            "never worse for the founder than your own first offer), \"hold\" (your original "
+            "offer stands) or \"out\" (you withdraw completely). The founder cannot counter "
+            "again.")
 
 
 def _numbers(t: dict) -> str:
@@ -192,6 +220,12 @@ def verdict_system() -> str:
         "debate, then write the final verdict.\n"
         "- Ground every risk and next step in something said in the pitch or the debate. "
         "No generic startup advice.\n"
+        "- If a shark's arithmetic or units were wrong (for example meals called months), "
+        "say so plainly; never repeat a wrong figure as their reason or as a risk.\n"
+        "- ESTABLISHED FACTS are on the record. A shark who called one of them missing was "
+        "wrong: never repeat that as a risk. You may doubt a claim the founder made; then say "
+        "what evidence would settle it. The founder's own evidence (e.g. a competitor that "
+        "tried and failed) is not a risk unless the debate showed why it cuts against them.\n"
         "- Calibrate the score on the business, not on how harsh the sharks sounded: "
         "0-1 no viable customer at all, 2-3 weak or unclear, 4-6 real but unproven (paying "
         "users exist but the economics or moat are open questions), 7-8 strong with evidence, "
@@ -200,7 +234,8 @@ def verdict_system() -> str:
         "shark said. Match their final stance unless the founder's answers clearly changed it. "
         "A shark who made an offer is invest; a shark who went out is pass.\n"
         "- If offers were made, weigh what they and the founder's choice show, without "
-        "treating an offer as proof the business works.\n"
+        "treating an offer as proof the business works. Each shark's reason may mention only "
+        "the terms that shark offered; the accepted deal belongs to the shark(s) named in it.\n"
         "- Give the three biggest risks and three concrete next steps doable within 30 days, "
         "each a full sentence about this specific business.\n"
         "- Then write a punchy, shareable one-sentence summary. Never write placeholders."
@@ -208,17 +243,19 @@ def verdict_system() -> str:
 
 
 def verdict_user(pitch: str, transcript: list[tuple[str, str]], sharks: list[Persona],
-                 final_stances: dict[str, str]) -> str:
+                 final_stances: dict[str, str], ask: dict | None = None) -> str:
     convo = "\n".join(f"{who}: {text}" for who, text in transcript)
     ids = ", ".join(f"{p.id} = {p.name}" for p in sharks)
     stances = ", ".join(f"{p.id}: {final_stances.get(p.id, 'maybe')}" for p in sharks)
+    answers = [text for who, text in transcript if who == "Founder"]
     return (f"SHARKS: {' | '.join(p.name for p in sharks)}\nSHARK IDS: {ids}\n\n"
-            f"PITCH: {pitch}\n\nDEBATE:\n{convo}\n\nFINAL STANCES: {stances}")
+            f"PITCH: {pitch}\n\n{facts_block(pitch, answers, ask)}\n"
+            f"DEBATE:\n{convo}\n\nFINAL STANCES: {stances}")
 
 
 # ---------- Janta ----------
 
-def crowd_system(single: bool = True) -> str:
+def crowd_system(single: bool = True, show_attitude: bool = True) -> str:
     who = ("You are given ONE person. Write how that specific person would react."
            if single else
            "You are given a list of people. For EACH person, write how that specific person "
@@ -233,8 +270,9 @@ def crowd_system(single: bool = True) -> str:
         "doesn't serve (no children for a homework app, no shop for a shop app) is at most "
         "neutral, however much they like new things. Someone whose pain it clearly solves can "
         "say yes even if they are usually cautious.\n"
-        "- Their general tendency (early adopter, skeptic and so on) only colours HOW they react, "
-        "e.g. a skeptic who needs it still asks for proof. It does not decide the vote.\n"
+        + ("- Their general tendency (early adopter, skeptic and so on) only colours HOW they "
+           "react, e.g. a skeptic who needs it still asks for proof. It does not decide the vote.\n"
+           if show_attitude else "") +
         "- Be realistic, not polite. Most new products get mixed reactions.\n"
         "- In comment, write exactly what the person would say out loud about something specific "
         "in the idea. Keep it to one or two sentences. They may mix in Hindi or their own "
@@ -249,8 +287,11 @@ def crowd_system(single: bool = True) -> str:
     )
 
 
-def crowd_user(pitch: str, people: list[CrowdPersona], digest: str | None) -> str:
-    lines = "\n".join(p.one_line() for p in people)
+def crowd_user(pitch: str, people: list[CrowdPersona], digest: str | None,
+               show_attitude: bool = True) -> str:
+    # one_line() with no argument when shown, so scripts that patch it keep working
+    lines = "\n".join(p.one_line() if show_attitude else p.one_line(show_attitude=False)
+                      for p in people)
     heard = (f"\n\nWHAT THE REST OF THE CROWD SAID IN ROUND 1 (people may change their mind "
              f"after hearing this, but only if it is convincing to them):\n{digest}"
              if digest else "")
@@ -260,18 +301,28 @@ def crowd_user(pitch: str, people: list[CrowdPersona], digest: str | None) -> st
 def janta_summary_system() -> str:
     return (
         "You summarise how a simulated crowd of Indian consumers reacted to a startup idea. "
-        "Use the vote counts, the segment breakdown and the comments you are given. "
-        "Write three reasons people liked it, three reasons people pushed back, and three "
-        "changes the crowd would make, each a full sentence drawn from what specific people "
-        "actually said (mention who, e.g. 'delivery riders in Mumbai'). Then write a short, "
-        "punchy headline that sums up the crowd's verdict. Never write placeholders."
+        "Use the vote counts, the segment breakdown and the comments you are given.\n"
+        "- reasons_for: why people who voted AGREE liked it, one reason per agreeing person "
+        "up to 3. If nobody agreed, return an empty list: never fill it from unsure or "
+        "disagreeing people.\n"
+        "- reasons_against: the same for people who voted DISAGREE.\n"
+        "- advice: three changes the crowd would make.\n"
+        "- Each item is a full sentence drawn from what specific people actually said "
+        "(mention who, e.g. 'delivery riders in Mumbai').\n"
+        "- If a TARGET MARKET is given, lead with how the people inside it reacted; people "
+        "outside it are a comparison group, and 'it isn't available where I live' from them "
+        "is not a finding about the idea.\n"
+        "- Then write a short, punchy headline that sums up the crowd's verdict. Never write "
+        "placeholders."
     )
 
 
-def janta_summary_user(pitch: str, tally: dict, segments: dict, comments: list[str]) -> str:
+def janta_summary_user(pitch: str, tally: dict, segments: dict, comments: list[str],
+                       market: str | None = None) -> str:
     seg = "\n".join(f"{name}: {data}" for name, data in segments.items())
     sample = "\n".join(f"- {c}" for c in comments)
-    return (f"IDEA: {pitch}\n\nFINAL VOTES: {tally}\n\nBY SEGMENT:\n{seg}\n\n"
+    target = f"TARGET MARKET: {market}\n\n" if market else ""
+    return (f"IDEA: {pitch}\n\n{target}FINAL VOTES: {tally}\n\nBY SEGMENT:\n{seg}\n\n"
             f"COMMENTS:\n{sample}")
 
 

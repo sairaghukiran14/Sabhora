@@ -51,6 +51,9 @@ class Settings(BaseSettings):
     janta_tokens_per_person: int = 1500  # per round; caps a 50-person, 2-round run at 150k
     janta_parallel: int = 6
     janta_rounds: int = 2
+    # Whether the crowd model sees each person's attitude label ("early adopter"...). Off:
+    # shown, the label decided most votes (docs/05, reports/ section 13).
+    janta_show_attitude: bool = False
     janta_pace_s: float = 0.08  # delay between crowd messages, for the live feel
     roast_parallel: int = 3
 

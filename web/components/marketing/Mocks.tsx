@@ -104,11 +104,11 @@ export function JantaMock({ compact = false }: { compact?: boolean }) {
           <div className="space-y-2">
             <p className="rounded-xl bg-bg px-3 py-2 text-[13px] leading-relaxed">
               “Idea accha hai, par ₹99 thoda zyada lagta hai.”
-              <span className="mt-0.5 block text-[11px] text-faint">Kavya, 31 · Teacher · Indore</span>
+              <span className="mt-0.5 block text-[11px] text-faint">Anjali, 31 · School teacher · Indore</span>
             </p>
             <p className="rounded-xl bg-bg px-3 py-2 text-[13px] leading-relaxed">
               “बढ़िया है, इसके लिए पैसे देना ठीक लगता है।”
-              <span className="mt-0.5 block text-[11px] text-faint">Ravi, 38 · Bank clerk · Lucknow</span>
+              <span className="mt-0.5 block text-[11px] text-faint">Rohit, 38 · Government clerk · Lucknow</span>
             </p>
           </div>
         )}
@@ -158,19 +158,21 @@ export function RoastMock({ compact = false }: { compact?: boolean }) {
   );
 }
 
+// Real crowd building blocks only (backend/personas/janta/dimensions.yaml): these cities,
+// jobs and regional first names are what a Janta crowd can actually contain.
 const PERSONAS = [
-  ["Priya, 29", "Software engineer", "Pune", 1],
-  ["Imran, 41", "Kirana store owner", "Bareilly", 3],
-  ["Kavya, 31", "Teacher", "Indore", 2],
-  ["Joseph, 55", "Retired officer", "Kochi", 2],
-  ["Neha, 22", "College student", "Delhi", 1],
-  ["Venkat, 36", "Chartered accountant", "Guntur", 3],
-  ["Farah, 27", "Graphic designer", "Hyderabad", 1],
-  ["Suresh, 48", "Auto-rickshaw driver", "Nagpur", 2],
-  ["Harpreet, 33", "Nurse", "Rohtak", 3],
-  ["Ishaan, 25", "Startup founder", "Bengaluru", 1],
-  ["Lakshmi, 44", "Homemaker", "Coimbatore", 2],
-  ["Abhishek, 30", "Sales executive", "Siliguri", 3],
+  ["Snehal, 29", "Software engineer", "Pune", 2],
+  ["Aman, 41", "Kirana shop owner", "Bareilly", 3],
+  ["Divya, 34", "School teacher", "Coimbatore", 2],
+  ["Subhash, 61", "Retired bank manager", "Kolkata", 1],
+  ["Neha, 20", "College student", "Delhi", 1],
+  ["Anjali, 36", "Chartered accountant", "Indore", 2],
+  ["Rahul, 27", "Delivery rider", "Bhubaneswar", 2],
+  ["Ravi, 48", "Auto-rickshaw driver", "Chennai", 1],
+  ["Komal, 33", "Home business owner", "Nashik", 3],
+  ["Karthik, 31", "Content creator", "Hyderabad", 1],
+  ["Puja, 45", "Farmer", "Patna", 3],
+  ["Rohit, 38", "Small factory owner", "Lucknow", 2],
 ] as const;
 
 export function PersonaMarquee() {

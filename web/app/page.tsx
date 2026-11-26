@@ -10,7 +10,7 @@ import { JantaMock, PersonaMarquee, RoastMock, SharksMock } from "@/components/m
 import LiveShark from "@/components/LiveShark";
 import Reveal from "@/components/Reveal";
 import {
-  Arrow, Check, Coins, Key, Languages, Link, Lock, Message, Minus, Sharks, Target, Users, X,
+  Arrow, Check, Coins, Languages, Link, Lock, Message, Minus, Sharks, Target, Users, X,
 } from "@/components/icons";
 import { btn, Container, cx, RoomBadge, SectionHeader } from "@/components/ui";
 import { PLANS } from "@/lib/pricing";
@@ -64,8 +64,8 @@ const extras = [
   { Icon: Message, t: "Answer back", d: "Reply to the Sharks between rounds, then follow up with anyone after the verdict." },
   { Icon: Languages, t: "Speaks like India", d: "Personas answer in English, Hinglish and Hindi, the way your users talk." },
   { Icon: Coins, t: "Pay only for results", d: "Credits are charged for finished runs. A failed run never costs you." },
-  { Icon: Key, t: "Bring your own key", d: "On Pro, plug in your own model key and skip model costs entirely." },
-  { Icon: Lock, t: "Private by default", d: "Your ideas stay yours. Nothing is shared unless you share it." },
+  { Icon: Target, t: "Matched to your market", d: "Name your city and customer, and most of the Janta crowd comes from that market, beside a comparison group." },
+  { Icon: Lock, t: "Private by default", d: "Runs stay private until you share a link. Your idea goes only to the AI models that run the panel." },
 ];
 
 const steps = [
@@ -78,7 +78,7 @@ type Cell = boolean | "partial" | string;
 const compare: { label: string; cells: [Cell, Cell, Cell, Cell] }[] = [
   { label: "Time to an answer", cells: ["About 2 minutes", "Days", "1–2 weeks", "3–4 weeks"] },
   { label: "Honest, critical feedback", cells: [true, false, "partial", true] },
-  { label: "Shows who would actually pay", cells: [true, false, "partial", "partial"] },
+  { label: "Who might pay, and who pushes back", cells: ["partial", false, "partial", "partial"] },
   { label: "Investor-level questions", cells: [true, false, false, false] },
   { label: "Landing page review", cells: [true, false, false, false] },
   { label: "Cost", cells: ["From ₹5 a run", "Free, but biased", "₹₹", "₹₹₹₹"] },
@@ -89,10 +89,10 @@ const faqs = [
   { q: "Are the personas real people?", a: "No. They're AI personas on hand-written profiles across Indian city tiers, ages and jobs. They are not based on survey data. Treat their replies as starting points for conversations with real customers, not as market research." },
   { q: "Can I trust an AI verdict?", a: "No. Treat it as a way to surface questions, risks and objections you may not have considered. It does not predict whether people will buy. Our own tests show that one persona's vote is unsteady and that overall support leans on persona traits, so don't read the counts as market signal. Validate the important objections with real customers." },
   { q: "How much does a run cost?", a: "Everything is priced in credits, and 1 credit is roughly ₹1. A Roast is 5 credits, a Sharks debate is 15, and a Janta crowd is 10 to 30 depending on size. You get 50 free credits when you sign up." },
-  { q: "Do I need a credit card to start?", a: "No. Sign up with your email, get 50 credits, and run your first verdict right away. You only pay when you want more credits or a bigger plan." },
+  { q: "Do I need a credit card to start?", a: "No. Sign up with your email, get 50 credits, and run your first verdict right away. Paid credits and plans are coming soon." },
   { q: "Is my idea kept private?", a: "Runs are visible only to you. To write the debate, your pitch or page is sent to the AI providers we use. If you share a verdict, it gets a read-only link you can switch off at any time, and deleting a run erases it." },
   { q: "What languages do the personas speak?", a: "English, Hinglish and Hindi. Janta personas reply the way people across India actually talk, so the quotes feel real." },
-  { q: "Can I cancel a plan?", a: "Any time, from Billing. You keep your plan until the end of the period and your unused credits stay in your account." },
+  { q: "Can I cancel a plan?", a: "Paid plans aren't on sale yet. When they open, you'll be able to cancel any time, keep your plan until the end of the period, and keep your unused credits." },
 ];
 
 function CellValue({ v, strong }: { v: Cell; strong?: boolean }) {
@@ -175,6 +175,7 @@ export default function Home() {
                   <RoastMock compact />
                 </div>
               </div>
+              <p className="mt-3 text-center text-[12px] text-faint">Example runs for illustration, not real results.</p>
             </div>
           </Container>
           <div id="hero-end" aria-hidden />
@@ -184,7 +185,7 @@ export default function Home() {
         <section className="border-y border-edge bg-surface py-10 sm:py-14">
           <Container>
             <p className="text-center text-[13px] font-medium text-muted">
-              Your Janta crowd: real segments from metros to tier-3 towns
+              Your Janta crowd: invented profiles from metros to tier-3 towns
             </p>
           </Container>
           <div className="mt-6">
@@ -229,8 +230,8 @@ export default function Home() {
             </div>
             <Reveal>
               <p className="mx-auto mt-10 max-w-xl text-balance text-center font-display text-xl leading-snug sm:text-2xl">
-                Sabhora gives you all three perspectives{" "}
-                <span className="text-brand-ink">before you write a line of code.</span>
+                Sabhora gives you a fast, simulated first pass at all three,{" "}
+                <span className="text-brand-ink">so you know what to test with real people.</span>
               </p>
             </Reveal>
           </Container>
@@ -416,7 +417,7 @@ export default function Home() {
                 center
                 eyebrow="Pricing"
                 title="Start free. Pay only for verdicts you get."
-                sub="Every run is priced in credits (1 credit ≈ ₹1). A failed run is never charged. Pay in rupees with UPI or cards."
+                sub="Every run is priced in credits (1 credit ≈ ₹1). A failed run is never charged. Paid plans open soon; for now everyone starts with 50 free credits."
               />
             </Reveal>
             <div className="mt-12 grid gap-5 lg:grid-cols-3">
