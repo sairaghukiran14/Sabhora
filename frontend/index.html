@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sabhora by Neevora Labs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap">
+<style>
+  /* Layout: one centred column; the live "stage" replaces nothing, it appears under the form */
+  :root {
+    --bg: #faf8f5; --surface: #ffffff; --surface-2: #f3efe8; --fg: #1c1a17; --muted: #6b655c;
+    --line: #e7e1d8; --accent: #c0442e; --accent-fg: #ffffff; --accent-soft: #f6e4df;
+    --agree: #2f7d55; --neutral: #c98a1a; --disagree: #b23b2e; --pending: #ddd6ca;
+    --font-head: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    --font-body: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17150f; --surface: #201d16; --surface-2: #2a261d; --fg: #f1ece3; --muted: #a79f92;
+      --line: #342f26; --accent: #e9663f; --accent-fg: #1a1208; --accent-soft: #3a2018;
+      --agree: #5cbd85; --neutral: #e0a93a; --disagree: #e97a63; --pending: #3d382f;
+      color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; } /* elements with their own display (flex cards, the chat drawer) must still hide */
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.55 var(--font-body); }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 28px 16px 80px; }
+  h1, h2, h3 { font-family: var(--font-head); line-height: 1.15; text-wrap: balance; margin: 0; }
+  button, input, textarea, select { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  header.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: baseline; gap: 10px; }
+  .brand h1 { font-size: 1.6rem; letter-spacing: -.02em; }
+  .brand small { color: var(--muted); }
+  .badge { font: 600 .75rem var(--font-head); padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); }
+  .badge.live { color: var(--agree); border-color: color-mix(in srgb, var(--agree) 40%, transparent); }
+
+  .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 22px 0 14px; }
+  @media (max-width: 600px) { .tabs { grid-template-columns: 1fr; } }
+  .tab { text-align: left; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); cursor: pointer; }
+  .tab b { display: block; font: 700 1.02rem var(--font-head); }
+  .tab span { font-size: .84rem; color: var(--muted); }
+  .tab[aria-selected="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .tab[aria-selected="true"] b { color: var(--accent); }
+
+  form.card, .stage { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+  label.f { display: block; font-weight: 600; font-size: .88rem; margin: 0 0 6px; }
+  textarea, input[type=url], input[type=text], input[type=password], select {
+    width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 10px 12px;
+  }
+  textarea { min-height: 110px; resize: vertical; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; margin-top: 12px; }
+  .row > * { min-width: 0; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .seg button { border: 0; background: var(--bg); padding: 8px 14px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .hint { color: var(--muted); font-size: .82rem; }
+  details.byok { margin-top: 14px; }
+  details.byok summary { cursor: pointer; color: var(--muted); font-size: .86rem; }
+  details.byok .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  @media (max-width: 600px) { details.byok .grid { grid-template-columns: 1fr; } }
+  .actions { display: flex; gap: 10px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+  .btn { border: 0; border-radius: 10px; padding: 10px 18px; font-weight: 600; cursor: pointer; background: var(--accent); color: var(--accent-fg); }
+  .btn[disabled] { opacity: .55; cursor: progress; }
+  .btn.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+  .linkbtn { background: none; border: 0; color: var(--accent); cursor: pointer; padding: 0; font-size: .88rem; }
+  .form-error { color: var(--disagree); font-size: .88rem; margin-top: 10px; }
+
+  /* ---------- stage ---------- */
+  .stage { margin-top: 18px; }
+  .stage-head { display: flex; justify-content: space-between; gap: 12px; align-items: start; flex-wrap: wrap; }
+  .eyebrow { font: 600 .72rem var(--font-head); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+  .pitchq { margin: 6px 0 0; color: var(--muted); font-style: italic; max-width: 62ch; overflow-wrap: anywhere; }
+  .status { font-size: .85rem; color: var(--muted); display: inline-flex; align-items: center; gap: 8px; }
+  .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1.2s infinite; }
+  .status.idle .pulse { animation: none; background: var(--agree); }
+  @keyframes pulse { 50% { opacity: .25; } }
+
+  .panel { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0; }
+  @media (max-width: 640px) { .panel { grid-template-columns: 1fr; } }
+  .shark { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--surface-2); display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; align-items: center; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font: 700 .85rem var(--font-head); color: #fff; grid-row: span 2; }
+  .shark .nm { font-weight: 600; }
+  .shark .tt { font-size: .76rem; color: var(--muted); grid-column: 1 / -1; }
+  .chip { display: inline-block; font: 600 .7rem var(--font-head); text-transform: uppercase; letter-spacing: .06em; padding: 2px 8px; border-radius: 999px; background: var(--pending); color: var(--fg); }
+  .chip.invest, .chip.agree { background: color-mix(in srgb, var(--agree) 18%, transparent); color: var(--agree); }
+  .chip.maybe, .chip.neutral { background: color-mix(in srgb, var(--neutral) 20%, transparent); color: var(--neutral); }
+  .chip.pass, .chip.disagree { background: color-mix(in srgb, var(--disagree) 16%, transparent); color: var(--disagree); }
+
+  .feed { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+  .msg { display: grid; grid-template-columns: 36px 1fr; gap: 10px; animation: rise .25s ease-out; }
+  .msg .body { background: var(--surface-2); border-radius: 4px 12px 12px 12px; padding: 9px 12px; min-width: 0; }
+  .msg .who { font-size: .8rem; color: var(--muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .msg .who b { color: var(--fg); }
+  .msg p { margin: 3px 0 0; overflow-wrap: anywhere; }
+  .msg.founder { grid-template-columns: 1fr 36px; }
+  .msg.founder .body { background: var(--accent-soft); border-radius: 12px 4px 12px 12px; order: -1; }
+  .sys { text-align: center; font-size: .8rem; color: var(--muted); }
+  .divider { display: flex; align-items: center; gap: 10px; font: 600 .72rem var(--font-head); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+  .divider::before, .divider::after { content: ""; flex: 1; border-top: 1px solid var(--line); }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } }
+
+  .founder-box { margin-top: 14px; border: 1px dashed var(--accent); border-radius: 12px; padding: 12px; background: var(--accent-soft); }
+  .founder-box .row { margin-top: 8px; align-items: center; }
+  .founder-box input { flex: 1 1 260px; }
+
+  /* janta */
+  .tallybar { display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: var(--pending); margin: 6px 0; }
+  .tallybar i { display: block; transition: width .3s; }
+  .tallynums { display: flex; gap: 14px; flex-wrap: wrap; font-size: .84rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .tallynums b { color: var(--fg); }
+  .dots { display: grid; grid-template-columns: repeat(auto-fill, minmax(16px, 1fr)); gap: 4px; margin: 14px 0; }
+  .dot { aspect-ratio: 1; border-radius: 4px; background: var(--pending); transition: background .3s, transform .3s; position: relative; }
+  .dot[data-vote="agree"] { background: var(--agree); }
+  .dot[data-vote="neutral"] { background: var(--neutral); }
+  .dot[data-vote="disagree"] { background: var(--disagree); }
+  .dot.pay::after { content: ""; position: absolute; inset: 30%; border-radius: 50%; background: var(--surface); }
+  .dot.flip { transform: scale(1.25); }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: .78rem; color: var(--muted); }
+  .legend span { display: inline-flex; gap: 6px; align-items: center; }
+  .legend i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+  .comment { font-size: .88rem; padding: 7px 10px; border-left: 3px solid var(--pending); background: var(--surface-2); border-radius: 0 8px 8px 0; animation: rise .25s ease-out; overflow-wrap: anywhere; }
+  .comment[data-vote="agree"] { border-color: var(--agree); }
+  .comment[data-vote="neutral"] { border-color: var(--neutral); }
+  .comment[data-vote="disagree"] { border-color: var(--disagree); }
+  .comment small { color: var(--muted); display: block; }
+
+  /* roast */
+  .pagecard { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin: 14px 0; background: var(--surface-2); overflow-wrap: anywhere; }
+  .reviews { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media (max-width: 640px) { .reviews { grid-template-columns: 1fr; } }
+  .review { border: 1px solid var(--line); border-radius: 12px; padding: 12px; min-width: 0; }
+  .review.waiting { color: var(--muted); }
+  .review p { margin: 6px 0; overflow-wrap: anywhere; }
+  .bars { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 8px; align-items: center; font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .bar { height: 6px; border-radius: 99px; background: var(--pending); overflow: hidden; }
+  .bar i { display: block; height: 100%; background: var(--accent); }
+  .fix { font-size: .84rem; border-top: 1px solid var(--line); padding-top: 6px; margin-top: 6px; }
+
+  /* verdict */
+  .verdict { margin-top: 18px; border: 2px solid var(--fg); border-radius: 14px; padding: 18px; animation: rise .35s ease-out; }
+  .vtop { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+  .score { font: 700 3rem/1 var(--font-head); font-variant-numeric: tabular-nums; }
+  .score small { font-size: 1rem; color: var(--muted); }
+  .oneliner { font: 600 1.2rem/1.3 var(--font-head); flex: 1 1 260px; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+  @media (max-width: 640px) { .cols { grid-template-columns: 1fr; } }
+  .cols h3 { font-size: .95rem; margin-bottom: 6px; }
+  .cols ul { margin: 0; padding-left: 18px; }
+  .cols li { margin: 3px 0; }
+  .votes { display: grid; gap: 8px; margin-top: 14px; }
+  .vote { display: grid; grid-template-columns: 110px auto 1fr; gap: 10px; align-items: baseline; font-size: .9rem; }
+  @media (max-width: 560px) { .vote { grid-template-columns: 1fr; gap: 2px; } }
+  table.segs { width: 100%; border-collapse: collapse; font-size: .84rem; font-variant-numeric: tabular-nums; }
+  table.segs th, table.segs td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--line); }
+  table.segs th { color: var(--muted); font-weight: 600; }
+  .mini { display: flex; height: 8px; width: 100%; min-width: 80px; border-radius: 99px; overflow: hidden; background: var(--pending); }
+  .segwrap { overflow-x: auto; }
+  .after { display: flex; gap: 10px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+  .after input { flex: 1 1 260px; }
+  .foot { color: var(--muted); font-size: .78rem; margin-top: 10px; }
+  .error { border: 1px solid var(--disagree); color: var(--disagree); border-radius: 12px; padding: 12px; margin-top: 14px; }
+  /* janta: the crowd, person by person */
+  button.dot { border: 0; padding: 0; cursor: pointer; }
+  .people-head { display: flex; justify-content: space-between; align-items: end; gap: 10px; flex-wrap: wrap; margin: 22px 0 10px; }
+  .people-head h3 { font-size: 1rem; }
+  .filters { display: flex; gap: 6px; flex-wrap: wrap; }
+  .fchip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 10px; font-size: .78rem; cursor: pointer; font-variant-numeric: tabular-nums; }
+  .fchip[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  .people { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+  .pcard { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: var(--surface); display: flex; flex-direction: column; gap: 6px; min-width: 0; border-top: 3px solid var(--pending); }
+  .pcard[data-vote="agree"] { border-top-color: var(--agree); }
+  .pcard[data-vote="neutral"] { border-top-color: var(--neutral); }
+  .pcard[data-vote="disagree"] { border-top-color: var(--disagree); }
+  .pcard.flash { box-shadow: 0 0 0 3px var(--accent); }
+  .pcard header { display: grid; grid-template-columns: 30px 1fr auto; gap: 8px; align-items: center; }
+  .pav { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 700 .72rem var(--font-head); background: var(--surface-2); }
+  .pwho { min-width: 0; line-height: 1.25; }
+  .pwho b { display: block; font-size: .9rem; }
+  .pwho span { font-size: .75rem; }
+  .pprof { margin: 0; font-size: .75rem; color: var(--muted); }
+  .turn { font-size: .86rem; border-left: 2px solid var(--line); padding-left: 8px; overflow-wrap: anywhere; }
+  .turn .rl { display: flex; gap: 6px; align-items: center; font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+  .turn p { margin: 3px 0 0; }
+  .turn.moved .rl { color: var(--accent); }
+  .waiting-line { font-size: .8rem; color: var(--muted); }
+  .pcard footer { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .paytag { font-size: .72rem; font-weight: 600; color: var(--agree); }
+  .chatnote { font-size: .72rem; color: var(--accent); }
+  .btn.sm { padding: 5px 12px; font-size: .8rem; border-radius: 8px; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+  /* how the verdict was reached */
+  .explain { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 14px; }
+  .explain h3 { font-size: 1rem; margin-bottom: 8px; }
+  .steps { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+  .steps li { padding-left: 4px; }
+  .steps .mini { margin-top: 4px; max-width: 320px; }
+  .explain p { margin: 8px 0; }
+  .cta-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  table.traj { border-collapse: collapse; font-size: .86rem; margin: 6px 0; }
+  table.traj th, table.traj td { padding: 5px 10px 5px 0; text-align: left; border-bottom: 1px solid var(--line); }
+  table.traj th { color: var(--muted); font-weight: 600; font-size: .78rem; }
+
+  /* follow-up chat drawer */
+  .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 20; }
+  .chat { position: fixed; top: 0; right: 0; bottom: 0; width: min(440px, 100%); z-index: 21; background: var(--surface); border-left: 1px solid var(--line); display: flex; flex-direction: column; padding: calc(12px + env(safe-area-inset-top, 0px)) max(14px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) 14px; box-shadow: -10px 0 30px rgba(0,0,0,.15); }
+  .chat-head { display: grid; grid-template-columns: 36px 1fr auto auto; gap: 10px; align-items: center; }
+  .chat-who { min-width: 0; line-height: 1.25; }
+  .chat-who b { display: block; }
+  .chat-who span { font-size: .78rem; }
+  .iconbtn { border: 1px solid var(--line); background: transparent; border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-size: 1rem; }
+  .chat-note { font-size: .8rem; color: var(--muted); background: var(--surface-2); border-radius: 10px; padding: 8px 10px; margin: 10px 0 6px; overflow-wrap: anywhere; }
+  .chat-log { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 6px 2px; min-height: 0; }
+  .bubble { max-width: 85%; padding: 8px 11px; border-radius: 12px; font-size: .9rem; overflow-wrap: anywhere; animation: rise .2s ease-out; }
+  .bubble.me { align-self: flex-end; background: var(--accent-soft); border-radius: 12px 4px 12px 12px; }
+  .bubble.them { align-self: flex-start; background: var(--surface-2); border-radius: 4px 12px 12px 12px; }
+  .bubble.err { align-self: center; color: var(--disagree); background: transparent; font-size: .8rem; }
+  .moved-line { align-self: center; font-size: .75rem; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+  .chat-suggest { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0; }
+  .chat-form { display: flex; gap: 8px; }
+  .chat-form input { flex: 1; min-width: 0; }
+  .chat-foot { margin: 6px 0 0; font-size: .74rem; }
+
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><h1>Sabhora</h1><small>by Neevora Labs · your pitch, judged by the panel</small></div>
+    <span class="badge" id="providerBadge">Connecting…</span>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Mode">
+    <button class="tab" role="tab" id="tab-sharks" data-mode="sharks" aria-selected="true">
+      <b>Sharks</b><span>5 investors grill you over 3 rounds. Answer between rounds.</span></button>
+    <button class="tab" role="tab" id="tab-janta" data-mode="janta" aria-selected="false">
+      <b>Janta</b><span>A crowd of Indian personas reacts, votes, and says if they'd pay.</span></button>
+    <button class="tab" role="tab" id="tab-roast" data-mode="roast" aria-selected="false">
+      <b>Roast</b><span>6 influencers review your landing page and name the top fixes.</span></button>
+  </div>
+
+  <form class="card" id="form" novalidate>
+    <div data-for="sharks janta">
+      <label class="f" for="pitch">Your pitch</label>
+      <textarea id="pitch" maxlength="2000" placeholder="What you do, for whom, how you make money, and any traction you have."></textarea>
+      <div class="row" style="justify-content:space-between">
+        <span class="hint"><span id="count">0</span>/2000 · at least 20 characters</span>
+        <button type="button" class="linkbtn" id="sample">Fill an example pitch</button>
+      </div>
+    </div>
+    <div data-for="roast" hidden>
+      <label class="f" for="url">Landing page URL</label>
+      <input type="url" id="url" placeholder="https://yourstartup.com" autocomplete="url">
+      <div class="row"><button type="button" class="linkbtn" id="sampleUrl">Use an example URL</button></div>
+    </div>
+    <div class="row">
+      <div data-for="sharks">
+        <label class="f">Tone</label>
+        <div class="seg" id="tone">
+          <button type="button" data-tone="roast" aria-pressed="true">Roast me</button>
+          <button type="button" data-tone="serious" aria-pressed="false">Serious</button>
+        </div>
+      </div>
+      <div data-for="janta" hidden style="width:220px">
+        <label class="f" for="size">Crowd size</label>
+        <select id="size"><option value="25">25 people</option><option value="50" selected>50 people</option><option value="100">100 people</option></select>
+      </div>
+    </div>
+    <details class="byok">
+      <summary>Bring your own API key (optional)</summary>
+      <p class="hint">Used for this one run only. Sent with the request, never stored. Leave blank to use the server's setup.</p>
+      <div class="grid">
+        <div><label class="f" for="kAnth">Anthropic key</label><input type="password" id="kAnth" autocomplete="off" placeholder="sk-ant-…"></div>
+        <div><label class="f" for="kSarvam">Sarvam key</label><input type="password" id="kSarvam" autocomplete="off"></div>
+      </div>
+    </details>
+    <div class="actions">
+      <button class="btn" id="go" type="submit">Face the sharks</button>
+      <span class="hint" id="goHint">Takes about a minute.</span>
+    </div>
+    <div class="form-error" id="formError" role="alert" hidden></div>
+  </form>
+
+  <section class="stage" id="stage" hidden aria-live="polite">
+    <div class="stage-head">
+      <div><div class="eyebrow" id="stageMode"></div><p class="pitchq" id="stagePitch"></p></div>
+      <span class="status" id="status"><i class="pulse"></i><span id="statusText">Starting…</span></span>
+    </div>
+    <div id="board"></div>
+    <div class="feed" id="feed"></div>
+    <div class="founder-box" id="founderBox" hidden>
+      <b>Your turn.</b> <span class="hint" id="countdown"></span>
+      <div class="row">
+        <input type="text" id="reply" maxlength="500" placeholder="Answer the sharks: numbers beat adjectives.">
+        <button type="button" class="btn" id="sendReply">Answer</button>
+        <button type="button" class="btn ghost" id="skipReply">Skip</button>
+      </div>
+    </div>
+    <div id="verdict"></div>
+    <div class="after" id="after" hidden>
+      <input type="text" id="shareUrl" readonly aria-label="Share link">
+      <button type="button" class="btn ghost" id="copy">Copy link</button>
+      <button type="button" class="btn" id="again">New pitch</button>
+    </div>
+    <div class="foot" id="foot"></div>
+  </section>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="chat" id="chat" hidden role="dialog" aria-modal="true" aria-labelledby="chatName">
+  <header class="chat-head">
+    <div class="avatar" id="chatAv"></div>
+    <div class="chat-who"><b id="chatName"></b><span class="hint" id="chatTitle"></span></div>
+    <span class="chip" id="chatPos"></span>
+    <button type="button" class="iconbtn" id="chatClose" aria-label="Close chat">✕</button>
+  </header>
+  <p class="chat-note" id="chatNote"></p>
+  <div class="chat-log" id="chatLog" aria-live="polite"></div>
+  <div class="chat-suggest" id="chatSuggest"></div>
+  <form class="chat-form" id="chatForm" novalidate>
+    <input type="text" id="chatInput" maxlength="500" placeholder="Ask them anything…" autocomplete="off" aria-label="Your message">
+    <button class="btn" id="chatSend" type="submit">Send</button>
+  </form>
+  <p class="hint chat-foot">They change their mind only for reasons that fit their own life.</p>
+</aside>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (s) => document.querySelector(s);
+  // Build DOM nodes with textContent only, so model and user text can never inject HTML.
+  function h(tag, props, ...kids) {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(props || {})) {
+      if (k === "class") n.className = v;
+      else if (k === "text") n.textContent = v;
+      else if (k === "style") n.setAttribute("style", v);
+      else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+      else if (v !== false && v != null) n.setAttribute(k, v === true ? "" : v);
+    }
+    for (const c of kids.flat()) if (c != null && c !== false) n.append(c instanceof Node ? c : String(c));
+    return n;
+  }
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const AVATAR = ["#c0442e", "#2f6d8a", "#7a4fa0", "#2f7d55", "#b7791f", "#9b2c5d"];
+  const initials = (name) => name.replace(/".*?"/g, "").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+  const MODE_LABEL = { sharks: "Sharks", janta: "Janta", roast: "Roast" };
+  const GO_LABEL = { sharks: "Face the sharks", janta: "Ask the janta", roast: "Roast my page" };
+  const SAMPLE = "KiranaOne: a WhatsApp-first ordering app for kirana shops in tier-2 cities. Shopkeepers reorder stock from local distributors in one tap, in Hindi or their regional language. We charge distributors 1.5% per order. 40 shops in Indore use it weekly after 3 months; average order Rs 6,000.";
+
+  let mode = "sharks", tone = "roast";
+  let S = null; // current stage state
+
+  // ---------- mode + form ----------
+  function setMode(m) {
+    mode = m;
+    document.querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.mode === m)));
+    document.querySelectorAll("[data-for]").forEach((el) => { el.hidden = !el.dataset.for.split(" ").includes(m); });
+    $("#go").textContent = GO_LABEL[m];
+    $("#goHint").textContent = m === "janta" ? "Bigger crowds take longer." : "Takes about a minute.";
+    $("#formError").hidden = true;
+  }
+  document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => setMode(t.dataset.mode)));
+  document.querySelectorAll("#tone button").forEach((b) => b.addEventListener("click", () => {
+    tone = b.dataset.tone;
+    document.querySelectorAll("#tone button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  }));
+  $("#pitch").addEventListener("input", () => { $("#count").textContent = $("#pitch").value.length; });
+  $("#pitch").addEventListener("keydown", (e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) $("#form").requestSubmit(); });
+  $("#sample").addEventListener("click", () => { $("#pitch").value = SAMPLE; $("#count").textContent = SAMPLE.length; });
+  $("#sampleUrl").addEventListener("click", () => { $("#url").value = "https://basecamp.com"; });
+
+  function errorText(data, fallback) {
+    const d = data && data.detail;
+    if (typeof d === "string") return d;
+    if (Array.isArray(d) && d.length) return String(d[0].msg || fallback).replace(/^Value error, /, "");
+    return fallback;
+  }
+
+  $("#form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const body = { mode };
+    if (mode === "roast") {
+      let u = $("#url").value.trim();
+      if (u && !/^https?:\/\//i.test(u)) u = "https://" + u;
+      body.url = u;
+    } else {
+      body.pitch = $("#pitch").value.trim();
+      if (body.pitch.length < 20) return showFormError("Write at least 20 characters so the panel has something to judge.");
+    }
+    if (mode === "sharks") body.tone = tone;
+    if (mode === "janta") body.panel_size = Number($("#size").value);
+    const headers = { "Content-Type": "application/json" };
+    if ($("#kAnth").value.trim()) headers["X-Anthropic-Key"] = $("#kAnth").value.trim();
+    if ($("#kSarvam").value.trim()) headers["X-Sarvam-Key"] = $("#kSarvam").value.trim();
+
+    $("#go").disabled = true; $("#formError").hidden = true;
+    try {
+      const r = await fetch("/api/debates", { method: "POST", headers, body: JSON.stringify(body) });
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok) return showFormError(errorText(data, `Couldn't start (HTTP ${r.status}).`));
+      history.pushState(null, "", "/d/" + data.id);
+      beginStage(data.id, mode, body, true);
+      connect(data.id);
+    } catch {
+      showFormError("Couldn't reach the server. Is it running?");
+    } finally {
+      $("#go").disabled = false;
+    }
+  });
+  function showFormError(t) { const el = $("#formError"); el.textContent = t; el.hidden = false; }
+
+  // ---------- stage ----------
+  function beginStage(id, m, request, live) {
+    if (S && S.es) S.es.close();
+    if (S && S.timer) clearInterval(S.timer);
+    closeChat();
+    S = { id, mode: m, live, lastId: -1, done: false, crowd: {}, panel: {}, size: 0, es: null, timer: null,
+          request, people: {}, r1: {}, final: {}, pay: {}, changed: {}, asked: 0, filter: "all",
+          stances: {}, founder: [], reviews: {}, verdictIn: false, chats: {} };
+    $("#stage").hidden = false;
+    $("#stageMode").textContent = MODE_LABEL[m] + (live ? " · live" : " · replay");
+    $("#stagePitch").textContent = request.pitch ? `“${request.pitch}”` : (request.url || "");
+    ["#board", "#feed", "#verdict", "#foot"].forEach((s) => $(s).replaceChildren());
+    $("#after").hidden = true; $("#founderBox").hidden = true;
+    setStatus("Starting…", true);
+    $("#stage").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  function setStatus(text, busy) {
+    $("#statusText").textContent = text;
+    $("#status").classList.toggle("idle", !busy);
+  }
+  function sys(text) { $("#feed").append(h("div", { class: "sys", text })); }
+  function avatar(name, i) { return h("div", { class: "avatar", style: `background:${AVATAR[i % AVATAR.length]}`, text: initials(name) }); }
+
+  // One handler for live streams and replays alike.
+  function apply(ev) {
+    switch (ev.type) {
+      case "start": return onStart(ev);
+      case "round":
+        if (S.mode === "sharks") $("#feed").append(h("div", { class: "divider", text: `Round ${ev.round}` }));
+        if (S.mode === "janta" && ev.round > 1) S.asked = ev.asked || 0;
+        return setStatus(S.mode === "sharks" ? `Round ${ev.round} of ${S.rounds}`
+          : ev.round > 1 && ev.asked != null ? `Round ${ev.round}: ${ev.asked} swing voters hear the crowd and reconsider…`
+          : `Round ${ev.round} of ${S.rounds}: the crowd is reacting…`, true);
+      case "typing": return setStatus(`${ev.name} is thinking…`, true);
+      case "message": return onMessage(ev);
+      case "founder_turn": return onFounderTurn(ev);
+      case "founder":
+        hideFounderBox();
+        S.founder.push({ round: ev.round, answered: true });
+        return $("#feed").append(h("div", { class: "msg founder" },
+          h("div", { class: "body" }, h("div", { class: "who" }, h("b", { text: "You (founder)" })), h("p", { text: ev.text })),
+          h("div", { class: "avatar", style: "background:var(--fg);color:var(--bg)", text: "You" })));
+      case "founder_skipped":
+        hideFounderBox(); S.founder.push({ round: ev.round, answered: false });
+        return sys("The founder stayed silent. The sharks noticed.");
+      case "notice": return sys(ev.text);
+      case "judging": return setStatus("The judge is writing the verdict…", true);
+      case "reaction": return onReaction(ev);
+      case "tally": return renderTally(ev);
+      case "fetching": return setStatus("Reading your landing page…", true);
+      case "page": return onPage(ev);
+      case "review": return onReview(ev);
+      case "verdict": return onVerdict(ev);
+      case "error": hideFounderBox(); return $("#verdict").append(h("div", { class: "error", role: "alert", text: ev.message }));
+      case "done": return onDone(ev);
+    }
+  }
+
+  function onStart(ev) {
+    S.rounds = ev.rounds || 1;
+    const board = $("#board");
+    if (ev.mode === "sharks") {
+      const panel = h("div", { class: "panel" });
+      ev.panel.forEach((p, i) => {
+        const chip = h("span", { class: "chip", text: "listening" });
+        const conf = h("span", { class: "hint", text: "" });
+        const chatBtn = chatButton("shark", p.id);
+        S.panel[p.id] = { i, chip, conf, name: p.name, title: p.title, chatBtn };
+        panel.append(h("div", { class: "shark" }, avatar(p.name, i), h("div", { class: "nm", text: p.name }),
+          h("div", {}, chip, " ", conf), h("div", { class: "tt", text: p.title }),
+          h("div", { style: "grid-column:1/-1;margin-top:6px" }, chatBtn)));
+      });
+      board.append(panel);
+    } else if (ev.mode === "janta") {
+      S.size = ev.size;
+      const bar = h("div", { class: "tallybar" }, h("i", { style: "background:var(--agree);width:0" }),
+        h("i", { style: "background:var(--neutral);width:0" }), h("i", { style: "background:var(--disagree);width:0" }));
+      const nums = h("div", { class: "tallynums", id: "tallynums" }, `Waiting for ${ev.size} people…`);
+      const dots = h("div", { class: "dots" });
+      const people = h("div", { class: "people", id: "people" });
+      ev.crowd.forEach((p) => {
+        const d = h("button", { type: "button", class: "dot", "aria-label": `${p.name}, ${p.occupation}, ${p.city}`,
+          title: `${p.name}, ${p.age}, ${p.occupation}, ${p.city} (${p.attitude})${p.household ? ` · ${p.household}` : ""}${p.model ? ` · ${p.model}` : ""}`,
+          onclick: () => showPerson(p.id) });
+        S.crowd[p.id] = { p, d };
+        dots.append(d);
+        people.append(personCard(p));
+      });
+      S.bar = bar;
+      const filters = h("div", { class: "filters", role: "group", "aria-label": "Show people" },
+        ...[["all", "Everyone"], ["agree", "Agree"], ["neutral", "Neutral"], ["disagree", "Disagree"],
+            ["changed", "Changed mind"], ["pay", "Would pay"]].map(([key, label]) =>
+          h("button", { type: "button", class: "fchip", "data-f": key, "aria-pressed": String(key === "all"),
+            onclick: () => setFilter(key) }, label, " ", h("span", { class: "fcount", "data-c": key }))));
+      board.append(h("div", { style: "margin-top:14px" }, nums, bar), dots,
+        h("div", { class: "legend" },
+          h("span", {}, h("i", { style: "background:var(--agree)" }), "Agree"),
+          h("span", {}, h("i", { style: "background:var(--neutral)" }), "Neutral"),
+          h("span", {}, h("i", { style: "background:var(--disagree)" }), "Disagree"),
+          h("span", {}, h("i", { style: "background:var(--pending);box-shadow:inset 0 0 0 3px var(--agree)" }), "Dot inside = would pay"),
+          h("span", { text: "Tap a dot to see that person" })),
+        h("div", { class: "people-head" },
+          h("div", {}, h("h3", { text: "The crowd, person by person" }),
+            h("div", { class: "hint", id: "peopleHint", text: "Round 1 is each person's first reaction. Round 2 is after hearing the crowd." })),
+          filters),
+        people);
+      updateCounts();
+    } else if (ev.mode === "roast") {
+      const grid = h("div", { class: "reviews", id: "reviews" });
+      ev.panel.forEach((p, i) => {
+        const chatBtn = chatButton("roaster", p.id);
+        const card = h("div", { class: "review waiting" },
+          h("div", { class: "who", style: "display:flex;gap:10px;align-items:center" }, avatar(p.name, i),
+            h("div", {}, h("b", { text: p.name }), h("div", { class: "hint", text: p.title }))),
+          h("p", { text: "Reading the page…" }));
+        S.panel[p.id] = { i, card, name: p.name, title: p.title, chatBtn };
+        grid.append(card);
+      });
+      board.append(grid);
+    }
+  }
+
+  // ---------- janta people grid ----------
+  function chatButton(kind, id) {
+    return h("button", { type: "button", class: "btn ghost sm", disabled: !S.verdictIn,
+      title: "Opens once the verdict is in", text: "Chat", onclick: () => openChat(kind, id) });
+  }
+  function personCard(p) {
+    const now = h("span", { class: "chip", text: "listening" });
+    const r1 = h("div", { class: "turn", hidden: true });
+    const r2 = h("div", { class: "turn", hidden: true });
+    const pay = h("span", { class: "paytag", hidden: true, text: "Would pay" });
+    const note = h("span", { class: "chatnote", hidden: true });
+    const chatBtn = chatButton("crowd", p.id);
+    const card = h("article", { class: "pcard", id: `p-${p.id}`, "data-vote": "" },
+      h("header", {}, h("div", { class: "pav", text: initials(p.name) }),
+        h("div", { class: "pwho" }, h("b", { text: `${p.name}, ${p.age}` }), h("span", { class: "hint", text: `${p.occupation} · ${p.city}` })),
+        now),
+      p.household ? h("p", { class: "pprof", text: `${p.household}${p.phone ? ` · ${p.phone}` : ""} · ${p.attitude.toLowerCase()}` }) : null,
+      h("div", { class: "waiting-line", text: "Thinking about it…" }),
+      r1, r2,
+      h("footer", {}, h("span", {}, pay, " ", note), chatBtn));
+    S.people[p.id] = { card, now, r1, r2, pay, note, chatBtn };
+    return card;
+  }
+  function fillTurn(el, label, vote, comment, moved) {
+    el.hidden = false;
+    el.classList.toggle("moved", !!moved);
+    el.replaceChildren(h("div", { class: "rl" }, label, h("span", { class: "chip " + vote, text: vote })), h("p", { text: comment }));
+  }
+  function matches(id, f) {
+    if (f === "all") return true;
+    if (f === "changed") return !!S.changed[id];
+    if (f === "pay") return !!S.pay[id];
+    return S.final[id] === f;
+  }
+  function setFilter(f) {
+    S.filter = f;
+    document.querySelectorAll(".fchip").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.f === f)));
+    Object.keys(S.people).forEach((id) => { S.people[id].card.hidden = !matches(id, f); });
+  }
+  function updateCounts() {
+    document.querySelectorAll(".fcount").forEach((el) => {
+      const f = el.dataset.c;
+      el.textContent = f === "all" ? `${Object.keys(S.people).length}` : `${Object.keys(S.people).filter((id) => matches(id, f)).length}`;
+    });
+  }
+  function showPerson(id) {
+    if (!matches(id, S.filter)) setFilter("all");
+    const card = S.people[id] && S.people[id].card;
+    if (!card) return;
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+    card.classList.add("flash");
+    setTimeout(() => card.classList.remove("flash"), 1200);
+  }
+
+  function onMessage(ev) {
+    const p = S.panel[ev.speaker] || { i: 0 };
+    if (p.chip) { p.chip.className = "chip " + ev.stance; p.chip.textContent = ev.stance; p.conf.textContent = `${ev.confidence}/10 sure`; }
+    (S.stances[ev.speaker] = S.stances[ev.speaker] || []).push({ round: ev.round, stance: ev.stance, confidence: ev.confidence });
+    $("#feed").append(h("div", { class: "msg" }, avatar(ev.name, p.i),
+      h("div", { class: "body" },
+        h("div", { class: "who" }, h("b", { text: ev.name }), h("span", { class: "chip " + ev.stance, text: ev.stance })),
+        h("p", { text: ev.text }))));
+    setStatus(`Round ${ev.round} of ${S.rounds}`, true);
+  }
+
+  function onFounderTurn(ev) {
+    if (!S.live || S.done) return; // replays never ask for input
+    setStatus("Waiting for your answer…", true);
+    const box = $("#founderBox");
+    box.hidden = false; $("#reply").value = ""; $("#reply").focus({ preventScroll: true });
+    box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    let left = Math.round(ev.wait_s);
+    const tick = () => { $("#countdown").textContent = `${left}s left, or the sharks move on.`; left -= 1; if (left < 0) clearInterval(S.timer); };
+    clearInterval(S.timer); tick(); S.timer = setInterval(tick, 1000);
+  }
+  function hideFounderBox() { $("#founderBox").hidden = true; if (S && S.timer) clearInterval(S.timer); }
+  async function sendReply(skip) {
+    const text = $("#reply").value.trim();
+    if (!skip && !text) { $("#reply").focus(); return; }
+    $("#sendReply").disabled = $("#skipReply").disabled = true;
+    try {
+      const r = await fetch(`/api/debates/${S.id}/reply`, { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(skip ? { skip: true } : { text }) });
+      if (!r.ok) { const d = await r.json().catch(() => ({})); sys(errorText(d, "Your answer didn't reach the sharks.")); }
+      hideFounderBox();
+    } finally { $("#sendReply").disabled = $("#skipReply").disabled = false; }
+  }
+  $("#sendReply").addEventListener("click", () => sendReply(false));
+  $("#skipReply").addEventListener("click", () => sendReply(true));
+  $("#reply").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); sendReply(false); } });
+
+  function onReaction(ev) {
+    const c = S.crowd[ev.persona_id];
+    if (!c) return;
+    c.d.dataset.vote = ev.vote;
+    c.d.classList.toggle("pay", !!ev.would_pay);
+    c.d.title = `${c.p.name}, ${c.p.age}, ${c.p.occupation}, ${c.p.city}: ${ev.vote}${ev.would_pay ? " (would pay)" : ""} — ${ev.comment}`;
+    if (ev.changed) { c.d.classList.add("flip"); setTimeout(() => c.d.classList.remove("flip"), 400); }
+    const card = S.people[ev.persona_id];
+    if (!card) return;
+    const id = ev.persona_id;
+    if (ev.round === 1 || !(id in S.r1)) {
+      S.r1[id] = ev.vote;
+      fillTurn(card.r1, "Round 1", ev.vote, ev.comment, false);
+    } else {
+      const before = S.r1[id];
+      S.changed[id] = before !== ev.vote;
+      fillTurn(card.r2, S.changed[id] ? `Round 2 · changed from ${before}` : "Round 2 · kept their view",
+        ev.vote, ev.comment, S.changed[id]);
+    }
+    S.final[id] = ev.vote;
+    S.pay[id] = !!ev.would_pay;
+    const w = card.card.querySelector(".waiting-line"); if (w) w.remove();
+    card.card.dataset.vote = ev.vote;
+    card.now.className = "chip " + ev.vote; card.now.textContent = ev.vote;
+    card.pay.hidden = !ev.would_pay;
+    card.card.hidden = !matches(id, S.filter);
+    updateCounts();
+  }
+  function renderTally(t) {
+    const n = S.size || t.total || 1;
+    const [a, ne, d] = S.bar.children;
+    a.style.width = `${100 * t.agree / n}%`; ne.style.width = `${100 * t.neutral / n}%`; d.style.width = `${100 * t.disagree / n}%`;
+    $("#tallynums").replaceChildren(
+      h("span", {}, h("b", { text: t.agree }), " agree"), h("span", {}, h("b", { text: t.neutral }), " neutral"),
+      h("span", {}, h("b", { text: t.disagree }), " disagree"), h("span", {}, h("b", { text: `${t.would_pay_pct}%` }), " would pay"),
+      h("span", { text: `${t.total}/${n} heard` }));
+  }
+
+  function onPage(ev) {
+    $("#board").prepend(h("div", { class: "pagecard" }, h("div", { class: "eyebrow", text: "Page under review" }),
+      h("b", { text: ev.title || ev.url }), h("div", { class: "hint", text: ev.description || ev.url })));
+    setStatus("The reviewers are reading…", true);
+  }
+  function scoreBars(r) {
+    return h("div", { class: "bars" }, ...["clarity", "trust", "design", "cta"].flatMap((k) => [
+      h("span", { text: k === "cta" ? "CTA" : k[0].toUpperCase() + k.slice(1) }),
+      h("div", { class: "bar" }, h("i", { style: `width:${r[k] * 10}%` })), h("span", { text: `${r[k]}/10` })]));
+  }
+  function onReview(ev) {
+    const p = S.panel[ev.roaster];
+    if (!p) return;
+    p.card.classList.remove("waiting");
+    p.card.querySelector("p").textContent = ev.review.roast;
+    S.reviews[ev.roaster] = { name: ev.name, review: ev.review };
+    p.card.append(scoreBars(ev.review), h("div", { class: "fix" }, h("b", { text: "Fix: " }), ev.review.fix),
+      h("div", { style: "margin-top:8px" }, p.chatBtn));
+  }
+
+  function list(title, items) {
+    return h("div", {}, h("h3", { text: title }), items && items.length ? h("ul", {}, items.map((x) => h("li", { text: x }))) : h("p", { class: "hint", text: "—" }));
+  }
+  function onVerdict(ev) {
+    const box = h("div", { class: "verdict" });
+    if (S.mode === "sharks") {
+      const v = ev.verdict;
+      S.finalVotes = Object.fromEntries(v.votes.map((x) => [x.shark, x.stance]));
+      box.append(h("div", { class: "eyebrow", text: "The verdict" }),
+        h("div", { class: "vtop" }, h("div", { class: "score" }, String(v.score), h("small", { text: "/10" })),
+          h("span", { class: "chip " + v.decision, text: v.decision }), h("div", { class: "oneliner", text: v.one_liner })),
+        h("div", { class: "votes" }, v.votes.map((x) => h("div", { class: "vote" }, h("b", { text: x.shark }),
+          h("span", { class: "chip " + x.stance, text: x.stance }), h("span", { text: x.reason })))),
+        h("div", { class: "cols" }, list("Top risks", v.top_risks), list("Next steps (30 days)", v.next_steps)));
+    } else if (S.mode === "janta") {
+      const s = ev.summary, t = ev.tally;
+      box.append(h("div", { class: "eyebrow", text: "What the janta thinks" }),
+        h("div", { class: "vtop" },
+          h("div", { class: "score" }, `${Math.round(100 * t.agree / (t.total || 1))}%`, h("small", { text: " agree" })),
+          h("div", { class: "score" }, `${t.would_pay_pct}%`, h("small", { text: " would pay" })),
+          h("div", { class: "oneliner", text: s.headline })),
+        h("div", { class: "cols" }, list("Why they liked it", s.reasons_for), list("Why they pushed back", s.reasons_against)),
+        h("div", { class: "cols" }, list("What they'd change", s.advice), h("div")),
+        ...Object.entries(ev.segments).map(([name, groups]) => segTable(name, groups)));
+    } else {
+      const v = ev.verdict, a = ev.averages;
+      box.append(h("div", { class: "eyebrow", text: "Roast verdict" }),
+        h("div", { class: "vtop" }, h("div", { class: "score" }, String(v.overall), h("small", { text: "/10" })),
+          h("div", { class: "oneliner", text: v.one_liner })),
+        h("div", { class: "cols" }, h("div", {}, h("h3", { text: "Average scores" }), scoreBars(a)), list("Top fixes", v.top_fixes)));
+    }
+    box.append(S.mode === "janta" ? explainJanta(ev) : S.mode === "sharks" ? explainSharks(ev) : explainRoast(ev));
+    $("#verdict").append(box);
+    S.verdictIn = true;
+    document.querySelectorAll("#stage .btn.sm").forEach((b) => { b.disabled = false; b.title = "Talk to them about the idea"; });
+  }
+
+  // ---------- how the verdict was reached (computed from the debate itself) ----------
+  const judgeName = () => h("span", { class: "judge-name", text: "the judge model" });
+  function split(counts, n) {
+    return h("div", { class: "mini" },
+      h("i", { style: `background:var(--agree);width:${100 * counts.agree / n}%` }),
+      h("i", { style: `background:var(--neutral);width:${100 * counts.neutral / n}%` }),
+      h("i", { style: `background:var(--disagree);width:${100 * counts.disagree / n}%` }));
+  }
+  function count(votes) {
+    const c = { agree: 0, neutral: 0, disagree: 0 };
+    Object.values(votes).forEach((v) => { c[v] = (c[v] || 0) + 1; });
+    return c;
+  }
+  function explainJanta(ev) {
+    const n = Object.keys(S.r1).length || 1, r1 = count(S.r1), fin = ev.tally;
+    const moves = {};
+    Object.keys(S.changed).forEach((id) => { if (S.changed[id]) { const k = `${S.r1[id]} → ${S.final[id]}`; moves[k] = (moves[k] || 0) + 1; } });
+    const changedN = Object.values(moves).reduce((a, b) => a + b, 0);
+    const moveText = changedN ? Object.entries(moves).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${v} ${k}`).join(", ") : "nobody changed their vote";
+    // strongest and weakest support among groups of 3+ people, across every breakdown
+    const groups = [];
+    Object.entries(ev.segments).forEach(([seg, gs]) => Object.entries(gs).forEach(([g, d]) => {
+      if (d.n >= 3) groups.push({ label: `${g} (${seg.toLowerCase()})`, pct: Math.round(100 * d.agree / d.n), n: d.n });
+    }));
+    groups.sort((a, b) => b.pct - a.pct);
+    const best = groups[0], worst = groups[groups.length - 1];
+    const talk = (f, label) => h("button", { type: "button", class: "btn ghost sm", text: label,
+      onclick: () => { setFilter(f); $("#people").scrollIntoView({ behavior: "smooth", block: "start" }); } });
+    return h("section", { class: "explain" },
+      h("h3", { text: "How this verdict was reached" }),
+      h("ol", { class: "steps" },
+        h("li", {}, h("b", { text: "Round 1: everyone reacted on their own. " }),
+          `${n} people across cities, ages and incomes judged the idea against their own home, work and habits: ${r1.agree} agree, ${r1.neutral} neutral, ${r1.disagree} disagree.`, split(r1, n)),
+        h("li", {}, h("b", { text: `Round 2: ${S.asked} swing voters reconsidered. ` }),
+          `Everyone who was neutral, plus every third person who had decided, heard what the crowd said. ${changedN ? `${changedN} changed their vote: ${moveText}.` : "Nobody changed their vote."}`),
+        h("li", {}, h("b", { text: "Final count. " }),
+          `${fin.agree} agree, ${fin.neutral} neutral, ${fin.disagree} disagree; ${fin.would_pay_pct}% said they would actually pay. The app counts these, not the AI.`, split(fin, fin.total || 1)),
+        h("li", {}, h("b", { text: "The summary above " }), "was written by ", judgeName(),
+          " after reading every comment and the breakdowns below.")),
+      best && worst && best !== worst ? h("p", {}, h("b", { text: "Most support: " }), `${best.label}, ${best.pct}% agree. `,
+        h("b", { text: "Least support: " }), `${worst.label}, ${worst.pct}% agree.`) : null,
+      h("div", { class: "cta-row" }, talk("disagree", "Talk to someone who said no"),
+        changedN ? talk("changed", "See who changed their mind") : null, talk("pay", "Meet the people who would pay")));
+  }
+  function explainSharks(ev) {
+    const rounds = Math.max(1, ...Object.values(S.stances).flat().map((s) => s.round));
+    const votes = Object.fromEntries(ev.verdict.votes.map((v) => [v.shark, v.stance]));
+    const rows = Object.entries(S.panel).map(([id, p]) => {
+      const by = Object.fromEntries((S.stances[id] || []).map((s) => [s.round, s]));
+      return h("tr", {}, h("td", { text: p.name.split(" ")[0] }),
+        ...Array.from({ length: rounds }, (_, i) => h("td", {}, by[i + 1] ? h("span", { class: "chip " + by[i + 1].stance, text: by[i + 1].stance }) : "—")),
+        h("td", {}, votes[p.name] ? h("span", { class: "chip " + votes[p.name], text: votes[p.name] }) : "—"));
+    });
+    const moved = [];
+    S.founder.filter((f) => f.answered).forEach((f) => Object.entries(S.panel).forEach(([id, p]) => {
+      const st = S.stances[id] || [], a = st.find((s) => s.round === f.round), b = st.find((s) => s.round === f.round + 1);
+      if (a && b && a.stance !== b.stance) moved.push(`${p.name.split(" ")[0]} moved ${a.stance} → ${b.stance} after your round-${f.round} answer`);
+    }));
+    const answered = S.founder.filter((f) => f.answered).length;
+    return h("section", { class: "explain" },
+      h("h3", { text: "How this verdict was reached" }),
+      h("p", { text: `${Object.keys(S.panel).length} sharks debated over ${rounds} rounds, the most skeptical speaking first each round. You answered ${answered} of ${S.founder.length} times.` }),
+      h("div", { class: "segwrap" }, h("table", { class: "traj" },
+        h("thead", {}, h("tr", {}, h("th", { text: "Shark" }), ...Array.from({ length: rounds }, (_, i) => h("th", { text: `Round ${i + 1}` })), h("th", { text: "Final vote" }))),
+        h("tbody", {}, rows))),
+      h("p", { text: moved.length ? `Your answers moved them: ${moved.join("; ")}.` : answered ? "Your answers didn't change any shark's stance." : "You didn't answer, so the sharks had only the pitch to go on." }),
+      h("p", {}, "The score, risks and next steps were written by ", judgeName(), " after reading the whole debate. Tap Chat on a shark to push back."));
+  }
+  function explainRoast(ev) {
+    const entries = Object.entries(S.reviews);
+    const avgOf = (r) => (r.clarity + r.trust + r.design + r.cta) / 4;
+    const sorted = [...entries].sort((a, b) => avgOf(a[1].review) - avgOf(b[1].review));
+    const weakest = Object.entries(ev.averages).sort((a, b) => a[1] - b[1])[0];
+    const label = (k) => k === "cta" ? "call-to-action" : k;
+    return h("section", { class: "explain" },
+      h("h3", { text: "How this verdict was reached" }),
+      h("p", { text: `${entries.length} reviewers each read the page and scored clarity, trust, design and call-to-action from 1 to 10.` }),
+      weakest ? h("p", {}, h("b", { text: "Weakest area: " }), `${label(weakest[0])}, averaging ${weakest[1]}/10.`) : null,
+      sorted.length > 1 ? h("p", {}, h("b", { text: "Toughest reviewer: " }), `${sorted[0][1].name} (${avgOf(sorted[0][1].review).toFixed(1)}/10). `,
+        h("b", { text: "Most generous: " }), `${sorted[sorted.length - 1][1].name} (${avgOf(sorted[sorted.length - 1][1].review).toFixed(1)}/10).`) : null,
+      h("p", {}, "The overall score and fixes were written by ", judgeName(), " from all six reviews. Tap Chat on a reviewer to ask how they'd fix it."));
+  }
+  function segTable(name, groups) {
+    const rows = Object.entries(groups).map(([g, d]) => h("tr", {},
+      h("td", { text: g }), h("td", { text: d.n }),
+      h("td", {}, h("div", { class: "mini" },
+        h("i", { style: `background:var(--agree);width:${100 * d.agree / d.n}%` }),
+        h("i", { style: `background:var(--neutral);width:${100 * d.neutral / d.n}%` }),
+        h("i", { style: `background:var(--disagree);width:${100 * d.disagree / d.n}%` }))),
+      h("td", { text: `${Math.round(100 * d.agree / d.n)}%` }), h("td", { text: `${Math.round(100 * d.would_pay / d.n)}%` })));
+    return h("div", { style: "margin-top:16px" }, h("h3", { style: "font-size:.95rem;margin-bottom:4px", text: `By ${name.toLowerCase()}` }),
+      h("div", { class: "segwrap" }, h("table", { class: "segs" },
+        h("thead", {}, h("tr", {}, ...["Group", "People", "Split", "Agree", "Would pay"].map((x) => h("th", { text: x })))),
+        h("tbody", {}, rows))));
+  }
+
+  function onDone(ev) {
+    S.done = true;
+    hideFounderBox();
+    if (S.es) S.es.close();
+    setStatus(S.live ? "Done" : "Replay finished", false);
+    $("#after").hidden = false;
+    $("#shareUrl").value = location.origin + "/d/" + S.id;
+    const models = ev.crowd_model === "fake" && ev.judge_model === "fake"
+      ? "Demo run with the fake AI provider (no API key used)."
+      : `Personas: ${ev.crowd_model} · Verdict: ${ev.judge_model}`;
+    $("#foot").textContent = `${models} · ${Number(ev.tokens || 0).toLocaleString()} tokens.`;
+    if (ev.judge_model && ev.judge_model !== "fake") {
+      const name = ev.judge_model === "anthropic" ? "Claude" : ev.judge_model === "sarvam" ? "Sarvam" : ev.judge_model;
+      document.querySelectorAll(".judge-name").forEach((el) => { el.textContent = `the judge (${name})`; });
+    }
+  }
+
+  // ---------- follow-up chat with one persona ----------
+  const SUGGEST = {
+    crowd: ["Why did you vote that way?", "What would make you pay for this?", "What do you use today instead?"],
+    shark: ["What would make you invest?", "Which number worries you most?", "If I fix that in 3 months, are you in?"],
+    roaster: ["What should the headline say?", "Rewrite my main button for me", "What would make you trust this page?"],
+  };
+  let chatCtx = null; // { kind, id, opener }
+  function personaInfo(kind, id) {
+    if (kind === "crowd") {
+      const p = S.crowd[id].p, card = S.people[id];
+      const said = [card.r1, card.r2].filter((el) => !el.hidden).map((el) => el.querySelector("p").textContent);
+      return { name: p.name, title: `${p.age}, ${p.occupation}, ${p.city}`, i: 0, position: S.final[id],
+        note: said.length ? `In the panel they said: “${said[said.length - 1]}”` : "They didn't get to speak in the panel." };
+    }
+    const p = S.panel[id];
+    if (kind === "shark") {
+      const st = S.stances[id] || [], last = st[st.length - 1];
+      return { name: p.name, title: p.title, i: p.i,
+        position: (S.finalVotes && S.finalVotes[p.name]) || (last ? last.stance : null),
+        note: `They debated your pitch over ${st.length} turns. Ask them what it would take.` };
+    }
+    const r = S.reviews[id];
+    return { name: p.name, title: p.title, i: p.i, position: null,
+      note: r ? `Their review: “${r.review.roast}”` : "They reviewed your landing page." };
+  }
+  function setPos(el, pos) {
+    el.hidden = !pos;
+    if (pos) { el.className = "chip " + pos; el.textContent = pos; }
+  }
+  function openChat(kind, id) {
+    if (!S || !S.verdictIn) return;
+    chatCtx = { kind, id, opener: document.activeElement };
+    const info = personaInfo(kind, id);
+    const st = S.chats[id] = S.chats[id] || { turns: [], position: info.position };
+    $("#chatAv").replaceChildren(); $("#chatAv").append(...avatar(info.name, info.i).childNodes);
+    $("#chatAv").setAttribute("style", `background:${AVATAR[info.i % AVATAR.length]}`);
+    $("#chatName").textContent = info.name;
+    $("#chatTitle").textContent = info.title;
+    setPos($("#chatPos"), st.position);
+    $("#chatNote").textContent = info.note;
+    const log = $("#chatLog"); log.replaceChildren();
+    st.turns.forEach((t) => log.append(h("div", { class: `bubble ${t.role === "founder" ? "me" : "them"}`, text: t.text })));
+    $("#chatSuggest").replaceChildren(...SUGGEST[kind].map((q) => h("button", { type: "button", class: "fchip", text: q, onclick: () => sendChat(q) })));
+    $("#chatSuggest").hidden = st.turns.length > 0;
+    $("#scrim").hidden = false; $("#chat").hidden = false;
+    log.scrollTop = log.scrollHeight;
+    $("#chatInput").focus();
+  }
+  function closeChat() {
+    $("#chat").hidden = true; $("#scrim").hidden = true;
+    if (chatCtx && chatCtx.opener && chatCtx.opener.focus) chatCtx.opener.focus({ preventScroll: true });
+    chatCtx = null;
+  }
+  async function sendChat(text) {
+    if (!chatCtx || !text.trim()) return;
+    const { kind, id } = chatCtx, info = personaInfo(kind, id), st = S.chats[id], log = $("#chatLog");
+    const message = text.trim();
+    $("#chatSuggest").hidden = true;
+    log.append(h("div", { class: "bubble me", text: message }));
+    const typing = h("div", { class: "moved-line", text: `${info.name.split(" ")[0]} is typing…` });
+    log.append(typing); log.scrollTop = log.scrollHeight;
+    $("#chatInput").value = ""; $("#chatSend").disabled = true;
+    const headers = { "Content-Type": "application/json" };
+    if ($("#kAnth").value.trim()) headers["X-Anthropic-Key"] = $("#kAnth").value.trim();
+    if ($("#kSarvam").value.trim()) headers["X-Sarvam-Key"] = $("#kSarvam").value.trim();
+    try {
+      const r = await fetch(`/api/debates/${S.id}/chat`, { method: "POST", headers,
+        body: JSON.stringify({ persona_id: id, message, history: st.turns.slice(-40) }) });
+      const data = await r.json().catch(() => ({}));
+      typing.remove();
+      if (!r.ok) {
+        log.append(h("div", { class: "bubble err", text: errorText(data, "No reply this time. Try again.") }));
+        $("#chatInput").value = message;
+        return;
+      }
+      st.turns.push({ role: "founder", text: message }, { role: "persona", text: data.reply });
+      log.append(h("div", { class: "bubble them", text: data.reply }));
+      if (data.position && data.position !== st.position) {
+        log.append(h("div", { class: "moved-line" }, `${info.name.split(" ")[0]} moved: `,
+          st.position ? h("span", { class: "chip " + st.position, text: st.position }) : "", " → ",
+          h("span", { class: "chip " + data.position, text: data.position })));
+        st.position = data.position;
+        setPos($("#chatPos"), st.position);
+        if (kind === "crowd" && S.people[id]) { const n = S.people[id].note; n.hidden = false; n.textContent = `After your chat: ${st.position}`; }
+      }
+      log.scrollTop = log.scrollHeight;
+    } catch {
+      typing.remove();
+      log.append(h("div", { class: "bubble err", text: "Couldn't reach the server." }));
+      $("#chatInput").value = message;
+    } finally {
+      $("#chatSend").disabled = false;
+      $("#chatInput").focus();
+    }
+  }
+  $("#chatForm").addEventListener("submit", (e) => { e.preventDefault(); sendChat($("#chatInput").value); });
+  $("#chatClose").addEventListener("click", closeChat);
+  $("#scrim").addEventListener("click", closeChat);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("#chat").hidden) closeChat(); });
+
+  // ---------- transport ----------
+  function connect(id) {
+    const es = new EventSource(`/api/debates/${id}/stream`);
+    S.es = es;
+    es.onmessage = (m) => {
+      const ev = JSON.parse(m.data);
+      if (ev.id <= S.lastId) return; // already applied (reconnect)
+      S.lastId = ev.id;
+      apply(ev);
+    };
+    es.onerror = () => {
+      if (S.done) { es.close(); return; }
+      if (es.readyState === EventSource.CLOSED) loadDebate(id); // stream gone: fall back to the saved copy
+    };
+  }
+
+  async function loadDebate(id) {
+    const r = await fetch(`/api/debates/${id}`);
+    if (!r.ok) { $("#stage").hidden = false; return showFormError("That debate link has expired or doesn't exist."); }
+    const snap = await r.json();
+    setMode(snap.mode);
+    if (snap.request.pitch) { $("#pitch").value = snap.request.pitch; $("#count").textContent = snap.request.pitch.length; }
+    if (snap.request.url) $("#url").value = snap.request.url;
+    if (!snap.finished) { beginStage(id, snap.mode, snap.request, true); return connect(id); } // still live: stream it
+    beginStage(id, snap.mode, snap.request, false);
+    for (const ev of snap.events) {
+      if (ev.type === "typing" || ev.type === "founder_turn") continue;
+      apply(ev);
+      await sleep(ev.type === "reaction" ? 6 : ev.type === "message" || ev.type === "review" ? 120 : 30);
+    }
+  }
+
+  $("#copy").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText($("#shareUrl").value); $("#copy").textContent = "Copied"; }
+    catch { $("#shareUrl").select(); }
+    setTimeout(() => { $("#copy").textContent = "Copy link"; }, 1500);
+  });
+  $("#again").addEventListener("click", () => {
+    if (S && S.es) S.es.close();
+    history.pushState(null, "", "/");
+    $("#stage").hidden = true;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    (mode === "roast" ? $("#url") : $("#pitch")).focus();
+  });
+
+  // ---------- boot ----------
+  fetch("/api/config").then((r) => r.json()).then((c) => {
+    const b = $("#providerBadge");
+    if (c.crowd_provider === "fake" && c.judge_provider === "fake") b.textContent = "Demo AI · no key in use";
+    else { b.textContent = `Live AI · ${c.crowd_provider} + ${c.judge_provider}`; b.classList.add("live"); }
+  }).catch(() => { $("#providerBadge").textContent = "Server offline"; });
+
+  setMode("sharks");
+  const m = location.pathname.match(/^\/d\/([a-f0-9]{12})$/);
+  if (m) loadDebate(m[1]);
+})();
+</script>
+</body>
+</html>

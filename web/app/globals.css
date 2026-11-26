@@ -1,0 +1,198 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Sabhora — design tokens (Direction A: Marigold Council)
+   Light is the hard default. Dark is opt-in via [data-theme="dark"].
+--------------------------------------------------------------------------- */
+
+:root {
+  /* neutrals — warm paper */
+  --bg: #faf9f6;
+  --surface: #ffffff;
+  --raised: #ffffff;
+  --edge: #e7e5e4;
+  --edge-strong: #d6d3d1;
+  --ink: #1c1917;
+  --muted: #78716c;
+  --faint: #a8a29e;
+
+  /* brand + semantic */
+  --brand: #4f46e5;
+  --brand-ink: #4338ca;
+  --brand-soft: #eef0ff;
+  --accent: #f59e0b;
+  --accent-ink: #b45309;
+  --accent-soft: #fef3e2;
+  --success: #059669;
+  --success-ink: #047857;
+  --success-soft: #e7f6f0;
+  --danger: #dc2626;
+  --danger-soft: #fdecec;
+
+  /* swappable mode hue — defaults to brand */
+  --mode: #4f46e5;
+  --mode-ink: #4338ca;
+  --mode-soft: #eef0ff;
+
+  /* shadow tint (warm) */
+  --sh: 28 25 23;
+
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --bg: #1a1714;
+  --surface: #221e19;
+  --raised: #2a251f;
+  --edge: #3a342d;
+  --edge-strong: #4a443c;
+  --ink: #f5f3ef;
+  --muted: #a8a29e;
+  --faint: #78716c;
+
+  --brand: #818cf8;
+  --brand-ink: #a5b4fc;
+  --brand-soft: #262348;
+  --accent: #fbbf24;
+  --accent-ink: #fcd34d;
+  --accent-soft: #332611;
+  --success: #34d399;
+  --success-ink: #6ee7b7;
+  --success-soft: #11291f;
+  --danger: #fb7185;
+  --danger-soft: #3a1620;
+
+  --mode: #818cf8;
+  --mode-ink: #a5b4fc;
+  --mode-soft: #262348;
+
+  --sh: 0 0 0;
+
+  color-scheme: dark;
+}
+
+/* per-room mode hue — set on a wrapper, cascades to --mode utilities */
+.room-sharks { --mode: #4338ca; --mode-ink: #3730a3; --mode-soft: #eef0ff; }
+.room-janta  { --mode: #f59e0b; --mode-ink: #b45309; --mode-soft: #fef3e2; }
+.room-roast  { --mode: #f43f5e; --mode-ink: #be123c; --mode-soft: #ffe9ee; }
+
+:root[data-theme="dark"] .room-sharks { --mode: #818cf8; --mode-ink: #a5b4fc; --mode-soft: #262348; }
+:root[data-theme="dark"] .room-janta  { --mode: #fbbf24; --mode-ink: #fcd34d; --mode-soft: #332611; }
+:root[data-theme="dark"] .room-roast  { --mode: #fb7185; --mode-ink: #fda4af; --mode-soft: #3a1620; }
+
+/* ---- expose tokens to Tailwind utilities (kept as var refs via `inline`) ---- */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-edge: var(--edge);
+  --color-edge-strong: var(--edge-strong);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-soft: var(--brand-soft);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-success: var(--success);
+  --color-success-ink: var(--success-ink);
+  --color-success-soft: var(--success-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  --color-mode: var(--mode);
+  --color-mode-ink: var(--mode-ink);
+  --color-mode-soft: var(--mode-soft);
+
+  --font-display: var(--font-space), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), var(--font-deva), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 12px;
+  --radius-lg: 16px;
+
+  --shadow-soft: 0 1px 2px rgb(var(--sh) / 0.06);
+  --shadow-card: 0 4px 16px rgb(var(--sh) / 0.08);
+  --shadow-lift: 0 12px 32px rgb(var(--sh) / 0.12);
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-inter), var(--font-deva), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Without this, a grid with no column utility grows to its widest child and overflows phones.
+     Any grid-cols-* utility still wins, because utilities sit in a later layer. */
+  [class~="grid"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-space), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: #1c1917;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  a { color: inherit; text-decoration: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+/* CSS-only entrance for above-the-fold content: paints before hydration */
+.fade-up { animation: fade-up 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+@keyframes marquee {
+  to { transform: translateX(calc(-50% - 6px)); }
+}
+
+/* soft brand + saffron light behind the hero */
+.hero-glow {
+  background:
+    radial-gradient(55% 45% at 15% 0%, color-mix(in srgb, var(--brand) 13%, transparent), transparent 70%),
+    radial-gradient(45% 40% at 88% 8%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%);
+}
+
+/* subtle grid texture used behind the hero */
+.paper-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 85%);
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 40%, transparent 85%);
+}

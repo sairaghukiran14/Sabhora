@@ -1,0 +1,212 @@
+{
+  "sarvam-105b-conversations": {
+    "sharks": {
+      "pass": 9,
+      "n": 9,
+      "avg_s": 0.0,
+      "rs_per_call": 0.0087,
+      "tokens_per_call": 725,
+      "rejects": [],
+      "sample": "Thirty-two out of forty reordering weekly sounds promising, beta, but I still do not see the repeat purchase over six months or the unit economics; if your gross margin is eaten by distributor payouts and WhatsApp business fees, how do you survive when a rival undercuts that 1.5%? I am passing.",
+      "extra": null
+    },
+    "crowd": {
+      "pass": 10,
+      "n": 10,
+      "avg_s": 0.0,
+      "rs_per_call": 0.0111,
+      "tokens_per_call": 764,
+      "rejects": [],
+      "sample": "Indore mein 40 shops pehle hi 3 mahine mein ise use kar rahe hain, toh Mumbai ke distributors bhi ek tap mein stock mangane ke liye jump karenge, main definitely try karunga.",
+      "extra": "votes {'agree': 7, 'neutral': 8, 'disagree': 15}, all-same batches 1/10"
+    },
+    "swing": {
+      "pass": 12,
+      "n": 12,
+      "avg_s": 0.0,
+      "rs_per_call": 0.0077,
+      "tokens_per_call": 662,
+      "rejects": [],
+      "sample": "neutral: Indore ke data se mujhe itna farq nahi padta, Vijayawada ke dukaan waale toh Hindi ke bajaye Telugu mein order karenge, toh kya wahan bhi yahi language option milega?",
+      "extra": "votes {'neutral': 7, 'disagree': 4, 'agree': 1}"
+    },
+    "judge": {
+      "pass": 3,
+      "n": 3,
+      "avg_s": 0.0,
+      "rs_per_call": 0.0339,
+      "tokens_per_call": 2798,
+      "rejects": [],
+      "sample": "Crowd Rejects KiranaOne: Too Few Shops, Too Much Data, and a Fee Nobody Asked For",
+      "extra": null
+    }
+  },
+  "glm5.3-flash": {
+    "sharks": {
+      "pass": 9,
+      "n": 9,
+      "avg_s": 0.0,
+      "rs_per_call": 0.0123,
+      "tokens_per_call": 692,
+      "rejects": [],
+      "sample": "Beta, 80% weekly repeat from shops is the first honest number I've heard today, but here's my real worry: at 1.5% on a Rs 6,000 order you're making Rs 90 per order, so even a hundred shops won't pay for a sales team. If distributors are your channel and your customer, what stops them squeezing you to 0.5% once they hold the relationship?",
+      "extra": null
+    },
+    "crowd": {
+      "pass": 10,
+      "n": 10,
+      "avg_s": 0.0,
+      "rs_per_call": 0.018,
+      "tokens_per_call": 747,
+      "rejects": [],
+      "sample": "WhatsApp-first with Hindi is smart, distributors won't need training. But 1.5% from distributors — will they actually absorb it or pass it to the shopkeepers? That decides everything.",
+      "extra": "votes {'neutral': 10, 'disagree': 16, 'agree': 4}, all-same batches 1/10"
+    },
+    "swing": {
+      "pass": 12,
+      "n": 12,
+      "avg_s": 0.0,
+      "rs_per_call": 0.012,
+      "tokens_per_call": 668,
+      "rejects": [],
+      "sample": "neutral: Telugu lo kuda option undali, Hindi matrame unte Vijayawada lo evaru vaadaru. WhatsApp lo order cheyadam easy, kani ee 1.5% distributor ela accept chestado naaku artham avvatledu.",
+      "extra": "votes {'neutral': 4, 'disagree': 7, 'agree': 1}"
+    },
+    "judge": {
+      "pass": 3,
+      "n": 3,
+      "avg_s": 0.0,
+      "rs_per_call": 0.0572,
+      "tokens_per_call": 3329,
+      "rejects": [],
+      "sample": "Distrust Wins: 30 of 50 Voters Tell KiranaOne 'Show Us Proof and Clear Pricing'",
+      "extra": null
+    }
+  },
+  "gemma4": {
+    "sharks": {
+      "pass": 9,
+      "n": 9,
+      "avg_s": 0.0,
+      "rs_per_call": 0.0288,
+      "tokens_per_call": 704,
+      "rejects": [],
+      "sample": "The repeat rate is decent, but a 1.5% cut on a 6,000 rupee order is barely peanuts for you. Beta, tell me the truth—how many thousands of orders do you need just to cover your own tea and coffee expenses?",
+      "extra": null
+    },
+    "crowd": {
+      "pass": 10,
+      "n": 10,
+      "avg_s": 0.0,
+      "rs_per_call": 0.0348,
+      "tokens_per_call": 711,
+      "rejects": [],
+      "sample": "This is a great way to digitize the supply chain in smaller towns! I'd love to see if this can scale to industrial raw materials too.",
+      "extra": "votes {'agree': 7, 'neutral': 11, 'disagree': 12}, all-same batches 0/10"
+    },
+    "swing": {
+      "pass": 12,
+      "n": 12,
+      "avg_s": 0.0,
+      "rs_per_call": 0.025,
+      "tokens_per_call": 635,
+      "rejects": [],
+      "sample": "agree: This looks very useful for the small shop owners in my colony, but will it work in Telugu as well or only Hindi?",
+      "extra": "votes {'agree': 3, 'disagree': 8, 'neutral': 1}"
+    },
+    "judge": {
+      "pass": 3,
+      "n": 3,
+      "avg_s": 0.0,
+      "rs_per_call": 0.1113,
+      "tokens_per_call": 2705,
+      "rejects": [],
+      "sample": "High Skepticism: Users See a Redundant Tool with Questionable Fees",
+      "extra": null
+    }
+  },
+  "deepseekv4.1-flash-1017": {
+    "sharks": {
+      "pass": 9,
+      "n": 9,
+      "avg_s": 0.0,
+      "rs_per_call": 0.0172,
+      "tokens_per_call": 912,
+      "rejects": [],
+      "sample": "Thirty-two of forty reordering weekly, that's the only number in your pitch I actually like, beta. But at 1.5% on a Rs 6,000 order you earn ninety rupees a shop per week, so tell me your CAC to get that shop and whether two distributors pushing you means they pay, or you still pay to acquire their shops.",
+      "extra": null
+    },
+    "crowd": {
+      "pass": 10,
+      "n": 10,
+      "avg_s": 0.0,
+      "rs_per_call": 0.0269,
+      "tokens_per_call": 1242,
+      "rejects": [],
+      "sample": "Interesting concept, but I run a factory, not a kirana. Still, I'd love to try it for my raw material orders if distributors adopt it. WhatsApp-first is smart.",
+      "extra": "votes {'agree': 6, 'neutral': 10, 'disagree': 14}, all-same batches 0/10"
+    },
+    "swing": {
+      "pass": 12,
+      "n": 12,
+      "avg_s": 0.0,
+      "rs_per_call": 0.0152,
+      "tokens_per_call": 838,
+      "rejects": [],
+      "sample": "neutral: Hindi ya regional language mein order karna achhi baat hai, lekin Vijayawada ke kirana waale Telugu mein hi baat karenge — Telugu support hai ya sirf Hindi? Aur distributor 1.5% alag se dega, woh dukaan waale pe nahi daalega na?",
+      "extra": "votes {'neutral': 8, 'disagree': 3, 'agree': 1}"
+    },
+    "judge": {
+      "pass": 3,
+      "n": 3,
+      "avg_s": 0.0,
+      "rs_per_call": 0.0692,
+      "tokens_per_call": 3497,
+      "rejects": [],
+      "sample": "Indore's 40 shops aren't enough: sceptical India says show me the proof and the fee breakdown.",
+      "extra": null
+    }
+  },
+  "glm5.3": {
+    "sharks": {
+      "pass": 9,
+      "n": 9,
+      "avg_s": 0.0,
+      "rs_per_call": 0.1179,
+      "tokens_per_call": 708,
+      "rejects": [],
+      "sample": "Beta, 32 of 40 reordering weekly — that's the first real number you've given me, and it warms my Dilli heart. But your 1.5% on a Rs 6,000 order is Rs 90 — show me what that gross margin looks like after you've paid for WhatsApp API, onboarding those shopkeepers by hand, and the field team you'll need in every new city.",
+      "extra": null
+    },
+    "crowd": {
+      "pass": 10,
+      "n": 10,
+      "avg_s": 0.0,
+      "rs_per_call": 0.1488,
+      "tokens_per_call": 718,
+      "rejects": [],
+      "sample": "Nice, WhatsApp-first is smart for kirana guys, but Mumbai distributors won't move at 1.5% cut easily — margins in this trade are thin, bhai. Still, one-tap reorder in Hindi is the right idea.",
+      "extra": "votes {'agree': 6, 'neutral': 12, 'disagree': 12}, all-same batches 0/10"
+    },
+    "swing": {
+      "pass": 12,
+      "n": 12,
+      "avg_s": 0.0,
+      "rs_per_call": 0.109,
+      "tokens_per_call": 667,
+      "rejects": [],
+      "sample": "neutral: Telugu mein order cheyyochu ante chala baagundhi, anduke WhatsApp lo try cheyyochu - kaani distributors ee app ki vastara leda vallu manam phone lo matladukuntunna rules chuste nammali.",
+      "extra": "votes {'neutral': 4, 'disagree': 7, 'agree': 1}"
+    },
+    "judge": {
+      "pass": 3,
+      "n": 3,
+      "avg_s": 0.0,
+      "rs_per_call": 0.5209,
+      "tokens_per_call": 3325,
+      "rejects": [],
+      "sample": "The crowd says WhatsApp ordering for kiranas is a solution to a problem nobody has—prove it at scale or shut it down.",
+      "extra": null
+    }
+  }
+}

@@ -1,0 +1,18 @@
+# Web server
+fastapi>=0.115
+uvicorn[standard]>=0.30
+
+# Settings and validation
+pydantic>=2.8
+pydantic-settings>=2.4
+pyyaml>=6.0
+
+# LLM providers
+httpx>=0.27
+anthropic>=0.75
+
+# Postgres (saved debates)
+psycopg[binary,pool]>=3.3
+
+# Landing-page scraping (Roast mode)
+beautifulsoup4>=4.12

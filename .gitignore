@@ -1,0 +1,19 @@
+# Secrets & dumps: never commit
+.env
+.env.*
+!.env.example
+*.dump
+
+# OS & local tooling
+.DS_Store
+.claude/
+
+# Python
+.venv/
+__pycache__/
+*.db
+.pytest_cache/
+.ruff_cache/
+
+# Saved debates (local data)
+backend/data/

@@ -1,0 +1,160 @@
+# Building blocks for the Janta (public) crowd.
+# The generator mixes these into N different personas with a fixed seed,
+# so the same crowd appears every time (reproducible results).
+#
+# Each person gets facts that let a model judge whether an idea FITS their life:
+# household (kids? joint family?), how they work today, what they already pay for, their
+# phone habits and their pain points. Without these, measured votes followed the attitude
+# label ~85% of the time (scripts/crowd_label_test.py). These are hand-written, plausible
+# profiles, not survey data; grounding them in real data is a later step.
+
+cities:
+  - {name: Mumbai, tier: 1, region: west, language: Hindi/Marathi}
+  - {name: Delhi, tier: 1, region: north, language: Hindi}
+  - {name: Bengaluru, tier: 1, region: south, language: Kannada/English}
+  - {name: Chennai, tier: 1, region: south, language: Tamil}
+  - {name: Hyderabad, tier: 1, region: south, language: Telugu/Hindi}
+  - {name: Kolkata, tier: 1, region: east, language: Bengali}
+  - {name: Pune, tier: 2, region: west, language: Marathi}
+  - {name: Jaipur, tier: 2, region: north, language: Hindi}
+  - {name: Lucknow, tier: 2, region: north, language: Hindi}
+  - {name: Indore, tier: 2, region: north, language: Hindi}
+  - {name: Coimbatore, tier: 2, region: south, language: Tamil}
+  - {name: Bhubaneswar, tier: 2, region: east, language: Odia}
+  - {name: Patna, tier: 3, region: east, language: Hindi/Bhojpuri}
+  - {name: Nashik, tier: 3, region: west, language: Marathi}
+  - {name: Vijayawada, tier: 3, region: south, language: Telugu}
+  - {name: Bareilly, tier: 3, region: north, language: Hindi}
+
+first_names:
+  north: [Aman, Pooja, Rohit, Neha, Vikas, Sunita, Karan, Anjali, Deepak, Ritu]
+  south: [Karthik, Lakshmi, Arun, Divya, Suresh, Meenakshi, Vignesh, Swathi, Ravi, Anitha]
+  east: [Sourav, Rimpa, Ankit, Puja, Subhash, Mitali, Rahul, Sneha, Bikash, Tanushree]
+  west: [Omkar, Snehal, Hardik, Komal, Sagar, Prachi, Nikhil, Rutuja, Jay, Mansi]
+
+# Order matters: the generator picks by position, so keep the list order stable.
+# min_age/max_age fix people who were impossible before (e.g. a 19-year-old retired banker).
+occupations:
+  - title: Kirana shop owner
+    income: "₹25k-50k/month"
+    min_age: 22
+    work: runs the shop 13 hours a day; orders stock from 3-4 distributors by phone and WhatsApp; keeps customer credit in a paper khata
+    pays_for: a ₹199 mobile recharge and a UPI QR sticker; no paid apps
+    pains: [distributor salesmen come at random times, money stuck in customer credit, quick-commerce apps taking regular customers, stock running out of fast sellers]
+  - title: Software engineer
+    income: "₹1-2L/month"
+    min_age: 22
+    work: hybrid job at an IT services company; 9-hour days plus calls with US clients
+    pays_for: OTT subscriptions, a quick-commerce membership and a gym
+    pains: [no time on weekdays, too many subscriptions already, long commute on office days, eating out too often]
+  - title: College student
+    income: "pocket money"
+    work: second-year undergraduate; attends classes and coaching; everything runs on the phone
+    pays_for: nothing regularly beyond a mobile data pack; splits OTT logins with friends
+    pains: [tight monthly budget, exam and placement stress, unreliable hostel or PG food, no savings]
+  - title: Homemaker running a home business
+    income: "₹10k-30k/month"
+    min_age: 24
+    work: sells home-made snacks and tiffins to about 40 regular customers through WhatsApp groups
+    pays_for: a family mobile plan; buys ingredients in bulk from the local market
+    pains: [tracking orders and payments inside chats, irregular income, can't reach customers beyond her area, ingredient prices rising]
+  - title: Delivery rider
+    income: "₹18k-30k/month"
+    min_age: 19
+    max_age: 45
+    work: rides for two delivery apps, 10-hour shifts, paid weekly
+    pays_for: fuel, a bike EMI and a mobile data pack
+    pains: [fuel costs, app incentives keep changing, no paid days off, phone battery dying mid-shift]
+  - title: Government clerk
+    income: "₹40k-60k/month"
+    min_age: 23
+    max_age: 60
+    work: fixed 10-to-5 office job; salary arrives on the 1st
+    pays_for: children's tuition, an LIC policy and a cable TV connection
+    pains: [slow paperwork, children's education costs, waiting months for reimbursements]
+  - title: Chartered Accountant (CA)
+    income: "₹1-1.5L/month"
+    min_age: 24
+    work: runs a small practice filing GST and income-tax returns for about 60 small businesses
+    pays_for: Tally and a GST filing software licence
+    pains: [deadline crunch every month, clients send bills as messy WhatsApp photos, chasing clients for documents]
+  - title: Farmer
+    income: "seasonal, ₹15k-40k/month"
+    min_age: 22
+    work: grows soybean and wheat on 4 acres; sells at the local mandi
+    pays_for: seeds, fertiliser and diesel; a basic mobile plan
+    pains: [unpredictable crop prices, middlemen take a big cut, patchy internet in the village, getting credit before sowing]
+  - title: School teacher
+    income: "₹30k-50k/month"
+    min_age: 23
+    max_age: 60
+    work: teaches Class 6-8 maths at a private school and takes home tuitions in the evening
+    pays_for: a school-recommended learning app for own child and a family mobile plan
+    pains: [large classes, parents want constant progress updates, low salary for the workload]
+  - title: Retired bank manager
+    income: "pension ₹50k/month"
+    min_age: 58
+    work: retired; manages family savings and investments; reads the newspaper daily
+    pays_for: health insurance, a newspaper subscription and cable TV
+    pains: [worried about online fraud, rising health expenses, children live in another city]
+  - title: Small factory owner
+    income: "₹2-5L/month"
+    min_age: 28
+    work: runs a 25-worker unit making packaging boxes; buys raw material from wholesalers on credit
+    pays_for: an accountant, Tally and a GST consultant
+    pains: [late payments from buyers, labour turnover, raw material prices swinging]
+  - title: Marketing executive
+    income: "₹60k-90k/month"
+    min_age: 22
+    max_age: 50
+    work: sells for an FMCG distributor and visits 30 retailers a week, on the road 4 days a week
+    pays_for: OTT, food delivery and a car EMI
+    pains: [monthly sales targets, chasing retailer payments, retailers ignoring new schemes]
+  - title: Auto-rickshaw driver
+    income: "₹20k-35k/month"
+    min_age: 21
+    max_age: 62
+    work: drives a rented auto 12 hours a day; gets rides from street hails and one ride app
+    pays_for: daily auto rent, CNG and a mobile data pack
+    pains: [daily rent for the auto, CNG queues, ride-app commission]
+  - title: Doctor
+    income: "₹2-4L/month"
+    min_age: 27
+    work: runs a clinic in the evenings and does hospital rounds in the morning
+    pays_for: clinic software, medical journals and staff salaries
+    pains: [no time, patient records on paper, too many sales reps]
+  - title: Content creator
+    income: "irregular, ₹20k-1L/month"
+    min_age: 18
+    max_age: 40
+    work: makes Instagram reels about local food, 40k followers; edits on the phone
+    pays_for: editing apps, a ring light and a fast data plan
+    pains: [unpredictable brand deals, algorithm changes, burnout from posting daily]
+
+# Who they live with, by age band. Says whether the person has school-age children.
+households:
+  "18-24": [lives with parents and a younger sibling, shares a rented room with two friends, stays in a college hostel or PG, newly married with no children]
+  "25-34": [newly married with no children, married with a toddler, single and living alone in a rented 1BHK, joint family with one child in primary school]
+  "35-49": [married with two school-going children in Class 4 and Class 8, joint family of eight with parents and a brother's family, married with one teenager preparing for board exams, separated and raising a 10-year-old alone]
+  "50+": [lives with spouse; children married and moved away, joint family with son and two grandchildren in school, widowed and living with son's family, lives with spouse and an adult son still studying]
+
+# How they use a phone, with likelihood by age band (weights in the same order as levels).
+phone_levels:
+  - {label: Power user, text: heavy smartphone user who tries new apps often}
+  - {label: Daily WhatsApp and UPI, text: uses WhatsApp, UPI and YouTube daily but rarely installs new apps}
+  - {label: Basic smartphone, text: basic smartphone for calls and WhatsApp voice notes; needs help with new apps}
+  - {label: Feature phone, text: uses a feature phone; family members handle anything online}
+phone_weights:
+  "18-24": [5, 4, 1, 0]
+  "25-34": [4, 5, 1, 0]
+  "35-49": [2, 5, 2.5, 0.5]
+  "50+": [0.5, 3.5, 4, 2]
+
+attitudes:
+  - {id: early_adopter, label: Early adopter, hint: "loves trying new apps, forgives rough edges"}
+  - {id: pragmatist, label: Pragmatist, hint: "pays only if it clearly saves time or money"}
+  - {id: skeptic, label: Skeptic, hint: "has seen many startups fail, needs proof"}
+  - {id: budget, label: Budget-conscious, hint: "compares every rupee, hates subscriptions"}
+  - {id: traditional, label: Traditionalist, hint: "trusts offline and word of mouth over apps"}
+
+age_range: [18, 68]
