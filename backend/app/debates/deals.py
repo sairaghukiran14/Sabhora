@@ -95,6 +95,42 @@ def check_valuation_stance(message: str, terms: dict, ask: dict) -> None:
             "say why the price is acceptable to you after all")
 
 
+# A rupee figure given as a valuation: "valuation of ₹4 crore", "₹4 crore ki valuation",
+# "₹4 crore par value karta hai", "values the company at ₹4 crore".
+_AMOUNT = r"(?:₹|rs\.?|inr)?\s*(?<![\d.,])\d[\d,]*(?:\.\d+)?\s*(?:lakhs?|lacs?|crores?|cr)\b"
+_VALUATION_CLAIMS = tuple(re.compile(rx, re.IGNORECASE) for rx in (
+    rf"\bvaluation\s*(?:of|is|at|ko|sirf|only|:|=)?\s*(?P<amount>{_AMOUNT})",
+    rf"(?P<amount>{_AMOUNT})\s*(?:ki|ka|ke|wali)?\s*(?:(?:post|pre)[- ]money\s+)?valuation",
+    rf"(?P<amount>{_AMOUNT})\s*(?:par|pe|mein|me)\s+value\b",
+    rf"\b(?:values?|valued|valuing)\b[^.?!\n%₹]{{0,30}}?\bat\s+(?:sirf\s+|only\s+|just\s+|about\s+)?"
+    rf"(?P<amount>{_AMOUNT})",
+))
+
+
+def valuation_claim_error(message: str, valuations: set[float], amounts: set[float],
+                          own: float | None) -> str | None:
+    """An error message if `message` calls a figure a valuation although no ask, offer or
+    counter is worth that. On the real run of 27 Nov 2026 Farah offered ₹50 lakh for 10% and
+    told the founder it valued the company at "₹4 crore instead of ₹5 crore". It is ₹5
+    crore; the figure check let ₹4 crore through as one step from other figures.
+
+    `valuations` and `amounts` are in rupees. A figure that is money on the table is left
+    alone: in "40 lakh ki valuation 5 crore" the 40 lakh is the money asked for. This does
+    not tell whose valuation a true figure is. `own` is the speaker's, in lakh."""
+    for rx in _VALUATION_CLAIMS:
+        for m in rx.finditer(message):
+            said = m.group("amount").strip()
+            value = numbers.mentions(said)[0].value
+            if numbers.matches(value, valuations) or numbers.matches(value, amounts):
+                continue
+            yours = (f" Your terms value the company at {prompts.money(own)}."
+                     if own else "")
+            return (f"you called {said!r} a valuation, but no ask, offer or counter here is "
+                    f"worth that.{yours} A valuation is the equity money divided by the "
+                    "equity share; use the right figure or leave it out")
+    return None
+
+
 def is_better(new: dict, old: dict) -> bool:
     """Better for the founder: nothing got worse and something got better."""
     def score(t: dict) -> tuple[float, ...]:  # every entry: higher is better for the founder
@@ -156,6 +192,7 @@ class Table:
         # verdict said "Rs 36 lakh" for the accepted offer, was rejected 3 times as an unknown
         # figure, and the run fell back to a generic verdict.
         self.allowed = allowed if allowed is not None else set()
+        self.shown: list[dict] = []  # every set of terms put on the table, withdrawn ones too
         self.said: list[tuple[str, str]] = []  # (shark id, message) at the table
         self.offers: dict[str, dict] = {}
         self.stances: dict[str, str] = {}  # facts for the verdict
@@ -178,6 +215,9 @@ class Table:
         for offer in (*self.standing, *proposed):
             allowed |= terms_values(offer)
         numbers.check_message(out.message, allowed)
+        wrong_value = self.check_valuations(out.message, *proposed)
+        if wrong_value:
+            raise ValueError(wrong_value)
         topic = ignores_record(out.message, [self.pitch, *self.answers])
         if topic:
             raise ValueError(record_error(topic))
@@ -187,6 +227,20 @@ class Table:
         wrong_payback = metrics.payback_error(out.message, [self.pitch, *self.answers])
         if wrong_payback:
             raise ValueError(wrong_payback)
+
+    def check_valuations(self, message: str, *proposed: dict) -> str | None:
+        terms = [*self.shown, *self.standing, *proposed]
+        valuations = {self.ask["valuation_lakh"] * 1e5}
+        amounts = {self.ask["investment_lakh"] * 1e5}
+        for t in terms:
+            worth = prompts.valuation_lakh(t["investment_lakh"], t["equity_pct"])
+            if worth:
+                valuations.add(worth * 1e5)
+            amounts |= {t[k] * 1e5 for k in ("investment_lakh", "debt_lakh",
+                                             "royalty_until_lakh") if t[k]}
+        own = (prompts.valuation_lakh(proposed[-1]["investment_lakh"],
+                                      proposed[-1]["equity_pct"]) if proposed else None)
+        return valuation_claim_error(message, valuations, amounts, own)
 
     @property
     def answers(self) -> list[str]:
@@ -211,6 +265,7 @@ class Table:
         self.said.append((shark.id, text))
         if offer:
             self.allowed |= terms_values(offer)
+            self.shown.append(offer)
         await self.session.emit(type_, speaker=shark.id, name=shark.name, text=text,
                                 action=action, offer=offer)
 
@@ -299,12 +354,14 @@ class Table:
 
     async def wait_for_founder(self, can_counter: bool) -> dict | None:
         self.session.open_deal = {"offer_ids": list(self.offers), "can_counter": can_counter}
+        voice = bool(self.session.request.get("voice"))
+        wait_s = (max(self.s.deal_wait_s, self.s.voice_founder_wait_s) if voice
+                  else self.s.deal_wait_s)
         await self.session.emit("founder_choice", offers=self.standing, can_counter=can_counter,
-                                wait_s=self.s.deal_wait_s,
-                                expires_at=time.time() + self.s.deal_wait_s)
+                                wait_s=wait_s, expires_at=time.time() + wait_s)
         try:
-            return await asyncio.wait_for(self.session.deal_inbox.get(),
-                                          timeout=self.s.deal_wait_s)
+            return await self.session.wait_for_founder_input(self.session.deal_inbox, wait_s,
+                                                             self.s.voice_hold_max_s)
         except TimeoutError:
             return None
         finally:
@@ -339,6 +396,7 @@ class Table:
                       or move["investment_lakh"]}))
             await self.session.emit("founder_deal", action="counter", offer=counter)
             self.allowed |= terms_values(counter)
+            self.shown.append(counter)
             self.transcript.append(("Founder", f"My counter to {' and '.join(offer['names'])}: "
                                                f"{prompts.terms_text(counter)}."))
             if await self.answer_counter(offer, counter):

@@ -4,6 +4,9 @@ import type { RoomMode, Tier } from "./types";
 
 export const FREE_GRANT = 50;
 
+/** Room for a spoken pitch of about 90 seconds. The engine accepts up to 2,000 with the extra lines. */
+export const IDEA_MAX = 1500;
+
 export const ROOMS: Record<
   RoomMode,
   { name: string; tagline: string; short: string; cls: string; cost: string }
@@ -17,8 +20,8 @@ export const ROOMS: Record<
   },
   janta: {
     name: "Janta",
-    tagline: "25–100 Indian personas",
-    short: "A crowd reacts, votes, and tells you who would actually pay.",
+    tagline: "25–1,000 Indian personas",
+    short: "A simulated crowd reacts and votes, raising objections to test with real people.",
     cls: "room-janta",
     cost: "from 10 credits",
   },
@@ -31,12 +34,20 @@ export const ROOMS: Record<
   },
 };
 
-export const JANTA_SIZES = [25, 50, 100] as const;
+export const JANTA_SIZES = [25, 50, 100, 500, 1000] as const;
 export type JantaSize = (typeof JANTA_SIZES)[number];
 
-export function runCost(mode: RoomMode, panelSize?: number): number {
-  if (mode === "sharks") return 15;
+/**
+ * Sharks with spoken investors costs more: speech is far dearer than text. The engine caps
+ * each run at 10,000 spoken characters, about Rs 20 on Sarvam's list price (27 Nov 2026).
+ */
+export const VOICE_CREDITS = 25;
+
+export function runCost(mode: RoomMode, panelSize?: number, voice = false): number {
+  if (mode === "sharks") return voice ? 15 + VOICE_CREDITS : 15;
   if (mode === "roast") return 5;
+  if (panelSize === 1000) return 180;
+  if (panelSize === 500) return 100;
   if (panelSize === 100) return 30;
   if (panelSize === 50) return 20;
   return 10;
@@ -45,7 +56,7 @@ export function runCost(mode: RoomMode, panelSize?: number): number {
 export const ENTITLEMENTS: Record<Tier, { jantaMax: number; byok: boolean }> = {
   free: { jantaMax: 25, byok: false },
   pro: { jantaMax: 150, byok: true },
-  deep: { jantaMax: 500, byok: true },
+  deep: { jantaMax: 1000, byok: true },
 };
 
 export const PLANS = [
@@ -74,7 +85,7 @@ export const PLANS = [
     price: "₹1,999",
     period: "per month",
     blurb: "For studios and accelerators.",
-    features: ["3,000 credits every month", "Janta with up to 100 people", "Early access to new rooms"],
+    features: ["3,000 credits every month", "Janta with up to 1,000 people", "Early access to new rooms"],
     cta: "Coming soon",
   },
 ];

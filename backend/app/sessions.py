@@ -25,6 +25,11 @@ class DebateSession:
         # Set while offers await the founder: {"offer_ids": [...], "can_counter": bool}
         self.open_deal: dict | None = None
         self.deal_inbox: asyncio.Queue[dict] = asyncio.Queue(maxsize=1)
+        # The wait for the founder now in progress, if any: when it ends (epoch seconds),
+        # and the latest it may be pushed to by hold().
+        self.deadline: float | None = None
+        self.deadline_limit = 0.0
+        self.wait_length = 0.0
         self.created_at = time.monotonic()
         self.budgets: list = []  # every TokenBudget this debate used, so spend is counted even on failure
         self.task: asyncio.Task | None = None  # keep a reference so it is not garbage-collected
@@ -43,6 +48,35 @@ class DebateSession:
                 self.finished = True
             self._changed.notify_all()
         return event
+
+    async def wait_for_founder_input(self, inbox: asyncio.Queue, wait_s: float,
+                                     max_s: float) -> object:
+        """inbox.get() with a deadline that hold() can move later. Raises TimeoutError."""
+        now = time.time()
+        self.wait_length, self.deadline = wait_s, now + wait_s
+        self.deadline_limit = now + max(wait_s, max_s)
+        try:
+            while True:
+                left = self.deadline - time.time()
+                if left <= 0:
+                    raise TimeoutError
+                try:
+                    return await asyncio.wait_for(inbox.get(), timeout=left)
+                except TimeoutError:
+                    continue  # the deadline may have moved while we slept
+        finally:
+            self.deadline = None
+
+    async def hold(self) -> float | None:
+        """Restart the founder's clock: they were still listening, or are recording.
+        Returns the new deadline, or None when nothing is waiting for them."""
+        if self.deadline is None:
+            return None
+        later = min(time.time() + self.wait_length, self.deadline_limit)
+        if later > self.deadline + 1:
+            self.deadline = later
+            await self.emit("clock", wait_s=self.wait_length, expires_at=later)
+        return self.deadline
 
     def _has_news(self, cursor: int) -> bool:
         return len(self.events) > cursor or self.finished

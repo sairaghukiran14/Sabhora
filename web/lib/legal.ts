@@ -18,7 +18,7 @@ export const LEGAL = {
   updated: "27 November 2026",
   // Who processes data for us. Keep in step with backend/.env and web/.env.local.
   processors: [
-    { name: "Sarvam AI", role: "Plays the personas (investors, crowd, reviewers) and answers follow-up chats", where: "India" },
+    { name: "Sarvam AI", role: "Plays the personas (investors, crowd, reviewers), answers follow-up chats, and handles speech if you use voice", where: "India" },
     { name: "Anthropic (Claude)", role: "Writes the final verdicts", where: "United States" },
     { name: "Neon", role: "Hosts our database", where: "Singapore (AWS ap-southeast-1)" },
   ],

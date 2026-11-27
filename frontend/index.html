@@ -760,7 +760,7 @@
         h("li", {}, h("b", { text: `Round 2: ${S.asked} swing voters reconsidered. ` }),
           `Everyone who was neutral, plus every third person who had decided, heard what the crowd said. ${changedN ? `${changedN} changed their vote: ${moveText}.` : "Nobody changed their vote."}`),
         h("li", {}, h("b", { text: "Final count. " }),
-          `${fin.agree} agree, ${fin.neutral} neutral, ${fin.disagree} disagree; ${fin.would_pay_pct}% said they would actually pay. The app counts these, not the AI.`, split(fin, fin.total || 1)),
+          `${fin.agree} agree, ${fin.neutral} neutral, ${fin.disagree} disagree; ${fin.would_pay_pct}% of the simulated crowd said they would pay. This is not a demand forecast. The app counts these, not the AI.`, split(fin, fin.total || 1)),
         h("li", {}, h("b", { text: "The summary above " }), "was written by ", judgeName(),
           " after reading every comment and the breakdowns below.")),
       best && worst && best !== worst ? h("p", {}, h("b", { text: "Most support: " }), `${best.label}, ${best.pct}% agree. `,

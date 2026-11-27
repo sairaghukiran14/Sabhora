@@ -22,6 +22,8 @@ export type RunInput = {
   customer?: string;
   price?: string;
   tone?: "roast" | "serious";
+  /** Sharks only: the investors speak aloud. */
+  voice?: boolean;
   url?: string;
 };
 

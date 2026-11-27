@@ -6,10 +6,13 @@ Models read facts out of a pitch well and do arithmetic badly, so the model must
 working in `maths` and this module does the sums.
 
 A figure is allowed when it appears in the pitch, the ask or a founder's answer, or when it
-equals one of the shark's own checked calculations. Only figures written with a rupee sign,
+equals one of the shark's own checked calculations. A calculation counts only if the numbers
+inside it are established too (see `check_operands`): otherwise "4812000 * 1" would turn any
+invented figure into a checked one. Only figures written with a rupee sign,
 or worth 1000 or more, are checked, so counts ("40 shops") and percentages pass untouched.
 """
 import ast
+import itertools
 import operator
 import re
 from collections.abc import Iterable
@@ -67,6 +70,8 @@ def established(pitch: str, founder_answers: Iterable[str], ask: dict | None) ->
         for key in ("investment_lakh", "valuation_lakh"):
             if ask.get(key):
                 allowed.add(ask[key] * 1e5)
+        if ask.get("equity_pct"):
+            allowed.add(float(ask["equity_pct"]))
     return allowed
 
 
@@ -110,15 +115,75 @@ def rupees(value: float) -> str:
     return f"₹{value:,.0f}"
 
 
-def check_calcs(calcs) -> set[float]:
-    """Recomputes what the model claims. Raises ValueError naming the first wrong sum."""
+# ---------- where the numbers inside the arithmetic come from ----------
+
+# Numbers any sum may use without the record: small counts, calendar and unit conversions.
+# They can't make up a figure alone, because a sum also needs a number from the record.
+CONSTANTS = frozenset([*range(1, 13), 4.33, 24, 30, 52, 100, 365, 1e3, 1e5, 1e7])
+
+
+def _same(a: float, b: float) -> bool:
+    return abs(a - b) <= 1e-9 * max(1.0, abs(b))
+
+
+def _operands(node: ast.AST):
+    if isinstance(node, ast.Constant):
+        yield float(node.value)
+    for child in ast.iter_child_nodes(node):
+        yield from _operands(child)
+
+
+def _on_record(n: float, known: set[float]) -> bool:
+    """`n` is a known figure as written, a known percentage as a fraction (64 -> 0.64), a
+    known rupee total in thousands, lakh or crore (4000000 -> 40), or the exact sum or
+    difference of two known figures (85 + 18 -> 103). Products and ratios are not accepted
+    here: they have to be shown as their own maths line."""
+    for k in known:
+        if _same(n, k) or (0 < k <= 100 and _same(n, k / 100)):
+            return True
+        if any(k >= unit and _same(n, k / unit) for unit in (1e3, 1e5, 1e7)):
+            return True
+    return any(_same(n, a + b) or _same(n, abs(a - b))
+               for a, b in itertools.combinations(known, 2))
+
+
+def check_operands(expression: str, known: set[float]) -> None:
+    """Raises ValueError if the sum uses a number nobody established, or none from the record."""
+    from_record = False
+    for n in _operands(ast.parse(expression.strip(), mode="eval")):
+        if any(_same(n, c) for c in CONSTANTS):
+            # a free number; it counts as the record's only if the record states it outright
+            # (not as a sum: 6 + 6 must not turn "12 * 1000" into a sum about this pitch)
+            from_record |= any(_same(n, k) for k in known)
+        elif _on_record(n, known):
+            from_record = True
+        else:
+            raise ValueError(
+                f"your maths {expression!r} uses {n:.12g}, which is not in the pitch, the ask, "
+                "the founder's answers or an earlier maths line. Build every sum from those "
+                "figures (work out a middle step on its own line first), or leave the "
+                "figure out. Your own assumption is not an established figure")
+    if not from_record:
+        raise ValueError(
+            f"your maths {expression!r} uses no figure from the pitch, the ask or the "
+            "founder's answers, so it establishes nothing")
+
+
+def check_calcs(calcs, known: Iterable[float] | None = None) -> set[float]:
+    """Recomputes what the model claims. Raises ValueError naming the first wrong sum.
+
+    With `known` (every established figure) it also checks where each sum's numbers come
+    from; a line may use the results of the lines before it."""
     verified = set()
+    known = None if known is None else set(known)
     for calc in calcs:
         got = evaluate(calc.expression)
         if got is None:
             raise ValueError(
                 f"maths expression {calc.expression!r} must be plain arithmetic using only "
                 "digits and + - * / ( ), for example '18 * 299'")
+        if known is not None:
+            check_operands(calc.expression, known | verified | {round(v, 2) for v in verified})
         if abs(got - calc.value) > max(0.5, abs(got) * ARITHMETIC_TOLERANCE):
             raise ValueError(
                 f"your arithmetic is wrong: {calc.expression} comes to {got:,.2f}, not "

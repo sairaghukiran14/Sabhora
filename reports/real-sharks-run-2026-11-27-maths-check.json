@@ -1,0 +1,896 @@
+{
+ "events": [
+  {
+   "id": 0,
+   "type": "start",
+   "mode": "sharks",
+   "rounds": 3,
+   "ask": {
+    "investment_lakh": 40,
+    "equity_pct": 8,
+    "valuation_lakh": 500.0
+   },
+   "panel": [
+    {
+     "id": "meera",
+     "name": "Meera Kapoor",
+     "title": "Built a D2C beauty brand to 500 crore, now invests in consumer brands"
+    },
+    {
+     "id": "arjun",
+     "name": "Arjun Reddy",
+     "title": "Partner at a Bengaluru SaaS and deep-tech venture fund"
+    },
+    {
+     "id": "ananya",
+     "name": "Ananya Iyer",
+     "title": "Angel investor and ex-founder focused on Bharat (tier-2 and tier-3 India)"
+    },
+    {
+     "id": "vikram",
+     "name": "Vikram Sethia",
+     "title": "Bootstrapped an industrial spare-parts distribution business, profit-first investor"
+    },
+    {
+     "id": "farah",
+     "name": "Farah Merchant",
+     "title": "Runs food-processing and packaging plants, invests in products that must be made well"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "type": "round",
+   "round": 1
+  },
+  {
+   "id": 2,
+   "type": "typing",
+   "speaker": "meera",
+   "name": "Meera Kapoor"
+  },
+  {
+   "id": 3,
+   "type": "message",
+   "round": 1,
+   "speaker": "meera",
+   "name": "Meera Kapoor",
+   "text": "Beta, 180 subscribers in 5 months sounds nice, but 64% renew in month 2 is barely above noise. Aapka CAC kitna hai aur gross margin kya nikal raha hai jab food aur delivery mila ke Rs 103 per meal ja raha hai?",
+   "stance": "maybe",
+   "confidence": 5,
+   "out": false
+  },
+  {
+   "id": 4,
+   "type": "typing",
+   "speaker": "arjun",
+   "name": "Arjun Reddy"
+  },
+  {
+   "id": 5,
+   "type": "message",
+   "round": 1,
+   "speaker": "arjun",
+   "name": "Arjun Reddy",
+   "text": "180 * 3200 / 100 gives 576000 rupees monthly revenue. Aap bas teen ghar ki rasoi par chal rahe ho with 185 rupees cost per meal; yeh ek thin wrapper hai Dabbawala ka, aur switching cost zero hai kyunki koi bhi competitor Pune IT parks mein easily replace kar sakta hai. I am not convinced this is a company, merely a feature. Maybe.",
+   "stance": "maybe",
+   "confidence": 4,
+   "out": false
+  },
+  {
+   "id": 6,
+   "type": "typing",
+   "speaker": "ananya",
+   "name": "Ananya Iyer"
+  },
+  {
+   "id": 7,
+   "type": "message",
+   "round": 1,
+   "speaker": "ananya",
+   "name": "Ananya Iyer",
+   "text": "Pune ke IT parks mein 180 subscribers aur 64% renewal ke saath, aapka CAC kabhi recover hoga jab switching cost bilkul zero hai? Yeh thin wrapper kisi bhi Dabbawala se alag nahi lag raha, aur aapke teeno ghar ki rasoi se aage koi on-ground distribution plan nahi dikha. Maybe.",
+   "stance": "maybe",
+   "confidence": 6,
+   "out": false
+  },
+  {
+   "id": 8,
+   "type": "typing",
+   "speaker": "vikram",
+   "name": "Vikram Sethia"
+  },
+  {
+   "id": 9,
+   "type": "notice",
+   "text": "Vikram Sethia passed on this turn."
+  },
+  {
+   "id": 10,
+   "type": "typing",
+   "speaker": "farah",
+   "name": "Farah Merchant"
+  },
+  {
+   "id": 11,
+   "type": "message",
+   "round": 1,
+   "speaker": "farah",
+   "name": "Farah Merchant",
+   "text": "180 * 3200 gives 576000 rupees monthly revenue, par aapka Rs 85 food cost aur Rs 18 delivery cost milake Rs 103 per meal hai; agar aap 8% equity ke liye Rs 40 lakh maang rahe ho to yeh Rs 5 crore valuation bilkul unsustainable lagta hai kyunki aapke paas koi quality audit ya compliance trail nahi hai in teen home kitchens mein. Worst day par agar inme se ek kitchen band ho gaya ya aapka single supplier aata-sabzi de nahi paya, toh aapka entire supply chain collapse kar jayega aur inventory unpaid pile up ho jayegi.",
+   "stance": "maybe",
+   "confidence": 6,
+   "out": false
+  },
+  {
+   "id": 12,
+   "type": "founder_turn",
+   "wait_s": 30.0,
+   "expires_at": 1795798340.278348
+  },
+  {
+   "id": 13,
+   "type": "founder",
+   "round": 1,
+   "text": "Unit economics: revenue per meal is Rs 145 (3200/22). Food 85 + delivery 18 + packaging 6 = Rs 109, so Rs 36 gross margin per meal. CAC is Rs 900 via office WhatsApp groups. Kitchens are FSSAI registered."
+  },
+  {
+   "id": 14,
+   "type": "round",
+   "round": 2
+  },
+  {
+   "id": 15,
+   "type": "typing",
+   "speaker": "arjun",
+   "name": "Arjun Reddy"
+  },
+  {
+   "id": 16,
+   "type": "message",
+   "round": 2,
+   "speaker": "arjun",
+   "name": "Arjun Reddy",
+   "text": "Aapka Rs 900 CAC payback 1.1 months hai, par yeh matlab nahi ki company defensible hai; yeh bas ek thin wrapper hai jiski switching cost bilkul zero hai kyunki koi bhi naya Pune IT park mein competitor easily replace kar sakta hai. Teen home kitchens par FSSAI registration ka koi moat nahi banata. I'm out because this is a services business disguised as SaaS with no scalable moat.",
+   "stance": "pass",
+   "confidence": 9,
+   "out": true
+  },
+  {
+   "id": 17,
+   "type": "typing",
+   "speaker": "ananya",
+   "name": "Ananya Iyer"
+  },
+  {
+   "id": 18,
+   "type": "message",
+   "round": 2,
+   "speaker": "ananya",
+   "name": "Ananya Iyer",
+   "text": "Aapka 1.1 months ka CAC payback sunne mein toh kamaal hai, par yeh sirf office WhatsApp groups se aaya hai aur Pune ke IT parks ke baahar yeh distribution ka jugaad fail ho jayega. Teen home kitchens mein FSSAI registration trust toh dikhata hai, par ek supplier ka failure ya ek kitchen band hone par poora supply chain collapse kar jayega, aur yeh risk Rs 5 crore ki valuation par bilkul fit nahi baithta. Isliye main pass kar rahi hoon.",
+   "stance": "pass",
+   "confidence": 9,
+   "out": true
+  },
+  {
+   "id": 19,
+   "type": "typing",
+   "speaker": "vikram",
+   "name": "Vikram Sethia"
+  },
+  {
+   "id": 20,
+   "type": "message",
+   "round": 2,
+   "speaker": "vikram",
+   "name": "Vikram Sethia",
+   "text": "Rs 900 CAC ka payback 1.1 months hai yeh sunke mera pet nahi bharta, par tu yeh bata ki 64% renewal ke baad month 3 se month 12 tak jo actual churn hoga uska hisaab tere paas hai ya bas 22 meals ka average nikal ke baith gaya hai? Mujhe lagta hai yeh Rs 5 crore ki valuation sirf 180 subscribers pe chipki hai jisme koi scalable moat nahi dikh raha.",
+   "stance": "pass",
+   "confidence": 8,
+   "out": false
+  },
+  {
+   "id": 21,
+   "type": "typing",
+   "speaker": "farah",
+   "name": "Farah Merchant"
+  },
+  {
+   "id": 22,
+   "type": "notice",
+   "text": "Farah Merchant passed on this turn."
+  },
+  {
+   "id": 23,
+   "type": "typing",
+   "speaker": "meera",
+   "name": "Meera Kapoor"
+  },
+  {
+   "id": 24,
+   "type": "message",
+   "round": 2,
+   "speaker": "meera",
+   "name": "Meera Kapoor",
+   "text": "Beta, 900 divided by (36 * 22) gives 1.1 months ka CAC payback, par yeh tab tak accha lagta hai jab tak aap month 3 ka actual churn rate nahi batate. 64% renewal month 2 mein hai, aur mere liye DabbaDost jaisa Pune ka tiffin feature tabhi company banta hai jab customer teesri baar bina discount ke order kare, jo aapke paas abhi missing hai, isliye main maybe par hoon 5/10 confidence.",
+   "stance": "maybe",
+   "confidence": 5,
+   "out": false
+  },
+  {
+   "id": 25,
+   "type": "founder_turn",
+   "wait_s": 30.0,
+   "expires_at": 1795798346.6795251
+  },
+  {
+   "id": 26,
+   "type": "founder",
+   "round": 2,
+   "text": "We have a 4th backup kitchen on standby and a weekly hygiene audit with photos. Renewal from month 3 onward is 88%. We are only in Pune for the next 12 months."
+  },
+  {
+   "id": 27,
+   "type": "round",
+   "round": 3
+  },
+  {
+   "id": 28,
+   "type": "typing",
+   "speaker": "vikram",
+   "name": "Vikram Sethia"
+  },
+  {
+   "id": 29,
+   "type": "message",
+   "round": 3,
+   "speaker": "vikram",
+   "name": "Vikram Sethia",
+   "text": "180 subscribers pe 5 crore ki valuation? Yeh toh dimaag ki dahi hai. 88% renewal month 3 se shuru, par tu 12 months mein Pune se nikalne wala hai, matlab yeh 1.1 months ka payback sirf ek saal ke liye hai. Jab Pune chhodega tab naya city kaunsa hai jahan yeh margin repeat hoga? Mujhe lagta hai yeh cash flow ka khel hai, par Pune ke IT parks ke baahar koi expansion plan nahi hai.",
+   "stance": "pass",
+   "confidence": 9,
+   "out": false
+  },
+  {
+   "id": 30,
+   "type": "typing",
+   "speaker": "farah",
+   "name": "Farah Merchant"
+  },
+  {
+   "id": 31,
+   "type": "message",
+   "round": 3,
+   "speaker": "farah",
+   "name": "Farah Merchant",
+   "text": "Aapka Rs 900 CAC payback 1.1 months hai, par yeh 88% renewal month 3 se shuru hone ke baad bhi ek saal tak Pune IT parks tak hi simatna ek bada red flag hai kyunki aapke paas unpaid inventory ya working capital ka koi buffer nahi hai agar koi ek home kitchen band ho gaya. Mere hisaab se 180 subscribers par Rs 5 crore ki valuation bilkul unjustified hai, isliye main pass kar rahi hoon.",
+   "stance": "pass",
+   "confidence": 9,
+   "out": true
+  },
+  {
+   "id": 32,
+   "type": "typing",
+   "speaker": "meera",
+   "name": "Meera Kapoor"
+  },
+  {
+   "id": 33,
+   "type": "message",
+   "round": 3,
+   "speaker": "meera",
+   "name": "Meera Kapoor",
+   "text": "Beta, 88% renewal month 3 se shuru hona sunke acha laga, par 12 months mein bas Pune tak simatna mujhe darata hai kyunki repeat purchase wale IT professionals agar ek baar city badal gaye toh yeh 36 rupees margin wala tiffin band kar denge. Mujhe Pune ke IT parks se bahar ka koi retention data nahi dikh raha, isliye main pass kar rahi hoon.",
+   "stance": "pass",
+   "confidence": 9,
+   "out": true
+  },
+  {
+   "id": 34,
+   "type": "offers_open"
+  },
+  {
+   "id": 35,
+   "type": "typing",
+   "speaker": "vikram",
+   "name": "Vikram Sethia"
+  },
+  {
+   "id": 36,
+   "type": "notice",
+   "text": "Vikram Sethia didn't make a move."
+  },
+  {
+   "id": 37,
+   "type": "deal",
+   "outcome": "no_deal",
+   "reason": "no_offers",
+   "offer": null
+  },
+  {
+   "id": 38,
+   "type": "judging"
+  },
+  {
+   "id": 39,
+   "type": "verdict",
+   "verdict": {
+    "score": 4,
+    "decision": "pass",
+    "one_liner": "DabbaDost has a sharp 1.1-month payback in Pune, but with zero switching cost and three home kitchens, the sharks say it is a feature waiting to be copied, not yet a company.",
+    "votes": [
+     {
+      "shark": "Meera Kapoor",
+      "stance": "pass",
+      "reason": "Meera wants proof that customers reorder a third time without discounts, and sees no retention data beyond Pune IT parks once the founder leaves the city."
+     },
+     {
+      "shark": "Arjun Reddy",
+      "stance": "pass",
+      "reason": "Arjun sees a thin wrapper over three home kitchens with no switching cost or scalable moat, calling it a services business rather than a company."
+     },
+     {
+      "shark": "Ananya Iyer",
+      "stance": "pass",
+      "reason": "Ananya doubts that office WhatsApp distribution survives outside IT parks and worries a single kitchen or supplier failure would collapse the supply chain."
+     },
+     {
+      "shark": "Vikram Sethia",
+      "stance": "pass",
+      "reason": "Vikram questions whether churn after month 3 was modelled rather than averaged, and sees a Rs 5 crore valuation resting on 180 subscribers in one city with no expansion plan."
+     },
+     {
+      "shark": "Farah Merchant",
+      "stance": "pass",
+      "reason": "Farah sees no compliance trail or working capital buffer across the three kitchens, so one kitchen failing would leave inventory unpaid, and she calls Rs 5 crore unjustified."
+     }
+    ],
+    "top_risks": [
+     "Revenue is confined to Pune for the next 12 months, and the debate showed no evidence that the 88% renewal holds for customers in other cities.",
+     "The three partner home kitchens are a single point of failure, with no working capital buffer or documented supplier contingency beyond a standby fourth kitchen that has not been tested.",
+     "Zero switching cost and no proprietary moat mean a tiffin competitor can replicate the offer in Pune IT parks, and the Rs 36 per meal margin leaves little room to respond."
+    ],
+    "next_steps": [
+     "Pull month-by-month churn for all 180 subscribers from month 3 through month 5 and show the cohort retention curve that supports the 88% figure.",
+     "Run a two-week test of the backup kitchen by moving one live delivery route onto it and recording lead time, quality, and any missed meals.",
+     "Map the cash needed to cover one month of food purchases across the three kitchens so the company can show how a single kitchen closure would be absorbed."
+    ]
+   }
+  },
+  {
+   "id": 40,
+   "type": "done",
+   "tokens": 52931,
+   "crowd_model": "sarvam",
+   "judge_model": "anthropic"
+  }
+ ],
+ "checks": [
+  {
+   "kind": "SharkTurn",
+   "who": "Meera Kapoor",
+   "reply": {
+    "maths": [],
+    "message": "Beta, 180 subscribers in 5 months sounds nice, but 64% renew in month 2 is barely above noise. Aapka CAC kitna hai aur gross margin kya nikal raha hai jab food aur delivery mila ke Rs 103 per meal ja raha hai?",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 5
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Arjun Reddy",
+   "reply": {
+    "maths": [],
+    "message": "180 subscribers in 5 months gives roughly 36 new customers per month, so your implied CAC is around ₹1.1 lakh if you spent the full ₹40 lakh on acquisition, which is absurd for a Pune tiffin service. Aapka gross margin barely 15% after food and delivery, aur yeh koi SaaS nahi hai, bas ek thin wrapper hai Swiggy या Zomato ke substitutes par, jisme koi switching cost nahi hai.",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 3
+   },
+   "error": "you said '₹1.1 lakh', which is not in the pitch, the ask, the founder's answers or your own maths. Either show how you get it by adding the arithmetic to maths (for example 18 * 299), or leave the figure out. Never estimate a total in your head"
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Arjun Reddy",
+   "reply": {
+    "maths": [],
+    "message": "180 * 3200 / 100 gives 576000 rupees monthly revenue. Aap bas teen ghar ki rasoi par chal rahe ho with 185 rupees cost per meal; yeh ek thin wrapper hai Dabbawala ka, aur switching cost zero hai kyunki koi bhi competitor Pune IT parks mein easily replace kar sakta hai. I am not convinced this is a company, merely a feature. Maybe.",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 4
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Ananya Iyer",
+   "reply": {
+    "maths": [],
+    "message": "Pune ke IT parks mein 64% month-2 renew ke saath 180 subscribers, yeh thin wrapper hai jisme switching cost bilkul zero hai; aur aapne Rs 103 per meal cost bataya jabki price Rs 3200 / 22 meals hai toh gross margin sirf 53%, matlab 180 * 103 = 18540 rupees monthly food aur delivery cost, yeh samajh nahi aa raha ki yeh 8% equity ke liye Rs 5 crore valuation kaise justify hota hai. Maybe.",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 6
+   },
+   "error": "you said '18540', which is not in the pitch, the ask, the founder's answers or your own maths. Either show how you get it by adding the arithmetic to maths (for example 18 * 299), or leave the figure out. Never estimate a total in your head"
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Ananya Iyer",
+   "reply": {
+    "maths": [],
+    "message": "Pune ke IT parks mein 180 subscribers aur 64% renewal ke saath, aapka CAC kabhi recover hoga jab switching cost bilkul zero hai? Yeh thin wrapper kisi bhi Dabbawala se alag nahi lag raha, aur aapke teeno ghar ki rasoi se aage koi on-ground distribution plan nahi dikha. Maybe.",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 6
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Vikram Sethia",
+   "reply": {
+    "maths": [],
+    "message": "180 subscribers aur 3200 rupees ki monthly fee se 576000 rupees monthly revenue aa raha hai, matlab 180 * 3200 / 100 = 576000. Food aur delivery mila ke 103 rupees cost hai, toh gross margin 2167 rupees per subscriber per month banta hai, par teen ghar ki rasoi pe 180 log handle karna Ludhiana ke spare-parts wholesale jaisa scalable nahi lagta. Jab switching cost zero hai aur Pune IT parks mein koi lock-in nahi, toh 40 lakh rupees ki valuation par profit kab dikhega? Maybe.",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 6
+   },
+   "error": "nobody mentioned Ludhiana. Only name places the pitch or the founder mentioned"
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Vikram Sethia",
+   "reply": {
+    "maths": [],
+    "message": "Beta, 180 subscribers se monthly revenue 576000 rupees ban raha hai, par cost 103 per meal hai toh gross margin itna kam hai ki payback period kabhi dikhega nahi. Pune IT parks mein 64% renewal aur zero switching cost dekh ke lagta hai yeh sirf ek thin wrapper hai, aur teen ghar ki rasoi se aage scale karne ka koi plan nahi hai. I am not convinced, pass.",
+    "out": true,
+    "stance": "pass",
+    "confidence": 9
+   },
+   "error": "round 1 is for questions: set out to false and stance to \"maybe\", then ask what you most need to know"
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Vikram Sethia",
+   "reply": {
+    "maths": [],
+    "message": "180 * 22 gives 3960 lunches monthly. Food cost 85 and delivery 18 means 103 per meal. 3200 minus 103 is 3097 margin per subscriber. But yeh 3960 meals ka hisaab mere 576000 revenue se match nahi karta, toh kya aapne 22 lunches ka matlab 22 working days liya hai ya kuch aur? Mujhe yeh clear chahiye before I decide anything.",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 6
+   },
+   "error": "you said '3097', which is not in the pitch, the ask, the founder's answers or your own maths. Either show how you get it by adding the arithmetic to maths (for example 18 * 299), or leave the figure out. Never estimate a total in your head"
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Farah Merchant",
+   "reply": {
+    "maths": [],
+    "message": "180 * 3200 gives 576000 rupees monthly revenue, par aapka Rs 85 food cost aur Rs 18 delivery cost milake Rs 103 per meal hai; agar aap 8% equity ke liye Rs 40 lakh maang rahe ho to yeh Rs 5 crore valuation bilkul unsustainable lagta hai kyunki aapke paas koi quality audit ya compliance trail nahi hai in teen home kitchens mein. Worst day par agar inme se ek kitchen band ho gaya ya aapka single supplier aata-sabzi de nahi paya, toh aapka entire supply chain collapse kar jayega aur inventory unpaid pile up ho jayegi.",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 6
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Arjun Reddy",
+   "reply": {
+    "maths": [],
+    "message": "Aapka Rs 900 CAC payback 1.1 months hai, par yeh matlab nahi ki company defensible hai; yeh bas ek thin wrapper hai jiski switching cost bilkul zero hai kyunki koi bhi naya Pune IT park mein competitor easily replace kar sakta hai. Teen home kitchens par FSSAI registration ka koi moat nahi banata. I'm out because this is a services business disguised as SaaS with no scalable moat.",
+    "out": true,
+    "stance": "pass",
+    "confidence": 9
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Ananya Iyer",
+   "reply": {
+    "maths": [],
+    "message": "Aapka 1.1 months ka CAC payback sunne mein toh kamaal hai, par yeh sirf office WhatsApp groups se aaya hai aur Pune ke IT parks ke baahar yeh distribution ka jugaad fail ho jayega. Teen home kitchens mein FSSAI registration trust toh dikhata hai, par ek supplier ka failure ya ek kitchen band hone par poora supply chain collapse kar jayega, aur yeh risk Rs 5 crore ki valuation par bilkul fit nahi baithta. Isliye main pass kar rahi hoon.",
+    "out": true,
+    "stance": "pass",
+    "confidence": 9
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Vikram Sethia",
+   "reply": {
+    "maths": [],
+    "message": "180 subscribers in 5 months matlab roughly 36 naye bande har mahine aaye, aur 64% renewal ke hisaab se bas 115 log tikenge. Rs 900 CAC divided by (Rs 36 margin multiplied by 22 meals) equals 1.1 months payback, par yeh WhatsApp groups se aaya hai jo ek din band ho sakte hain. Pune IT parks ke baahar distribution ka koi plan nahi, aur 85 rupees food cost par teen home kitchens se Rs 5 crore valuation mangna bilkul pagalpan hai. I'm out because this is a cash-burn wrapper with no scalable moat and an impossible valuation.",
+    "out": true,
+    "stance": "pass",
+    "confidence": 9
+   },
+   "error": "two sharks have already walked out this round, so you stay in: set out to false, keep stance pass if you lean that way, and put your hardest doubt to the founder as a question"
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Vikram Sethia",
+   "reply": {
+    "maths": [],
+    "message": "Rs 900 CAC ka payback 1.1 months hai yeh sunke mera pet nahi bharta, par tu yeh bata ki 64% renewal ke baad month 3 se month 12 tak jo actual churn hoga uska hisaab tere paas hai ya bas 22 meals ka average nikal ke baith gaya hai? Mujhe lagta hai yeh Rs 5 crore ki valuation sirf 180 subscribers pe chipki hai jisme koi scalable moat nahi dikh raha.",
+    "out": false,
+    "stance": "pass",
+    "confidence": 8
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Farah Merchant",
+   "reply": {
+    "maths": [],
+    "message": "Aapka Rs 36 gross margin per meal aur 1.1 months ka CAC payback sunke accha lagta hai, par 64% month-2 renewal ke baad actual churn ka koi data nahi hai jo aapne abhi tak share kiya ho. Mere plants mein hum worst day ke liye plan karte hain, aur yahan teen home kitchens aur ek single supplier ka setup hai, toh agar ek kitchen band hua ya supplier fail hua toh unpaid inventory pile up ho jayega. Mujhe ek quality audit trail aur multi-source backup chahiye is Rs 5 crore valuation ke liye, isliye abhi mera stance maybe hai aur confidence 6 hai.",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 6
+   },
+   "error": "don't say your stance or confidence out loud; they go in their own fields. Just say what you think"
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Farah Merchant",
+   "reply": {
+    "maths": [],
+    "message": "Aapka Rs 36 gross margin per meal aur 1.1 months ka CAC payback sunne mein accha lagta hai, par jab 64% month-2 renewal ke baad actual churn aayega toh yeh Rs 36 margin bahut jaldi evaporate ho jayega. Mere liye sabse bada red flag yeh teen home kitchens hain jinme koi quality audit ya compliance trail nahi hai, aur agar inme se ek band hua ya single supplier fail hua toh unpaid inventory pile up ho jayegi aur entire supply chain collapse karegi. Isliye main pass kar rahi hoon kyunki yeh ek thin wrapper hai jisme scalable moat ya quality infrastructure bilkul nahi hai.",
+    "out": true,
+    "stance": "pass",
+    "confidence": 9
+   },
+   "error": "two sharks have already walked out this round, so you stay in: set out to false, keep stance pass if you lean that way, and put your hardest doubt to the founder as a question"
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Farah Merchant",
+   "reply": {
+    "maths": [],
+    "message": "Aapne Rs 36 gross margin per meal bataya, par yeh tabhi kaam karega jab in teen home kitchens mein quality audit aur batch traceability ho; worst day par agar ek kitchen mein koi hygiene breach hua ya aapka single supplier achanak band ho gaya, toh unpaid inventory pile up hoga aur entire Pune IT park supply chain collapse kar jayegi, toh kya aapne in home kitchens ke liye koi secondary kitchen ya dual-sourcing plan ready rakha hai?",
+    "out": false,
+    "stance": "pass",
+    "confidence": 9
+   },
+   "error": "that point has already been made in this debate, just in other words. Drop it and raise something nobody has raised yet"
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Meera Kapoor",
+   "reply": {
+    "maths": [],
+    "message": "Beta, 900 divided by (36 * 22) gives 1.1 months ka CAC payback, par yeh tab tak accha lagta hai jab tak aap month 3 ka actual churn rate nahi batate. 64% renewal month 2 mein hai, aur mere liye DabbaDost jaisa Pune ka tiffin feature tabhi company banta hai jab customer teesri baar bina discount ke order kare, jo aapke paas abhi missing hai, isliye main maybe par hoon 5/10 confidence.",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 5
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Vikram Sethia",
+   "reply": {
+    "maths": [],
+    "message": "180 subscribers pe 5 crore valuation? Yeh toh seedha loot hai. 180 * 3200 / 12 gives 48000 rupees monthly profit, aur 40 lakh maang rahe ho for 8%? Matlab tumhare 12 months ke pure profit se bhi kam. 48000 * 12 gives 576000 rupees, aur 4000000 divided by 576000 gives about 6.9 months payback, which is too long for a thin wrapper with zero moat in Pune IT parks. 88% renewal month 3 baad dikha raha hai par 12 months ka horizon hai, so yeh growth story bas ek local jugaad hai. I'm out because this valuation is pure fantasy on 180 customers with no scalable moat.",
+    "out": true,
+    "stance": "pass",
+    "confidence": 9
+   },
+   "error": "'wrapper' has already been argued by Ananya Iyer and Arjun Reddy. Leave it to them and judge this pitch through what you personally care about"
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Vikram Sethia",
+   "reply": {
+    "maths": [],
+    "message": "180 subscribers pe 5 crore ki valuation? Yeh toh dimaag ki dahi hai. 88% renewal month 3 se shuru, par tu 12 months mein Pune se nikalne wala hai, matlab yeh 1.1 months ka payback sirf ek saal ke liye hai. Jab Pune chhodega tab naya city kaunsa hai jahan yeh margin repeat hoga? Mujhe lagta hai yeh cash flow ka khel hai, par Pune ke IT parks ke baahar koi expansion plan nahi hai.",
+    "out": false,
+    "stance": "pass",
+    "confidence": 9
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Farah Merchant",
+   "reply": {
+    "maths": [],
+    "message": "Aapka Rs 900 CAC payback 1.1 months hai, par yeh 88% renewal month 3 se shuru hone ke baad bhi ek saal tak Pune IT parks tak hi simatna ek bada red flag hai kyunki aapke paas unpaid inventory ya working capital ka koi buffer nahi hai agar koi ek home kitchen band ho gaya. Mere hisaab se 180 subscribers par Rs 5 crore ki valuation bilkul unjustified hai, isliye main pass kar rahi hoon.",
+    "out": true,
+    "stance": "pass",
+    "confidence": 9
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Meera Kapoor",
+   "reply": {
+    "maths": [],
+    "message": "Beta, 88% renewal month 3 se shuru hona sunke acha laga, par 12 months mein bas Pune tak simatna mujhe darata hai kyunki repeat purchase wale IT professionals agar ek baar city badal gaye toh yeh 36 rupees margin wala tiffin band kar denge. Mujhe Pune ke IT parks se bahar ka koi retention data nahi dikh raha, isliye main pass kar rahi hoon.",
+    "out": true,
+    "stance": "pass",
+    "confidence": 9
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkOffer",
+   "who": "Vikram Sethia",
+   "reply": {
+    "decision": "offer",
+    "partner_id": "",
+    "terms": {
+     "investment_lakh": 30.0,
+     "equity_pct": 18.0,
+     "debt_lakh": 0.0,
+     "debt_interest_pct": 0.0,
+     "royalty_pct": 0.0,
+     "royalty_until_lakh": 0.0
+    },
+    "message": "1.1 months ka CAC payback sunke mera pet nahi bhara kyunki tu 12 months mein Pune chhodne wala hai aur scalable moat kuch nahi hai. 5 crore ki valuation 180 subscribers pe bilkul dimaag ki dahi hai. Main 30 lakh rupaye dunga 18% equity ke liye, baki 0, kyunki tu bas ek saal ka cash flow khel raha hai bina kisi expansion plan ke."
+   },
+   "error": "you said 'payback sunke mera pet nahi bhara kyunki tu 12 months', but CAC payback, worked out from the founder's numbers: ₹900 CAC ÷ (₹36 margin per meal × 22 meals a month) = about 1.1 months, before churn (₹900 CAC ÷ (₹36 margin per meal × 22 meals a month)). Use that figure. If you think churn or another cost changes it, say so in words instead of a new number"
+  },
+  {
+   "kind": "SharkOffer",
+   "who": "Vikram Sethia",
+   "reply": {
+    "decision": "offer",
+    "partner_id": "",
+    "terms": {
+     "investment_lakh": 50.0,
+     "equity_pct": 15.0,
+     "debt_lakh": 0.0,
+     "debt_interest_pct": 0.0,
+     "royalty_pct": 0.0,
+     "royalty_until_lakh": 0.0
+    },
+    "message": "180 subscribers pe 5 crore ki valuation bilkul bakwaas hai. Main 50 lakh mein 15% equity lunga. 1.1 months ka CAC payback accha hai par 12 months ka Pune expiry risk hai, isliye valuation cut kar raha hoon."
+   },
+   "error": "you said 'payback accha hai par 12 months', but CAC payback, worked out from the founder's numbers: ₹900 CAC ÷ (₹36 margin per meal × 22 meals a month) = about 1.1 months, before churn (₹900 CAC ÷ (₹36 margin per meal × 22 meals a month)). Use that figure. If you think churn or another cost changes it, say so in words instead of a new number"
+  },
+  {
+   "kind": "SharkOffer",
+   "who": "Vikram Sethia",
+   "reply": {
+    "decision": "offer",
+    "partner_id": "",
+    "terms": {
+     "investment_lakh": 50.0,
+     "equity_pct": 30.0,
+     "debt_lakh": 0.0,
+     "debt_interest_pct": 0.0,
+     "royalty_pct": 10.0,
+     "royalty_until_lakh": 50.0
+    },
+    "message": "180 subscribers pe 5 crore ki valuation dimaag ki dahi hai. 1.1 months ka CAC payback accha lagta hai, par 12 months mein Pune se bahar koi plan nahi hai. Main 50 lakh ke liye 30% equity aur 10% royalty 50 lakh tak lunga, kyunki profit ka koi saaf raasta nahi dikh raha."
+   },
+   "error": "you said 'payback accha lagta hai, par 12 months', but CAC payback, worked out from the founder's numbers: ₹900 CAC ÷ (₹36 margin per meal × 22 meals a month) = about 1.1 months, before churn (₹900 CAC ÷ (₹36 margin per meal × 22 meals a month)). Use that figure. If you think churn or another cost changes it, say so in words instead of a new number"
+  },
+  {
+   "kind": "SharkVerdictKeyed",
+   "who": "the impartial judge of Sabhora",
+   "reply": {
+    "votes": {
+     "meera": {
+      "reason": "Meera wants proof that customers reorder a third time without discounts, and sees no retention data beyond Pune IT parks once the founder leaves the city.",
+      "stance": "pass"
+     },
+     "arjun": {
+      "reason": "Arjun sees a thin wrapper over three home kitchens with no switching cost or scalable moat, calling it a services business rather than a company.",
+      "stance": "pass"
+     },
+     "ananya": {
+      "reason": "Ananya doubts that office WhatsApp distribution survives outside IT parks and worries a single kitchen or supplier failure would collapse the supply chain.",
+      "stance": "pass"
+     },
+     "vikram": {
+      "reason": "Vikram questions whether churn after month 3 was modelled rather than averaged, and sees a Rs 5 crore valuation resting on 180 subscribers in one city with no expansion plan.",
+      "stance": "pass"
+     },
+     "farah": {
+      "reason": "Farah sees no compliance trail or working capital buffer across the three kitchens, so one kitchen failing would leave inventory unpaid, and she calls Rs 5 crore unjustified.",
+      "stance": "pass"
+     }
+    },
+    "top_risks": [
+     "Revenue is confined to Pune for the next 12 months, and the debate showed no evidence that the 88% renewal holds for customers in other cities.",
+     "The three partner home kitchens are a single point of failure, with no working capital buffer or documented supplier contingency beyond a standby fourth kitchen that has not been tested.",
+     "Zero switching cost and no proprietary moat mean a tiffin competitor can replicate the offer in Pune IT parks, and the Rs 36 per meal margin leaves little room to respond."
+    ],
+    "next_steps": [
+     "Pull month-by-month churn for all 180 subscribers from month 3 through month 5 and show the cohort retention curve that supports the 88% figure.",
+     "Run a two-week test of the backup kitchen by moving one live delivery route onto it and recording lead time, quality, and any missed meals.",
+     "Map the cash needed to cover one month of food purchases across the three kitchens so the company can show how a single kitchen closure would be absorbed."
+    ],
+    "one_liner": "DabbaDost has a sharp 1.1-month payback in Pune, but with zero switching cost and three home kitchens, the sharks say it is a feature waiting to be copied, not yet a company.",
+    "decision": "pass",
+    "score": 4
+   },
+   "error": null
+  }
+ ],
+ "calls": [
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1115,
+   "out": 92,
+   "text": "{\n  \"message\": \"Beta, 180 subscribers in 5 months sounds nice, but 64% renew in month 2 is barely above noise. Aapka CAC kitna hai aur gross margin kya nikal raha hai jab food aur delivery mila ke Rs 103 per meal ja raha hai?\",\n  \"out\": false,\n  \"stance\": \"maybe\",\n  \"confidence\": 5\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1140,
+   "out": 128,
+   "text": "{\n  \"message\": \"180 subscribers in 5 months gives roughly 36 new customers per month, so your implied CAC is around ₹1.1 lakh if you spent the full ₹40 lakh on acquisition, which is absurd for a Pune tiffin service. Aapka gross margin barely 15% after food and delivery, aur yeh koi SaaS nahi hai, bas ek thin wrapper hai Swiggy या Zomato ke substitutes par, jisme koi switching cost nahi hai.\",\n  \"out\": false,\n  \"stance\": \"maybe\",\n  \"confidence\": 3\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1226,
+   "out": 125,
+   "text": "{\n  \"message\": \"180 * 3200 / 100 gives 576000 rupees monthly revenue. Aap bas teen ghar ki rasoi par chal rahe ho with 185 rupees cost per meal; yeh ek thin wrapper hai Dabbawala ka, aur switching cost zero hai kyunki koi bhi competitor Pune IT parks mein easily replace kar sakta hai. I am not convinced this is a company, merely a feature. Maybe.\",\n  \"out\": false,\n  \"stance\": \"maybe\",\n  \"confidence\": 4\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1265,
+   "out": 152,
+   "text": "{\n  \"message\": \"Pune ke IT parks mein 64% month-2 renew ke saath 180 subscribers, yeh thin wrapper hai jisme switching cost bilkul zero hai; aur aapne Rs 103 per meal cost bataya jabki price Rs 3200 / 22 meals hai toh gross margin sirf 53%, matlab 180 * 103 = 18540 rupees monthly food aur delivery cost, yeh samajh nahi aa raha ki yeh 8% equity ke liye Rs 5 crore valuation kaise justify hota hai. Maybe.\",\n  \"out\": false,\n  \"stance\": \"maybe\",\n  \"confidence\": 6\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1351,
+   "out": 105,
+   "text": "{\n  \"message\": \"Pune ke IT parks mein 180 subscribers aur 64% renewal ke saath, aapka CAC kabhi recover hoga jab switching cost bilkul zero hai? Yeh thin wrapper kisi bhi Dabbawala se alag nahi lag raha, aur aapke teeno ghar ki rasoi se aage koi on-ground distribution plan nahi dikha. Maybe.\",\n  \"out\": false,\n  \"stance\": \"maybe\",\n  \"confidence\": 6\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1367,
+   "out": 177,
+   "text": "{\n  \"message\": \"180 subscribers aur 3200 rupees ki monthly fee se 576000 rupees monthly revenue aa raha hai, matlab 180 * 3200 / 100 = 576000. Food aur delivery mila ke 103 rupees cost hai, toh gross margin 2167 rupees per subscriber per month banta hai, par teen ghar ki rasoi pe 180 log handle karna Ludhiana ke spare-parts wholesale jaisa scalable nahi lagta. Jab switching cost zero hai aur Pune IT parks mein koi lock-in nahi, toh 40 lakh rupees ki valuation par profit kab dikhega? Maybe.\",\n  \"out\": false,\n  \"stance\": \"maybe\",\n  \"confidence\": 6\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1401,
+   "out": 128,
+   "text": "{\n  \"message\": \"Beta, 180 subscribers se monthly revenue 576000 rupees ban raha hai, par cost 103 per meal hai toh gross margin itna kam hai ki payback period kabhi dikhega nahi. Pune IT parks mein 64% renewal aur zero switching cost dekh ke lagta hai yeh sirf ek thin wrapper hai, aur teen ghar ki rasoi se aage scale karne ka koi plan nahi hai. I am not convinced, pass.\",\n  \"out\": true,\n  \"stance\": \"pass\",\n  \"confidence\": 9\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1412,
+   "out": 142,
+   "text": "{\n  \"message\": \"180 * 22 gives 3960 lunches monthly. Food cost 85 and delivery 18 means 103 per meal. 3200 minus 103 is 3097 margin per subscriber. But yeh 3960 meals ka hisaab mere 576000 revenue se match nahi karta, toh kya aapne 22 lunches ka matlab 22 working days liya hai ya kuch aur? Mujhe yeh clear chahiye before I decide anything.\",\n  \"out\": false,\n  \"stance\": \"maybe\",\n  \"confidence\": 6\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1366,
+   "out": 175,
+   "text": "{\n  \"message\": \"180 * 3200 gives 576000 rupees monthly revenue, par aapka Rs 85 food cost aur Rs 18 delivery cost milake Rs 103 per meal hai; agar aap 8% equity ke liye Rs 40 lakh maang rahe ho to yeh Rs 5 crore valuation bilkul unsustainable lagta hai kyunki aapke paas koi quality audit ya compliance trail nahi hai in teen home kitchens mein. Worst day par agar inme se ek kitchen band ho gaya ya aapka single supplier aata-sabzi de nahi paya, toh aapka entire supply chain collapse kar jayega aur inventory unpaid pile up ho jayegi.\",\n  \"out\": false,\n  \"stance\": \"maybe\",\n  \"confidence\": 6\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1680,
+   "out": 123,
+   "text": "{\n  \"message\": \"Aapka Rs 900 CAC payback 1.1 months hai, par yeh matlab nahi ki company defensible hai; yeh bas ek thin wrapper hai jiski switching cost bilkul zero hai kyunki koi bhi naya Pune IT park mein competitor easily replace kar sakta hai. Teen home kitchens par FSSAI registration ka koi moat nahi banata. I'm out because this is a services business disguised as SaaS with no scalable moat.\",\n  \"out\": true,\n  \"stance\": \"pass\",\n  \"confidence\": 9\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1801,
+   "out": 139,
+   "text": "{\n  \"message\": \"Aapka 1.1 months ka CAC payback sunne mein toh kamaal hai, par yeh sirf office WhatsApp groups se aaya hai aur Pune ke IT parks ke baahar yeh distribution ka jugaad fail ho jayega. Teen home kitchens mein FSSAI registration trust toh dikhata hai, par ek supplier ka failure ya ek kitchen band hone par poora supply chain collapse kar jayega, aur yeh risk Rs 5 crore ki valuation par bilkul fit nahi baithta. Isliye main pass kar rahi hoon.\",\n  \"out\": true,\n  \"stance\": \"pass\",\n  \"confidence\": 9\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1936,
+   "out": 175,
+   "text": "{\n  \"message\": \"180 subscribers in 5 months matlab roughly 36 naye bande har mahine aaye, aur 64% renewal ke hisaab se bas 115 log tikenge. Rs 900 CAC divided by (Rs 36 margin multiplied by 22 meals) equals 1.1 months payback, par yeh WhatsApp groups se aaya hai jo ek din band ho sakte hain. Pune IT parks ke baahar distribution ka koi plan nahi, aur 85 rupees food cost par teen home kitchens se Rs 5 crore valuation mangna bilkul pagalpan hai. I'm out because this is a cash-burn wrapper with no scalable moat and an impossible valuation.\",\n  \"out\": true,\n  \"stance\": \"pass\",\n  \"confidence\": 9\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1995,
+   "out": 125,
+   "text": "{\"message\": \"Rs 900 CAC ka payback 1.1 months hai yeh sunke mera pet nahi bharta, par tu yeh bata ki 64% renewal ke baad month 3 se month 12 tak jo actual churn hoga uska hisaab tere paas hai ya bas 22 meals ka average nikal ke baith gaya hai? Mujhe lagta hai yeh Rs 5 crore ki valuation sirf 180 subscribers pe chipki hai jisme koi scalable moat nahi dikh raha.\", \"out\": false, \"stance\": \"pass\", \"confidence\": 8}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 2054,
+   "out": 157,
+   "text": "{\"message\": \"Aapka Rs 36 gross margin per meal aur 1.1 months ka CAC payback sunke accha lagta hai, par 64% month-2 renewal ke baad actual churn ka koi data nahi hai jo aapne abhi tak share kiya ho. Mere plants mein hum worst day ke liye plan karte hain, aur yahan teen home kitchens aur ek single supplier ka setup hai, toh agar ek kitchen band hua ya supplier fail hua toh unpaid inventory pile up ho jayega. Mujhe ek quality audit trail aur multi-source backup chahiye is Rs 5 crore valuation ke liye, isliye abhi mera stance maybe hai aur confidence 6 hai.\", \"out\": false, \"stance\": \"maybe\", \"confidence\": 6}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 2097,
+   "out": 161,
+   "text": "{\"message\": \"Aapka Rs 36 gross margin per meal aur 1.1 months ka CAC payback sunne mein accha lagta hai, par jab 64% month-2 renewal ke baad actual churn aayega toh yeh Rs 36 margin bahut jaldi evaporate ho jayega. Mere liye sabse bada red flag yeh teen home kitchens hain jinme koi quality audit ya compliance trail nahi hai, aur agar inme se ek band hua ya single supplier fail hua toh unpaid inventory pile up ho jayegi aur entire supply chain collapse karegi. Isliye main pass kar rahi hoon kyunki yeh ek thin wrapper hai jisme scalable moat ya quality infrastructure bilkul nahi hai.\", \"out\": true, \"stance\": \"pass\", \"confidence\": 9}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 2113,
+   "out": 120,
+   "text": "{\"message\": \"Aapne Rs 36 gross margin per meal bataya, par yeh tabhi kaam karega jab in teen home kitchens mein quality audit aur batch traceability ho; worst day par agar ek kitchen mein koi hygiene breach hua ya aapka single supplier achanak band ho gaya, toh unpaid inventory pile up hoga aur entire Pune IT park supply chain collapse kar jayegi, toh kya aapne in home kitchens ke liye koi secondary kitchen ya dual-sourcing plan ready rakha hai?\", \"out\": false, \"stance\": \"pass\", \"confidence\": 9}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 2074,
+   "out": 146,
+   "text": "{\n  \"message\": \"Beta, 900 divided by (36 * 22) gives 1.1 months ka CAC payback, par yeh tab tak accha lagta hai jab tak aap month 3 ka actual churn rate nahi batate. 64% renewal month 2 mein hai, aur mere liye DabbaDost jaisa Pune ka tiffin feature tabhi company banta hai jab customer teesri baar bina discount ke order kare, jo aapke paas abhi missing hai, isliye main maybe par hoon 5/10 confidence.\",\n  \"out\": false,\n  \"stance\": \"maybe\",\n  \"confidence\": 5\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 2261,
+   "out": 209,
+   "text": "{\"message\": \"180 subscribers pe 5 crore valuation? Yeh toh seedha loot hai. 180 * 3200 / 12 gives 48000 rupees monthly profit, aur 40 lakh maang rahe ho for 8%? Matlab tumhare 12 months ke pure profit se bhi kam. 48000 * 12 gives 576000 rupees, aur 4000000 divided by 576000 gives about 6.9 months payback, which is too long for a thin wrapper with zero moat in Pune IT parks. 88% renewal month 3 baad dikha raha hai par 12 months ka horizon hai, so yeh growth story bas ek local jugaad hai. I'm out because this valuation is pure fantasy on 180 customers with no scalable moat.\", \"out\": true, \"stance\": \"pass\", \"confidence\": 9}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 2309,
+   "out": 131,
+   "text": "{\"message\": \"180 subscribers pe 5 crore ki valuation? Yeh toh dimaag ki dahi hai. 88% renewal month 3 se shuru, par tu 12 months mein Pune se nikalne wala hai, matlab yeh 1.1 months ka payback sirf ek saal ke liye hai. Jab Pune chhodega tab naya city kaunsa hai jahan yeh margin repeat hoga? Mujhe lagta hai yeh cash flow ka khel hai, par Pune ke IT parks ke baahar koi expansion plan nahi hai.\", \"out\": false, \"stance\": \"pass\", \"confidence\": 9}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 2386,
+   "out": 138,
+   "text": "{\n  \"message\": \"Aapka Rs 900 CAC payback 1.1 months hai, par yeh 88% renewal month 3 se shuru hone ke baad bhi ek saal tak Pune IT parks tak hi simatna ek bada red flag hai kyunki aapke paas unpaid inventory ya working capital ka koi buffer nahi hai agar koi ek home kitchen band ho gaya. Mere hisaab se 180 subscribers par Rs 5 crore ki valuation bilkul unjustified hai, isliye main pass kar rahi hoon.\",\n  \"out\": true,\n  \"stance\": \"pass\",\n  \"confidence\": 9\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 2516,
+   "out": 121,
+   "text": "{\n  \"message\": \"Beta, 88% renewal month 3 se shuru hona sunke acha laga, par 12 months mein bas Pune tak simatna mujhe darata hai kyunki repeat purchase wale IT professionals agar ek baar city badal gaye toh yeh 36 rupees margin wala tiffin band kar denge. Mujhe Pune ke IT parks se bahar ka koi retention data nahi dikh raha, isliye main pass kar rahi hoon.\",\n  \"out\": true,\n  \"stance\": \"pass\",\n  \"confidence\": 9\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkOffer",
+   "in": 2297,
+   "out": 177,
+   "text": "{\"decision\": \"offer\", \"partner_id\": \"\", \"terms\": {\"investment_lakh\": 30, \"equity_pct\": 18, \"debt_lakh\": 0, \"debt_interest_pct\": 0, \"royalty_pct\": 0, \"royalty_until_lakh\": 0}, \"message\": \"1.1 months ka CAC payback sunke mera pet nahi bhara kyunki tu 12 months mein Pune chhodne wala hai aur scalable moat kuch nahi hai. 5 crore ki valuation 180 subscribers pe bilkul dimaag ki dahi hai. Main 30 lakh rupaye dunga 18% equity ke liye, baki 0, kyunki tu bas ek saal ka cash flow khel raha hai bina kisi expansion plan ke.\"}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkOffer",
+   "in": 2412,
+   "out": 165,
+   "text": "{\n  \"decision\": \"offer\",\n  \"partner_id\": \"\",\n  \"terms\": {\n    \"investment_lakh\": 50,\n    \"equity_pct\": 15,\n    \"debt_lakh\": 0,\n    \"debt_interest_pct\": 0,\n    \"royalty_pct\": 0,\n    \"royalty_until_lakh\": 0\n  },\n  \"message\": \"180 subscribers pe 5 crore ki valuation bilkul bakwaas hai. Main 50 lakh mein 15% equity lunga. 1.1 months ka CAC payback accha hai par 12 months ka Pune expiry risk hai, isliye valuation cut kar raha hoon.\"\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkOffer",
+   "in": 2409,
+   "out": 193,
+   "text": "{\n  \"decision\": \"offer\",\n  \"partner_id\": \"\",\n  \"terms\": {\n    \"investment_lakh\": 50,\n    \"equity_pct\": 30,\n    \"debt_lakh\": 0,\n    \"debt_interest_pct\": 0,\n    \"royalty_pct\": 10,\n    \"royalty_until_lakh\": 50\n  },\n  \"message\": \"180 subscribers pe 5 crore ki valuation dimaag ki dahi hai. 1.1 months ka CAC payback accha lagta hai, par 12 months mein Pune se bahar koi plan nahi hai. Main 50 lakh ke liye 30% equity aur 10% royalty 50 lakh tak lunga, kyunki profit ka koi saaf raasta nahi dikh raha.\"\n}"
+  },
+  {
+   "model": "judge",
+   "kind": "SharkVerdictKeyed",
+   "in": 4664,
+   "out": 780,
+   "text": "{\"votes\":{\"meera\":{\"reason\":\"Meera wants proof that customers reorder a third time without discounts, and sees no retention data beyond Pune IT parks once the founder leaves the city.\",\"stance\":\"pass\"},\"arjun\":{\"reason\":\"Arjun sees a thin wrapper over three home kitchens with no switching cost or scalable moat, calling it a services business rather than a company.\",\"stance\":\"pass\"},\"ananya\":{\"reason\":\"Ananya doubts that office WhatsApp distribution survives outside IT parks and worries a single kitchen or supplier failure would collapse the supply chain.\",\"stance\":\"pass\"},\"vikram\":{\"reason\":\"Vikram questions whether churn after month 3 was modelled rather than averaged, and sees a Rs 5 crore valuation resting on 180 subscribers in one city with no expansion plan.\",\"stance\":\"pass\"},\"farah\":{\"reason\":\"Farah sees no compliance trail or working capital buffer across the three kitchens, so one kitchen failing would leave inventory unpaid, and she calls Rs 5 crore unjustified.\",\"stance\":\"pass\"}},\"top_risks\":[\"Revenue is confined to Pune for the next 12 months, and the debate showed no evidence that the 88% renewal holds for customers in other cities.\",\"The three partner home kitchens are a single point of failure, with no working capital buffer or documented supplier contingency beyond a standby fourth kitchen that has not been tested.\",\"Zero switching cost and no proprietary moat mean a tiffin competitor can replicate the offer in Pune IT parks, and the Rs 36 per meal margin leaves little room to respond.\"],\"next_steps\":[\"Pull month-by-month churn for all 180 subscribers from month 3 through month 5 and show the cohort retention curve that supports the 88% figure.\",\"Run a two-week test of the backup kitchen by moving one live delivery route onto it and recording lead time, quality, and any missed meals.\",\"Map the cash needed to cover one month of food purchases across the three kitchens so the company can show how a single kitchen closure would be absorbed.\"],\"one_liner\":\"DabbaDost has a sharp 1.1-month payback in Pune, but with zero switching cost and three home kitchens, the sharks say it is a feature waiting to be copied, not yet a company.\",\"decision\":\"pass\",\"score\":4}"
+  }
+ ]
+}

@@ -72,6 +72,8 @@ export type EngineConfig = {
   judge_provider: string;
   shark_rounds: number;
   janta_max_size: number;
+  /** "demo" is placeholder sound beside the demo AI. */
+  voice?: "live" | "demo" | "off";
 };
 
 /** null when the engine is offline. */
@@ -85,7 +87,7 @@ export async function getEngineConfig(): Promise<EngineConfig | null> {
 
 export function createDebate(
   userId: string,
-  body: { mode: RoomMode; pitch?: string; url?: string; tone?: string; panel_size?: number; ask_amount_lakh?: number; ask_equity_pct?: number },
+  body: { mode: RoomMode; voice?: boolean; pitch?: string; url?: string; tone?: string; panel_size?: number; ask_amount_lakh?: number; ask_equity_pct?: number },
 ) {
   return call<{ id: string }>("/api/debates", { method: "POST", body: JSON.stringify(body), userId });
 }
@@ -133,6 +135,45 @@ export function sendChat(
     `/api/debates/${encodeURIComponent(debateId)}/chat`,
     { method: "POST", body: JSON.stringify(body), userId, timeoutMs: 90_000 },
   );
+}
+
+/** A fetch to the engine whose body isn't JSON (audio in or out). */
+async function raw(path: string, userId: string, init: RequestInit & { contentType: string }): Promise<Response> {
+  const { contentType, ...rest } = init;
+  let res: Response;
+  try {
+    res = await fetch(`${BASE}${path}`, {
+      ...rest,
+      headers: { ...headers(userId), "content-type": contentType },
+      cache: "no-store",
+      signal: AbortSignal.timeout(90_000),
+    });
+  } catch (err) {
+    throw new BackendError(0, OFFLINE, String(err));
+  }
+  if (!res.ok) {
+    const detail = (await res.text().catch(() => "")).slice(0, 300);
+    console.error(`[backend] ${path} -> ${res.status}: ${detail}`);
+    throw new BackendError(res.status, userMessageFor(res.status, detail), detail);
+  }
+  return res;
+}
+
+export async function transcribeClip(userId: string, audio: ArrayBuffer, contentType: string): Promise<{ text: string }> {
+  const res = await raw("/api/voice/transcribe", userId, { method: "POST", body: audio, contentType });
+  return (await res.json()) as { text: string };
+}
+
+export function getSpeech(userId: string, debateId: string, eventId: number): Promise<Response> {
+  return raw(`/api/debates/${encodeURIComponent(debateId)}/speech`, userId, {
+    method: "POST",
+    body: JSON.stringify({ event_id: eventId }),
+    contentType: "application/json",
+  });
+}
+
+export function holdClock(userId: string, debateId: string) {
+  return call<{ expires_at: number }>(`/api/debates/${encodeURIComponent(debateId)}/hold`, { method: "POST", userId });
 }
 
 /** The raw SSE response. No timeout: a debate can run for minutes; `signal` ends it. */

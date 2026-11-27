@@ -1,0 +1,256 @@
+<title>Sabhora Commercial Storyboard</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a production sheet. Sticky 60s timeline on top, then one row per shot: phone-shaped sketch frame left, shot notes right. */
+:root{
+  --bg:#faf9f6; --surface:#ffffff; --ink:#1c1917; --muted:#78716c; --edge:#e7e5e4;
+  --brand:#4f46e5; --brand-soft:#eef0ff; --accent:#f59e0b; --accent-ink:#b45309; --accent-soft:#fef3e2;
+  --sharks:#4f46e5; --janta:#0f9f7a; --roast:#e2533a; --hook:#57534e; --close:#b45309;
+  --frame:#141210; --frame-ink:#f5f3ef;
+  --f-display:"Space Grotesk",ui-sans-serif,system-ui,sans-serif;
+  --f-body:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1a1714; --surface:#221e19; --ink:#f5f3ef; --muted:#a8a29e; --edge:#3a342d;
+  --brand:#818cf8; --brand-soft:#262348; --accent:#fbbf24; --accent-ink:#fcd34d; --accent-soft:#332611;
+  --sharks:#818cf8; --janta:#34d3a6; --roast:#f87a62; --hook:#a8a29e; --close:#fcd34d;
+  --frame:#0d0b09; --frame-ink:#f5f3ef; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1a1714; --surface:#221e19; --ink:#f5f3ef; --muted:#a8a29e; --edge:#3a342d;
+  --brand:#818cf8; --brand-soft:#262348; --accent:#fbbf24; --accent-ink:#fcd34d; --accent-soft:#332611;
+  --sharks:#818cf8; --janta:#34d3a6; --roast:#f87a62; --hook:#a8a29e; --close:#fcd34d;
+  --frame:#0d0b09; --frame-ink:#f5f3ef; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1080px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:-.02em}
+header.top{padding-block:40px 24px;display:grid;gap:14px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink)}
+header.top h1{font-size:clamp(2rem,5vw,3.2rem);line-height:1.05}
+header.top p{margin:0;max-width:64ch;color:var(--muted);font-size:16px}
+.specs{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.chip{font-family:var(--f-mono);font-size:12px;border:1px solid var(--edge);background:var(--surface);border-radius:999px;padding:3px 10px;color:var(--ink)}
+
+/* timeline */
+.tl{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:12px;border-bottom:1px solid var(--edge)}
+.tl-bar{display:flex;height:34px;border-radius:8px;overflow:hidden;gap:2px}
+.tl-bar a{display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;font-family:var(--f-mono);font-size:11px;font-weight:500;min-width:0;overflow:hidden;white-space:nowrap}
+.tl-bar a:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.tl-ticks{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:11px;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
+.act-hook{background:var(--hook)} .act-sharks{background:var(--sharks)} .act-janta{background:var(--janta)} .act-roast{background:var(--roast)} .act-close{background:var(--close)}
+
+/* acts & shots */
+section.act{padding-top:36px;scroll-margin-top:80px}
+.act-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:2px solid var(--c);padding-bottom:8px}
+.act-head h2{font-size:1.6rem;color:var(--ink)}
+.act-head .range{font-family:var(--f-mono);font-size:13px;color:var(--c)}
+.act-head .goal{flex-basis:100%;color:var(--muted);margin:0;font-size:14px}
+.shot{display:grid;grid-template-columns:150px minmax(0,1fr);gap:20px;padding-block:20px;border-bottom:1px solid var(--edge)}
+.notes{min-width:0;display:grid;gap:8px;align-content:start}
+.shot-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.sid{font-family:var(--f-mono);font-weight:500;font-size:13px}
+.time{font-family:var(--f-mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.kind{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:4px;border:1px solid var(--edge);color:var(--muted)}
+.kind.live{color:var(--accent-ink);background:var(--accent-soft);border-color:transparent}
+.kind.screen{color:var(--brand);background:var(--brand-soft);border-color:transparent}
+.shot h3{font-size:1.08rem;font-weight:600}
+dl.f{display:grid;grid-template-columns:88px minmax(0,1fr);gap:4px 12px;margin:0;font-size:14px}
+dl.f dt{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+dl.f dd{margin:0}
+.cap{font-family:var(--f-display);font-weight:600}
+
+/* phone sketch frames */
+.ph{width:150px;aspect-ratio:9/16;max-width:100%;border-radius:14px;background:var(--frame);color:var(--frame-ink);position:relative;overflow:hidden;border:3px solid var(--frame);box-shadow:0 1px 0 var(--edge)}
+.ph .ov{position:absolute;left:8px;right:8px;bottom:12px;font-family:var(--f-display);font-weight:700;font-size:12px;line-height:1.15;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.ph .tag{position:absolute;top:6px;left:6px;font-family:var(--f-mono);font-size:9px;opacity:.7}
+.sk{position:absolute;inset:22px 10px 44px;display:flex;flex-direction:column;gap:5px;justify-content:center}
+.card{background:rgba(255,255,255,.1);border-radius:4px;height:14px;display:flex;align-items:center;gap:4px;padding:0 4px;font-size:8px;font-family:var(--f-mono)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--c,#fff);flex:none}
+.big{font-family:var(--f-display);font-weight:700;font-size:20px;text-align:center;line-height:1.05}
+.stamp{align-self:center;transform:rotate(-10deg);border:2px solid var(--roast);color:var(--roast);font-family:var(--f-display);font-weight:700;padding:2px 8px;border-radius:4px;font-size:14px}
+.grid100{display:grid;grid-template-columns:repeat(10,1fr);gap:2px}
+.grid100 i{aspect-ratio:1;border-radius:2px;background:rgba(255,255,255,.14)}
+.grid100 i.on{background:var(--janta)} .grid100 i.no{background:var(--roast)} .grid100 i.sp{outline:1.5px solid var(--accent);outline-offset:1px}
+.bubble{background:#fff;color:#1c1917;font-size:8px;border-radius:6px;padding:3px 5px;align-self:flex-start;max-width:90%;line-height:1.2}
+.bars{display:grid;gap:5px}
+.bars div{height:8px;border-radius:2px;background:rgba(255,255,255,.12);position:relative}
+.bars div::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--w);background:var(--roast);border-radius:2px}
+.person{align-self:center;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.18);position:relative}
+.person::after{content:"";position:absolute;left:-14px;right:-14px;top:52px;height:40px;border-radius:30px 30px 0 0;background:rgba(255,255,255,.12)}
+.pip{position:absolute;right:6px;top:22px;width:34px;height:44px;border-radius:6px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.4)}
+
+/* lower sections */
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px;margin-top:16px}
+.box{background:var(--surface);border:1px solid var(--edge);border-radius:10px;padding:18px;min-width:0}
+.box h3{font-size:1.05rem;margin-bottom:6px}
+.box ol,.box ul{margin:6px 0 0;padding-left:20px;display:grid;gap:4px;font-size:14px}
+.box p{margin:4px 0 0;font-size:14px;color:var(--muted)}
+.lead{color:var(--muted);max-width:64ch;margin:8px 0 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+.tbl{overflow-x:auto;margin-top:12px;border:1px solid var(--edge);border-radius:10px;background:var(--surface)}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--edge);vertical-align:top}
+th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+tr:last-child td{border-bottom:0}
+td.t{font-family:var(--f-mono);white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--muted)}
+.warn{border-left:3px solid var(--accent);background:var(--accent-soft)}
+@media (max-width:560px){
+  .shot{grid-template-columns:96px minmax(0,1fr);gap:14px}
+  .ph{width:96px;border-radius:10px}
+  .ph .ov{font-size:9px} .big{font-size:14px} .card{height:10px;font-size:6px}
+  .sk{inset:16px 6px 34px;gap:3px}
+  dl.f{grid-template-columns:minmax(0,1fr)} dl.f dt{padding-top:6px}
+  .tl-bar a{font-size:0}
+}
+@media (prefers-reduced-motion:no-preference){ html{scroll-behavior:smooth} }
+</style>
+
+<div class="wrap">
+<header class="top">
+  <span class="eyebrow">Neevora Labs · Launch film · Draft 1</span>
+  <h1>Sabhora: “Nobody will tell you the truth”</h1>
+  <p>A 60-second vertical commercial. One founder pitches one idea, a tiffin service for PG students at ₹3,200 a month, and takes it through all three rooms: the Sharks grill it, the Janta crowd reacts, and the reviewers roast the landing page. Every screen shot comes from a real recorded run, not a mockup.</p>
+  <div class="specs">
+    <span class="chip">9:16 · 1080×1920</span><span class="chip">60s master + 3 × 15s cuts</span><span class="chip">Hinglish captions, burned in</span><span class="chip">Sound-off friendly</span>
+  </div>
+</header>
+
+<nav class="tl" aria-label="Timeline">
+  <div class="tl-bar" id="tlbar"></div>
+  <div class="tl-ticks"><span>0:00</span><span>0:15</span><span>0:30</span><span>0:45</span><span>1:00</span></div>
+</nav>
+
+<main id="acts"></main>
+
+<section class="act" id="cutdowns" style="--c:var(--brand)">
+  <div class="act-head"><h2>15-second cutdowns</h2><span class="range">cut from the same footage</span>
+  <p class="goal">One room per cut, for Reels, Shorts and story ads. Each one opens on its strongest frame, not on the logo.</p></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Cut</th><th>0–3s hook</th><th>3–12s body</th><th>12–15s end card</th></tr></thead>
+    <tbody>
+      <tr><td><b>Sharks</b><br><span class="time">S07 → S10</span></td><td>“I'm out” stamp, sharp thud</td><td>Offer card, a rival bids, founder taps Counter</td><td>“5 investors. 3 rounds. 1 counter-offer.”</td></tr>
+      <tr><td><b>Janta</b><br><span class="time">S12 → S14</span></td><td>Grid already half lit, bubbles popping</td><td>Time-lapse to 100, hold on the sceptic, then the top objection</td><td>“Hear 100 simulated customers before launch.”</td></tr>
+      <tr><td><b>Roast</b><br><span class="time">S15 → S18</span></td><td>Caption “We let Sabhora roast our own landing page.”</td><td>Scores drop in, Sunita Aunty's line, fix list</td><td>“Six reviewers. One honest fix list.”</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="act" id="prep" style="--c:var(--accent)">
+  <div class="act-head"><h2>Before the shoot</h2><span class="range">checklist</span></div>
+  <div class="two">
+    <div class="box">
+      <h3>Screen capture</h3>
+      <ol>
+        <li>Run each room once for real on the tiffin idea (about ₹2 of AI calls in total). Keep the run IDs.</li>
+        <li>Record each run with its replay at phone width (about 390px wide, 3× scale) in light mode.</li>
+        <li>Janta: use the 100-person crowd so the grid fills the frame.</li>
+        <li>Roast: point it at Sabhora's own landing page, or a demo page you made for this. Never a real company's page.</li>
+        <li>Swap every figure on this sheet (offers, scores, quotes) for what your recorded run actually said.</li>
+      </ol>
+    </div>
+    <div class="box">
+      <h3>Live action</h3>
+      <ol>
+        <li>One founder (actor or you), a laptop, a hostel or PG room. Natural light.</li>
+        <li>Mom and friend are voice only (speakerphone, voice note). No faces needed.</li>
+        <li>Film reactions as close-ups for picture-in-picture: wince, lean in, smile, face-palm, relief.</li>
+        <li>Record clean room tone and the pitch line on a lav mic.</li>
+      </ol>
+    </div>
+    <div class="box warn">
+      <h3>Must stay true</h3>
+      <ul>
+        <li>Say “simulated personas” and “AI investors”. Never “real Indians” or “know if your idea will work”.</li>
+        <li>No Shark Tank name, logo, set look or theme music. The five sharks are originals.</li>
+        <li>CTA is “50 free credits”. Paid plans aren't live yet.</li>
+        <li>Hold publishing until the Sabhora name and trademark checks are done.</li>
+      </ul>
+    </div>
+    <div class="box">
+      <h3>Sound and edit</h3>
+      <ul>
+        <li>Original or licensed track only: tabla and drum build, then a crowd swell, then a comic sting.</li>
+        <li>Captions: two lines max, centred in the lower third, clear of the platform UI.</li>
+        <li>Speed-ramp every loading wait. Hold 1s on each payoff frame.</li>
+        <li>Cover frame: the “I'm out” stamp, or the lit Janta grid.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+</div>
+
+<script>
+const ACTS=[
+ {id:"hook",name:"Hook",c:"var(--hook)",from:0,to:7,goal:"Make every founder nod in under 5 seconds: the people who love you won't give you the truth.",shots:[
+  {t:"0:00–0:02",k:"live",title:"Mummy approves",vis:"Founder at a laptop in a PG room, phone on speaker on the desk. Mom's voice.",au:"Mom (VO): “Beta, bahut accha idea hai!” Light, happy music.",cap:"Mummy: approved.",cs:"Handheld, warm light.",sk:"person",ov:"Mummy: approved."},
+  {t:"0:02–0:04",k:"live",title:"Dost approves",vis:"A voice-note bubble pops on the founder's phone. Founder grins and nods.",au:"Friend (voice note): “Bhai, mast idea hai, kar de.”",cap:"Dost: approved.",cs:"Insert shot of the phone screen.",sk:"bubble",ov:"Dost: approved."},
+  {t:"0:04–0:05",k:"graphic",title:"Smash to black",vis:"Hard cut to black. White type slams in.",au:"Music stops dead. A record scratch, then silence.",cap:"Nobody will tell you the truth.",cs:"Text animation only.",sk:"black",ov:"Nobody will tell you the truth."},
+  {t:"0:05–0:07",k:"graphic",title:"Sabhora arrives",vis:"Sabhora logo builds on the paper background, then the saffron underline draws on.",au:"VO: “Toh Sabhora se poocho.” Drum hit.",cap:"Hear the doubts before you build.",cs:"Logo from web/app/icon.svg.",sk:"logo",ov:"Hear the doubts before you build."}]},
+ {id:"sharks",name:"Sharks",c:"var(--sharks)",from:7,to:24,goal:"Show real pressure: hard questions, someone walking out, then an offer worth fighting for.",shots:[
+  {t:"0:07–0:10",k:"screen",title:"Pitch by voice",vis:"New run with the Sharks room picked. Founder taps the mic and speaks. The transcript types in live.",au:"Founder: “Tiffin for PG students, ghar jaisa khana, ₹3,200 a month.”",cap:"Pitch to 5 AI investors.",cs:"Screen recording plus founder face as picture-in-picture.",sk:"mic",ov:"Pitch to 5 AI investors."},
+  {t:"0:10–0:14",k:"screen",title:"The grilling",vis:"Five shark cards stream replies. Zoom on the hardest question as it types out.",au:"Tabla build starts. Keyboard clicks.",cap:"(The shark's real question, quoted)",cs:"Push-in zoom on one card.",sk:"sharks",ov:"“Margin kitna bachega?”"},
+  {t:"0:14–0:16",k:"screen",title:"“I'm out”",vis:"One shark card gets the “I'm out” label. Cut to the founder wincing.",au:"Deep thud. Music drops to a single beat.",cap:"Ouch.",cs:"Freeze-frame on the label for 0.5s.",sk:"out",ov:"Ouch."},
+  {t:"0:16–0:19",k:"screen",title:"Offer, then a bidding war",vis:"The offer card slides in (e.g. ₹40L for 20%). A second shark counter-bids right under it.",au:"Drums speed up.",cap:"Then they started bidding.",cs:"Use the run's real offer figures.",sk:"offer",ov:"Then they started bidding."},
+  {t:"0:19–0:22",k:"screen",title:"Founder counters",vis:"Founder taps Counter and types a lower equity figure. Thumb hovers, then sends.",au:"Tension riser.",cap:"Counter-offer?",cs:"Close-up of the thumb on a real phone, cut to screen.",sk:"counter",ov:"Counter-offer?"},
+  {t:"0:22–0:24",k:"screen",title:"Deal",vis:"Shark accepts. The verdict score card lands. Founder lets out a breath.",au:"Big hit, then the music opens up.",cap:"Deal.",cs:"Hold 1s on the score.",sk:"deal",ov:"Deal."}]},
+ {id:"janta",name:"Janta",c:"var(--janta)",from:24,to:40,goal:"The hero visual. India's crowd lights up and talks. This is the shot people will screenshot.",shots:[
+  {t:"0:24–0:27",k:"screen",title:"Switch rooms",vis:"Founder picks Janta, crowd size 100. Room colour washes the screen.",au:"Music thins. A low crowd murmur fades in.",cap:"Investors said yes. Would customers pay?",cs:"Screen recording.",sk:"pick",ov:"Would customers pay?"},
+  {t:"0:27–0:34",k:"screen",title:"The Talking Grid",vis:"100 squares fill. Speech bubbles pop in Hinglish, ripples spread across neighbours.",au:"Murmur swells into chatter.",cap:"100 simulated Indian customers react.",cs:"Speed-ramp 4× through the fill, back to 1× on the last bubbles.",sk:"grid",ov:"100 simulated customers react."},
+  {t:"0:34–0:37",k:"screen",title:"The sceptic",vis:"Slow push-in on one sceptical bubble, then a square showing “changed their mind”.",au:"Chatter ducks. One voice clear.",cap:"(The best sceptical quote)",cs:"Pick a real quote with a city and job attached.",sk:"sceptic",ov:"“₹3,200? Mess mein 2,000 hai.”"},
+  {t:"0:37–0:40",k:"screen",title:"The objection list",vis:"Summary: who would pay by city tier, plus the top objection highlighted.",au:"Soft ding.",cap:"Your top objection, before launch.",cs:"Highlight the objection with a marker swipe in the edit.",sk:"summary",ov:"Your top objection, before launch."}]},
+ {id:"roast",name:"Roast",c:"var(--roast)",from:40,to:53,goal:"The comic release. Blunt reviewers, one unforgettable aunty, then a fix list you can act on.",shots:[
+  {t:"0:40–0:43",k:"screen",title:"Paste the URL",vis:"Founder pastes their landing page link into the Roast room. Gulp.",au:"Comic suspense plucks.",cap:"Now the scary part.",cs:"Use Sabhora's own page or a demo page.",sk:"url",ov:"Now the scary part."},
+  {t:"0:43–0:48",k:"screen",title:"Six reviewers score it",vis:"Reviewer cards pop in. Clarity, trust, design and CTA bars fill, one stays low.",au:"Quick pops on each score.",cap:"6 reviewers. 4 scores. Zero mercy.",cs:"Stagger the cards in the edit if they arrive together.",sk:"scores",ov:"Zero mercy."},
+  {t:"0:48–0:51",k:"screen",title:"Sunita Aunty",vis:"Sunita Aunty's comment fills the screen. Cut to the founder's face-palm.",au:"Comic sting. A tiny laugh.",cap:"(Sunita Aunty's real line)",cs:"Full-screen text treatment of her line.",sk:"aunty",ov:"Sunita Aunty has notes."},
+  {t:"0:51–0:53",k:"screen",title:"The fix list",vis:"The ranked fix list. Founder ticks off the first fix.",au:"Satisfying tick sound.",cap:"Fix it today.",cs:"Screen recording plus thumb tap.",sk:"fixes",ov:"Fix it today."}]},
+ {id:"close",name:"Close",c:"var(--close)",from:53,to:60,goal:"Turn the story into an action: share it, then try it free.",shots:[
+  {t:"0:53–0:56",k:"screen",title:"Share the verdict",vis:"Founder taps Share link. The co-founder's phone buzzes with the preview card.",au:"Whoosh, phone buzz.",cap:"Send it to your co-founder.",cs:"Shows the per-run link preview image.",sk:"share",ov:"Send it to your co-founder."},
+  {t:"0:56–1:00",k:"graphic",title:"End card",vis:"“Sharks. Janta. Roast.” stacks in the three room colours, then “50 free credits” and the URL.",au:"VO: “Pehle sach suno. Phir banao.” Final hit.",cap:"Try it free: 50 credits.",cs:"Small line: “AI investors and personas are simulated.” Sabhora by Neevora Labs.",sk:"end",ov:"Sharks. Janta. Roast."}]}
+];
+
+const T=60;
+const bar=document.getElementById("tlbar");
+ACTS.forEach(a=>{const l=document.createElement("a");l.href="#"+a.id;l.className="act-"+a.id;l.style.flex=(a.to-a.from);l.textContent=a.name;l.title=a.name+" "+fmt(a.from)+"–"+fmt(a.to);bar.appendChild(l)});
+function fmt(s){return "0:"+String(s).padStart(2,"0").replace("60","1:00").replace("0:1:00","1:00")}
+
+function sketch(k){
+  const g=(n,f)=>Array.from({length:n},(_,i)=>f(i)).join("");
+  switch(k){
+   case "person":return `<div class="sk"><div class="person"></div></div><div class="pip" style="display:none"></div>`;
+   case "bubble":return `<div class="sk"><div class="bubble">▶ 0:04 voice note</div><div class="person" style="margin-top:6px"></div></div>`;
+   case "black":return `<div class="sk"></div>`;
+   case "logo":return `<div class="sk" style="background:#faf9f6;inset:0;color:#1c1917;align-items:center"><div class="big" style="color:#4f46e5">Sabhora</div><div style="width:50%;height:3px;background:#f59e0b;border-radius:2px"></div></div>`;
+   case "mic":return `<div class="sk"><div class="card" style="--c:var(--sharks)"><span class="dot"></span>Sharks</div><div class="card" style="height:34px;align-items:flex-start;padding-top:4px">Tiffin for PG…</div><div class="dot" style="align-self:center;width:26px;height:26px;--c:var(--roast)"></div></div><div class="pip"></div>`;
+   case "sharks":return `<div class="sk">${["Meera","Arjun","Ananya","Vikram","Farah"].map(n=>`<div class="card" style="--c:var(--sharks)"><span class="dot"></span>${n}</div>`).join("")}</div>`;
+   case "out":return `<div class="sk">${["Meera","Arjun"].map(n=>`<div class="card" style="--c:var(--sharks)"><span class="dot"></span>${n}</div>`).join("")}<div class="stamp">I'M OUT</div></div><div class="pip"></div>`;
+   case "offer":return `<div class="sk"><div class="card" style="height:40px;flex-direction:column;align-items:flex-start;justify-content:center;border:1px solid var(--accent)">OFFER<b style="font-size:11px">₹40L · 20%</b></div><div class="card" style="--c:var(--sharks)"><span class="dot"></span>+ rival bid</div></div>`;
+   case "counter":return `<div class="sk"><div class="card" style="height:28px">₹40L · 20%</div><div class="card" style="height:22px;background:var(--brand);justify-content:center">COUNTER →</div></div>`;
+   case "deal":return `<div class="sk" style="align-items:center"><div class="big" style="color:var(--accent)">DEAL</div><div class="card" style="width:100%;justify-content:center">score 7/10</div></div><div class="pip"></div>`;
+   case "pick":return `<div class="sk"><div class="card" style="--c:var(--janta)"><span class="dot"></span>Janta</div>${["25","50","100"].map((n,i)=>`<div class="card" style="${i==2?'background:var(--janta)':''}">${n} people</div>`).join("")}</div>`;
+   case "grid":return `<div class="sk"><div class="bubble">“Ghar jaisa? Pakka?”</div><div class="grid100">${g(100,i=>`<i class="${[3,7,12,18,22,27,31,40,44,48,53,58,61,66,70,77,81,85,92,96].includes(i)?'on':[9,25,37,63,88].includes(i)?'no':''} ${i==44?'sp':''}"></i>`)}</div></div>`;
+   case "sceptic":return `<div class="sk"><div class="grid100" style="opacity:.35">${g(40,i=>`<i class="${i%3?'on':''}"></i>`)}</div><div class="bubble" style="align-self:center;font-size:9px">changed their mind</div></div>`;
+   case "summary":return `<div class="sk"><div class="bars">${["70%","45%","30%"].map(w=>`<div style="--w:${w}"></div>`).join("")}</div><div class="card" style="height:22px;background:var(--accent-soft);color:#1c1917">Top objection</div></div>`;
+   case "url":return `<div class="sk"><div class="card" style="--c:var(--roast)"><span class="dot"></span>Roast</div><div class="card" style="height:20px;border:1px solid rgba(255,255,255,.4)">https://…</div></div><div class="pip"></div>`;
+   case "scores":return `<div class="sk"><div class="bars">${["80%","55%","70%","25%"].map(w=>`<div style="--w:${w}"></div>`).join("")}</div>${g(3,()=>`<div class="card" style="--c:var(--roast)"><span class="dot"></span>reviewer</div>`)}</div>`;
+   case "aunty":return `<div class="sk"><div class="bubble" style="font-size:10px;align-self:center;padding:6px">Sunita Aunty: “…”</div></div><div class="pip"></div>`;
+   case "fixes":return `<div class="sk">${g(4,i=>`<div class="card">${i==0?'✓':i+1}. fix</div>`)}</div>`;
+   case "share":return `<div class="sk"><div class="card" style="height:22px;background:var(--brand);justify-content:center">Share link</div><div class="card" style="height:36px">preview card</div></div>`;
+   case "end":return `<div class="sk" style="align-items:center;gap:2px"><div class="big" style="color:var(--sharks);font-size:15px">Sharks.</div><div class="big" style="color:var(--janta);font-size:15px">Janta.</div><div class="big" style="color:var(--roast);font-size:15px">Roast.</div><div class="card" style="margin-top:6px;background:var(--accent);color:#1c1917">50 free credits</div></div>`;
+  }return ""}
+
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let n=0;const main=document.getElementById("acts");
+main.innerHTML=ACTS.map(a=>`<section class="act" id="${a.id}" style="--c:${a.c}">
+ <div class="act-head"><h2>${a.name}</h2><span class="range">${fmt(a.from)}–${fmt(a.to)} · ${a.to-a.from}s</span><p class="goal">${esc(a.goal)}</p></div>
+ ${a.shots.map(s=>{n++;const id="S"+String(n).padStart(2,"0");const kl={live:"Live action",screen:"Screen",graphic:"Graphic"}[s.k];
+ return `<article class="shot"><div class="ph" role="img" aria-label="Sketch of shot ${id}: ${esc(s.title)}"><span class="tag">${id}</span>${sketch(s.sk)}<div class="ov">${esc(s.ov)}</div></div>
+ <div class="notes"><div class="shot-top"><span class="sid" style="color:${a.c}">${id}</span><span class="time">${s.t}</span><span class="kind ${s.k}">${kl}</span></div>
+ <h3>${esc(s.title)}</h3>
+ <dl class="f"><dt>Visual</dt><dd>${esc(s.vis)}</dd><dt>Audio</dt><dd>${esc(s.au)}</dd><dt>Caption</dt><dd class="cap">${esc(s.cap)}</dd><dt>Capture</dt><dd>${esc(s.cs)}</dd></dl></div></article>`}).join("")}
+</section>`).join("");
+</script>

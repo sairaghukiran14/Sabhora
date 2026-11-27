@@ -30,7 +30,8 @@ class CreateDebate(BaseModel):
     tone: Tone = "roast"
     pitch: str | None = Field(default=None, min_length=20, max_length=2000)
     url: HttpUrl | None = None  # Roast mode only
-    panel_size: int | None = Field(default=None, ge=5, le=500)  # Janta crowd size
+    panel_size: int | None = Field(default=None, ge=5, le=1000)  # Janta crowd size
+    voice: bool = False  # Sharks only: the founder may listen to the sharks speak
     # Sharks mode: the founder's ask, e.g. 50 (lakh rupees) for 5 (percent equity).
     # Without an ask the sharks debate but make no offers.
     ask_amount_lakh: float | None = Field(default=None, ge=1, le=100_000)
@@ -47,8 +48,13 @@ class CreateDebate(BaseModel):
         return self
 
 
+class SpeechRequest(BaseModel):
+    """Which line of a debate to read aloud. The text always comes from the debate."""
+    event_id: int = Field(ge=0)
+
+
 class FounderReply(BaseModel):
-    text: str | None = Field(default=None, max_length=500)
+    text: str | None = Field(default=None, max_length=800)  # room for a spoken answer
     skip: bool = False
 
     @model_validator(mode="after")
@@ -119,10 +125,13 @@ class SharkTurn(BaseModel):
 
     `maths` comes first because field order is generation order: the model works a figure
     out before it says it, instead of inventing one mid-sentence (it said "₹4,812 a month"
-    for 18 shops at ₹299 on the first real run)."""
-    maths: list[Calc] = Field(default_factory=list, max_length=4, description=(
-        "Work out here every figure you are about to say that is not already in ESTABLISHED "
-        "FACTS. Leave empty if you state no new figures."))
+    for 18 shops at ₹299 on the first real run).
+
+    `maths` is required (an empty list is fine). While it had a default, all 21 shark
+    replies on the real run of 27 Nov 2026 left the key out and started with `message`."""
+    maths: list[Calc] = Field(max_length=4, description=(
+        "Always include this, before the message. Work out here every figure you are about "
+        "to say that is not already in ESTABLISHED FACTS. Use [] if you state no new figures."))
     message: str = Field(min_length=60, max_length=700)
     out: bool  # "I'm out": the shark leaves this pitch for good
     stance: Stance
@@ -190,9 +199,8 @@ def shark_verdict_model(shark_ids: list[str]) -> type[BaseModel]:
         top_risks=(list[Point], Field(min_length=3, max_length=3, description="The 3 biggest risks")),
         next_steps=(list[Point], Field(min_length=3, max_length=3, description="3 concrete next steps")),
         one_liner=(str, Field(min_length=15, description="Punchy, shareable one-line summary")),
-        decision=(Stance, ...),
         score=(int, Field(ge=0, le=10, description="Overall viability 0-10, decided last")),
-    )
+    )  # no "decision": code counts it from the votes (debates/sharks.panel_decision)
 
 
 class SharkVerdict(BaseModel):

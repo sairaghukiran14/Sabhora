@@ -32,6 +32,24 @@ class Settings(BaseSettings):
     llm_timeout_s: float = 60.0
     fake_delay_s: float = 0.4  # makes the fake provider feel "live"
 
+    # --- Voice (Sharks: spoken pitch and answers, spoken sharks) ---
+    # "fake" = placeholder audio and text, free. "sarvam" = real speech, billed.
+    voice_provider: Literal["fake", "sarvam"] = "fake"
+    sarvam_stt_model: str = "saaras:v4"
+    # "translate" writes English with digits. Tested on real clips, 27 Nov 2026: "translit"
+    # wrote numbers as words (no figure check could read them) and "codemix" wrote city names
+    # in Hindi script (crowd targeting missed them).
+    sarvam_stt_mode: str = "translate"
+    sarvam_tts_model: str = "bulbul:v4-flash"
+    sarvam_tts_language: str = "hi-IN"
+    # Spoken characters per debate: 10,000 is at most about Rs 20 on bulbul:v4-flash.
+    voice_max_chars_per_debate: int = 10_000
+    voice_daily_chars: int = 200_000  # whole server, about Rs 400 a day
+    voice_daily_clips: int = 500  # whole server, 30 s each: about Rs 120 a day
+    voice_clip_rate_per_hour: int = 40  # recorded clips per user per hour
+    voice_founder_wait_s: float = 90  # voice runs give more time to answer
+    voice_hold_max_s: float = 300  # longest a wait can be stretched while sharks talk
+
     # --- Cost caps (tokens) ---
     max_tokens_per_debate: int = 60_000
     judge_reserve_tokens: int = 30_000  # held back so a verdict can always be written

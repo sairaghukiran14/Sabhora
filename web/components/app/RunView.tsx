@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import {
   deriveRun,
   type CrowdMember,
-  type Reaction,
   type RoastVerdict,
   type RunEvent,
   type RunState,
@@ -17,11 +16,14 @@ import {
   type Vote,
 } from "@/lib/events";
 import type { RoomMode, RunStatus } from "@/lib/types";
-import { Alert, Globe, Info, Message, Play, Refresh } from "../icons";
+import { Alert, Globe, Info, Message, Play, Refresh, Volume } from "../icons";
 import { btn, cx } from "../ui";
+import { CrowdGrid, CrowdLegend, TalkingCrowd } from "./CrowdGrid";
 import DealTable, { AskChip, DealResult } from "./DealTable";
 import FounderTurn from "./FounderTurn";
 import PanelChat, { type ChatPerson, type PanelChatHandle } from "./PanelChat";
+import SharkVoiceBar from "./SharkVoiceBar";
+import { spokenLines, useSharkVoice, type SharkVoice } from "./useSharkVoice";
 import { useLiveEvents, useReplay, type Connection } from "./useRunEvents";
 
 const SHARK_COLOR: Record<string, string> = { meera: "#4f46e5", arjun: "#d97706", ananya: "#e11d48", vikram: "#0f766e", farah: "#7c3aed" };
@@ -202,7 +204,7 @@ type Chat = { runId: string } | null;
 
 // ================================================================ Sharks
 
-function SharksView({ state, active, verdictTop, chat, reply }: ViewProps & { chat: Chat; reply: Chat }) {
+function SharksView({ state, active, verdictTop, chat, reply, voice }: ViewProps & { chat: Chat; reply: Chat; voice: SharkVoice | null }) {
   const v = state.verdictEvent?.verdict as SharkVerdict | undefined;
   const messages = state.rounds.reduce((n, r) => n + r.items.length, 0);
   const endRef = useFollow(messages + (state.table?.length ?? 0) + (state.choice ? 500 : 0) + (state.founderTurn ? 1000 : 0) + (v ? 2000 : 0), active);
@@ -296,7 +298,19 @@ function SharksView({ state, active, verdictTop, chat, reply }: ViewProps & { ch
                         )}
                       </p>
                       <p className="truncate text-[12px] text-faint">{titles.get(item.speaker)}</p>
-                      <p className="mt-1.5 break-words rounded-2xl rounded-tl-sm border border-edge bg-bg px-4 py-3 text-[15px] leading-relaxed">{item.text}</p>
+                      <p
+                        className={cx(
+                          "mt-1.5 break-words rounded-2xl rounded-tl-sm border bg-bg px-4 py-3 text-[15px] leading-relaxed transition-colors",
+                          voice?.speaking?.id === item.id ? "border-mode ring-2 ring-mode/30" : "border-edge",
+                        )}
+                      >
+                        {item.text}
+                      </p>
+                      {voice && (
+                        <button type="button" onClick={() => voice.play(item.id)} className="mt-1 inline-flex items-center gap-1 text-[12px] font-medium text-muted hover:text-ink" aria-label={`Hear ${item.name} say this`}>
+                          <Volume size={13} /> Listen
+                        </button>
+                      )}
                     </div>
                   </motion.div>
                 );
@@ -326,7 +340,14 @@ function SharksView({ state, active, verdictTop, chat, reply }: ViewProps & { ch
         </div>
       )}
       {reply && state.founderTurn && (
-        <FounderTurn key={state.founderTurn.expiresAt ?? messages} runId={reply.runId} waitS={state.founderTurn.waitS} expiresAt={state.founderTurn.expiresAt} />
+        <FounderTurn
+          key={state.founderTurn.id}
+          runId={reply.runId}
+          waitS={state.founderTurn.waitS}
+          expiresAt={state.founderTurn.expiresAt}
+          voice={!!voice}
+          onRecordingChange={voice?.setPaused}
+        />
       )}
       {active && <div ref={endRef} aria-hidden className="!mt-0 scroll-mb-8" />}
       {!verdictTop && verdict}
@@ -393,91 +414,6 @@ function SegmentBars({ segments }: { segments: Segments }) {
 
 const describe = (p?: CrowdMember) => (p ? `${p.age} · ${p.occupation} · ${p.city}` : "");
 
-// The crowd as a grid of cells, one per person (as in the original index.html): grey while
-// waiting, then green/amber/red as each votes, with an inset circle for "would pay".
-const VOTE_DOT: Record<Vote, string> = { agree: "bg-success", neutral: "bg-accent", disagree: "bg-danger" };
-
-function Dot({ person, reaction }: { person?: CrowdMember; reaction?: Reaction }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const rid = reaction?.id;
-  // A brief pop each time this person reacts (first reply, and again if they change).
-  // Driven straight through the DOM so it doesn't re-render all the dots.
-  useEffect(() => {
-    if (rid == null) return;
-    const el = ref.current;
-    if (!el || typeof el.animate !== "function") return;
-    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
-    el.style.zIndex = "10";
-    const anim = el.animate([{ transform: "scale(1.25)" }, { transform: "scale(1)" }], {
-      duration: 380,
-      easing: "cubic-bezier(0.34, 1.56, 0.64, 1)",
-    });
-    const clear = () => {
-      el.style.zIndex = "";
-    };
-    anim.addEventListener("finish", clear);
-    anim.addEventListener("cancel", clear);
-    return () => anim.cancel();
-  }, [rid]);
-  const label = person
-    ? reaction
-      ? `${person.name}, ${person.occupation}, ${person.city} — ${VOTE_STYLE[reaction.vote].label.toLowerCase()}${reaction.would_pay ? ", would pay" : ""}`
-      : `${person.name}, ${person.occupation}, ${person.city} — waiting`
-    : "";
-  return (
-    <div
-      ref={ref}
-      title={label}
-      aria-label={label}
-      className={cx(
-        "relative aspect-square rounded-[4px] transition-colors duration-300",
-        reaction ? VOTE_DOT[reaction.vote] : "bg-edge-strong",
-      )}
-    >
-      {reaction?.would_pay && <span className="absolute inset-[30%] rounded-full bg-surface" />}
-    </div>
-  );
-}
-
-function CrowdGrid({ crowd, latest }: { crowd: CrowdMember[]; latest: Map<string, Reaction> }) {
-  return (
-    <div
-      className="grid gap-1"
-      style={{ gridTemplateColumns: "repeat(auto-fill, minmax(18px, 1fr))" }}
-      role="img"
-      aria-label={`Crowd of ${crowd.length}; ${latest.size} have reacted`}
-    >
-      {crowd.map((p) => (
-        <Dot key={p.id} person={p} reaction={latest.get(p.id)} />
-      ))}
-    </div>
-  );
-}
-
-function CrowdLegend() {
-  const items: [string, string][] = [
-    ["bg-success", "Agree"],
-    ["bg-accent", "Unsure"],
-    ["bg-danger", "Disagree"],
-    ["bg-edge-strong", "Waiting"],
-  ];
-  return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px] text-muted">
-      {items.map(([c, l]) => (
-        <span key={l} className="flex items-center gap-1.5">
-          <span className={cx("h-3 w-3 rounded-[3px]", c)} /> {l}
-        </span>
-      ))}
-      <span className="flex items-center gap-1.5">
-        <span className="relative h-3 w-3 rounded-[3px] bg-success">
-          <span className="absolute inset-[30%] rounded-full bg-surface" />
-        </span>
-        Dot inside = would pay
-      </span>
-    </div>
-  );
-}
-
 function JantaView({ state, active, verdictTop, chat }: ViewProps & { chat: Chat }) {
   const [filter, setFilter] = useState<Vote | "all">("all");
   const [showAll, setShowAll] = useState(false);
@@ -490,7 +426,7 @@ function JantaView({ state, active, verdictTop, chat }: ViewProps & { chat: Chat
   const shown = showAll ? filtered : filtered.slice(0, 12);
   const voices = (["agree", "neutral", "disagree"] as const).flatMap((vote) => reactions.filter((r) => r.vote === vote).slice(0, 2));
   const person = (id: string) => state.crowd.get(id);
-  const lastVoice = state.feed[state.feed.length - 1];
+  const crowdList = useMemo(() => [...state.crowd.values()], [state.crowd]);
 
   const verdict = summary && final && (
     <VerdictCard
@@ -530,20 +466,11 @@ function JantaView({ state, active, verdictTop, chat }: ViewProps & { chat: Chat
             </div>
           )}
           <div className="mt-4">
-            <CrowdGrid crowd={[...state.crowd.values()]} latest={state.latest} />
+            <TalkingCrowd crowd={crowdList} latest={state.latest} feed={state.feed} on={active} />
           </div>
           <div className="mt-4">
             <CrowdLegend />
           </div>
-          {lastVoice && person(lastVoice.persona_id) && (
-            <p className="mt-4 flex items-start gap-2 border-t border-edge pt-3 text-[13px] text-muted">
-              <Pill cls={VOTE_STYLE[lastVoice.vote].cls}>{VOTE_STYLE[lastVoice.vote].label}</Pill>
-              <span className="min-w-0">
-                <span className="font-medium text-ink">{person(lastVoice.persona_id)?.name}:</span>{" "}
-                <span className="break-words">“{lastVoice.comment}”</span>
-              </span>
-            </p>
-          )}
         </section>
       )}
 
@@ -555,7 +482,7 @@ function JantaView({ state, active, verdictTop, chat }: ViewProps & { chat: Chat
             The crowd at a glance{final ? ` · ${final.would_pay_pct}% would pay` : ""}
           </p>
           <div className="mt-4">
-            <CrowdGrid crowd={[...state.crowd.values()]} latest={state.latest} />
+            <CrowdGrid crowd={crowdList} latest={state.latest} />
           </div>
           <div className="mt-4">
             <CrowdLegend />
@@ -776,9 +703,11 @@ export type RunViewProps = {
   /** The signed-in owner can answer the sharks and chat. Shared links can't. */
   owner?: boolean;
   demo?: boolean;
+  /** This run paid for spoken investors. Only the owner can hear them. */
+  voice?: boolean;
 };
 
-export default function RunView({ runId, mode, status, events: saved, error, cost, owner = false, demo = false }: RunViewProps) {
+export default function RunView({ runId, mode, status, events: saved, error, cost, owner = false, demo = false, voice = false }: RunViewProps) {
   const running = status === "running";
   const { events, connection } = useLiveEvents(runId, saved, running);
   const replay = useReplay(events);
@@ -792,6 +721,11 @@ export default function RunView({ runId, mode, status, events: saved, error, cos
   const top = useRef<HTMLDivElement>(null);
   const chat: Chat = owner && status === "done" && !replay.playing ? { runId } : null;
   const shared = { state, active, verdictTop: !atEnd, chat };
+
+  // Voice: a live run is read out as it happens; a finished one waits to be asked.
+  const hasVoice = voice && owner && mode === "sharks" && status !== "failed";
+  const lines = useMemo(() => spokenLines(events), [events]);
+  const sharkVoice = useSharkVoice({ runId, lines, autoplay: hasVoice && running, after: spokenLines(saved).at(-1)?.id ?? -1 });
 
   return (
     <div ref={top} className={`room-${mode} scroll-mt-20 space-y-6`}>
@@ -834,7 +768,10 @@ export default function RunView({ runId, mode, status, events: saved, error, cos
         </div>
       )}
 
-      {mode === "sharks" && <SharksView {...shared} reply={owner && live ? { runId } : null} />}
+      {hasVoice && (
+        <SharkVoiceBar runId={runId} voice={sharkVoice} live={live} waitingFor={live ? (state.founderTurn ? state.founderTurn.id : (state.choice?.id ?? null)) : null} />
+      )}
+      {mode === "sharks" && <SharksView {...shared} reply={owner && live ? { runId } : null} voice={hasVoice ? sharkVoice : null} />}
       {mode === "janta" && <JantaView {...shared} />}
       {mode === "roast" && <RoastView {...shared} />}
 

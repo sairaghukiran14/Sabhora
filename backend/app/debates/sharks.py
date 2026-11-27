@@ -117,7 +117,11 @@ def turn_check(pitch: str, transcript: list[tuple[str, str]] | None = None,
         wrong_payback = metrics.payback_error(msg, record)
         if wrong_payback:
             raise ValueError(wrong_payback)
-        verified = numbers.check_calcs(turn.maths)
+        known = None
+        if allowed is not None:
+            pb = metrics.payback(record)  # shown to sharks as a fact, so they may build on it
+            known = allowed | ({round(pb.months, 1)} if pb else set())
+        verified = numbers.check_calcs(turn.maths, known)
         if allowed is not None:
             numbers.check_message(msg, allowed | verified)
             allowed.update(verified)  # only now that the whole turn is good
@@ -158,7 +162,8 @@ def offer_figures(events: list[dict]) -> dict[str, set[float]]:
 
 
 def verdict_check(allowed: set[float] | None = None, record: list[str] | None = None,
-                  offers: dict[str, set[float]] | None = None):
+                  offers: dict[str, set[float]] | None = None,
+                  ask: dict | None = None):
     """The judge must write real text (a real reply had a one-liner of just '....') and may
     not invent figures either: the made-up "₹4,812 a month" reached the verdict unchallenged.
     Nor may it call something missing that the founder covered (`record`): "no FSSAI process
@@ -172,11 +177,18 @@ def verdict_check(allowed: set[float] | None = None, record: list[str] | None = 
             for text in [raw.one_liner, *raw.top_risks, *raw.next_steps,
                          *(v.reason for _, v in raw.votes)]:
                 numbers.check_message(text, allowed)
+        # The founder's own figures belong to everyone, even when an offer happens to have
+        # the same value. On the real run of 27 Nov 2026 Vikram's reason quoted the ask's
+        # ₹5 crore valuation and was rejected as "Farah's offer", which was also ₹5 crore.
+        shared = numbers.values_in(record or [])
+        if ask:
+            shared |= {ask[k] * 1e5 for k in ("investment_lakh", "valuation_lakh") if ask.get(k)}
         for sid, v in raw.votes:  # each shark's reason may quote only that shark's own offer
             mine = (offers or {}).get(sid, set())
             theirs = {f for other, figs in (offers or {}).items() if other != sid for f in figs}
             for m in numbers.mentions(v.reason):
-                if m.checked and numbers.matches(m.value, theirs - mine) and not numbers.matches(m.value, mine):
+                if m.checked and numbers.matches(m.value, theirs - mine) \
+                        and not numbers.matches(m.value, mine) and not numbers.matches(m.value, shared):
                     raise ValueError(f"the reason for {sid} quotes {m.raw}, which is another "
                                      "shark's offer, not theirs. Give each shark only their own terms")
         if record:
@@ -198,6 +210,17 @@ def verdict_check(allowed: set[float] | None = None, record: list[str] | None = 
     return check
 
 
+def panel_decision(votes: list[SharkVote]) -> Stance:
+    """The panel's call, which the app shows as "The panel would invest / pass": invest or
+    pass only when more than half the panel votes that way, otherwise maybe (ties and
+    splits included). Counted here: on the real run of 27 Nov 2026 the judge wrote "invest"
+    with 1 shark investing and 4 passing."""
+    for stance in ("invest", "pass"):
+        if sum(v.stance == stance for v in votes) * 2 > len(votes):
+            return stance
+    return "maybe"
+
+
 def to_verdict(raw, sharks: tuple[Persona, ...],
                fixed: dict[str, str] | None = None) -> SharkVerdict:
     """Turn the judge's keyed votes (one required field per shark id) into the app's verdict.
@@ -205,31 +228,26 @@ def to_verdict(raw, sharks: tuple[Persona, ...],
     fixed = fixed or {}
     votes = [SharkVote(shark=s.name, stance=fixed.get(s.id, getattr(raw.votes, s.id).stance),
                        reason=getattr(raw.votes, s.id).reason) for s in sharks]
-    return SharkVerdict(score=raw.score, decision=raw.decision, one_liner=raw.one_liner,
+    return SharkVerdict(score=raw.score, decision=panel_decision(votes), one_liner=raw.one_liner,
                         votes=votes, top_risks=raw.top_risks[:3], next_steps=raw.next_steps[:3])
 
 
-def fallback_verdict(sharks: tuple[Persona, ...], stances: dict[str, str]) -> SharkVerdict:
-    """Used only if the judge model fails: a verdict built from the final stances alone."""
-    votes = [SharkVote(shark=s.name, stance=stances.get(s.id, "maybe"),  # type: ignore[arg-type]
-                       reason="Based on their final stance in the debate.") for s in sharks]
-    invest = sum(v.stance == "invest" for v in votes)
-    decision: Stance = ("invest" if invest * 2 > len(sharks)
-                        else "pass" if invest == 0 else "maybe")
-    return SharkVerdict(
-        score=3 + round(6 * invest / len(sharks)), decision=decision,
-        one_liner="The panel has spoken; the judge was unavailable for details.",
-        votes=votes, top_risks=["Not enough evidence of demand", "Unclear moat", "Unproven economics"],
-        next_steps=["Talk to 10 target customers", "Test one price point", "Find one repeatable channel"],
-    )
+# Shown when the judge fails. There is no stand-in verdict: the old one listed three fixed
+# risks and next steps that came from no pitch, and the founder paid for it. Without a
+# "verdict" event the web app marks the run failed and refunds the credits.
+NO_VERDICT = ("The judge couldn't write a verdict for this debate, so there is no score. "
+              "What the sharks said is saved with this run.")
 
 
-async def _wait_for_founder(session: DebateSession, wait_s: float) -> str | None:
+async def _wait_for_founder(session: DebateSession, s: Settings) -> str | None:
+    voice = bool(session.request.get("voice"))
+    wait_s = max(s.founder_wait_s, s.voice_founder_wait_s) if voice else s.founder_wait_s
     session.awaiting_founder = True
     # expires_at (epoch seconds) lets a page that reloads mid-wait show the right countdown
     await session.emit("founder_turn", wait_s=wait_s, expires_at=time.time() + wait_s)
     try:
-        return await asyncio.wait_for(session.founder_inbox.get(), timeout=wait_s)
+        return await session.wait_for_founder_input(session.founder_inbox, wait_s,
+                                                    s.voice_hold_max_s)
     except TimeoutError:
         return None
     finally:
@@ -288,7 +306,7 @@ async def run(session: DebateSession, llms: LLMs, s: Settings) -> None:
             if not transcript and last_error:
                 raise last_error  # nobody could speak: a config problem, not a debate
             if rnd < s.shark_rounds and len(gone) < len(sharks):
-                reply = await _wait_for_founder(session, s.founder_wait_s)
+                reply = await _wait_for_founder(session, s)
                 if reply:
                     transcript.append(("Founder", reply))
                     allowed |= numbers.values_in([reply])  # the founder's figures are facts
@@ -314,11 +332,11 @@ async def run(session: DebateSession, llms: LLMs, s: Settings) -> None:
             prompts.verdict_user(pitch, transcript, list(sharks), stances, ask),
             shark_verdict_model([p.id for p in sharks]), budget=judge_budget, max_tokens=6000,
             check=verdict_check(allowed, [pitch, *(t for who, t in transcript if who == "Founder")],
-                                offer_figures(session.events)),
+                                offer_figures(session.events), ask),
             attempts=3)
-        verdict = to_verdict(raw, sharks, fixed)
     except (LLMError, BudgetExceeded) as err:
-        log.warning("judge failed, using fallback verdict",
+        log.warning("judge failed, no verdict",
                     extra={"debate_id": session.id, "error": str(err)[:300]})
-        verdict = fallback_verdict(sharks, stances)
-    await session.emit("verdict", verdict=verdict.model_dump())
+        await session.emit("error", message=NO_VERDICT)
+        return
+    await session.emit("verdict", verdict=to_verdict(raw, sharks, fixed).model_dump())

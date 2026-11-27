@@ -4,11 +4,11 @@ import { redirect } from "next/navigation";
 import { refresh, revalidatePath } from "next/cache";
 import { db, transaction } from "@/lib/db";
 import { getCurrentUser } from "@/lib/dal";
-import { BackendError, sendChat, sendFounderDeal, sendFounderReply, type DealMove } from "@/lib/backend";
+import { BackendError, getEngineConfig, holdClock, sendChat, sendFounderDeal, sendFounderReply, type DealMove } from "@/lib/backend";
 import { ASK_LIMITS } from "@/lib/money";
 import { flushEngineDeletions, queueEngineDeletion, startRun } from "@/lib/runs";
 import { brief } from "@/lib/text";
-import { ENTITLEMENTS, JANTA_SIZES, ROOMS, runCost } from "@/lib/pricing";
+import { ENTITLEMENTS, IDEA_MAX, JANTA_SIZES, ROOMS, runCost } from "@/lib/pricing";
 import { validatePublicUrl } from "@/lib/validation";
 import { hit } from "@/lib/rate-limit";
 import type { FormState } from "@/lib/form";
@@ -24,10 +24,11 @@ export async function createRun(_prev: FormState, fd: FormData): Promise<FormSta
   const price = String(fd.get("price") ?? "").trim().slice(0, 40);
   const tone = fd.get("tone") === "serious" ? "serious" : "roast";
   const rawUrl = String(fd.get("url") ?? "");
+  const voice = mode === "sharks" && fd.get("voice") === "1";
   const panelSize = mode === "janta" ? Number(fd.get("panelSize") ?? 25) : null;
   const askAmount = String(fd.get("askAmount") ?? "").trim().slice(0, 12);
   const askEquity = String(fd.get("askEquity") ?? "").trim().slice(0, 12);
-  const values = { idea, customer, price, url: rawUrl, panelSize: String(panelSize ?? ""), askAmount, askEquity };
+  const values = { idea, customer, price, url: rawUrl, panelSize: String(panelSize ?? ""), askAmount, askEquity, voice: voice ? "1" : "" };
 
   // ---- validate input
   let url = "";
@@ -37,7 +38,7 @@ export async function createRun(_prev: FormState, fd: FormData): Promise<FormSta
     url = v.url;
   } else {
     if (idea.length < 20) return { fieldErrors: { idea: "Describe your idea in at least 20 characters" }, values };
-    if (idea.length > 600) return { fieldErrors: { idea: "Keep it under 600 characters" }, values };
+    if (idea.length > IDEA_MAX) return { fieldErrors: { idea: `Keep it under ${IDEA_MAX} characters` }, values };
   }
   const ask = { ask_amount_lakh: Number(askAmount), ask_equity_pct: Number(askEquity) };
   if (mode === "sharks") {
@@ -53,12 +54,17 @@ export async function createRun(_prev: FormState, fd: FormData): Promise<FormSta
   if (mode === "janta") {
     if (!JANTA_SIZES.includes(panelSize as (typeof JANTA_SIZES)[number])) return { error: "Pick a crowd size", values };
     if ((panelSize ?? 0) > ENTITLEMENTS[user.tier].jantaMax) {
-      return { error: `Crowds of ${panelSize} are part of Pro. On Free you can poll 25 people.`, values };
+      const plan = (panelSize ?? 0) > ENTITLEMENTS.pro.jantaMax ? "Deep" : "Pro";
+      return { error: `Crowds of ${panelSize} are part of ${plan}. Your plan allows up to ${ENTITLEMENTS[user.tier].jantaMax} people.`, values };
     }
   }
 
   if (!hit(`runs:${user.id}`, 20, 60 * 60 * 1000).ok) {
     return { error: "You've started a lot of runs this hour. Take a breather and try again soon.", values };
+  }
+
+  if (voice && ((await getEngineConfig())?.voice ?? "off") === "off") {
+    return { error: "Spoken investors aren't available right now. Switch them off to start.", values };
   }
 
   // The engine takes one pitch string, so the optional details go in as labelled lines.
@@ -68,14 +74,14 @@ export async function createRun(_prev: FormState, fd: FormData): Promise<FormSta
     userId: user.id,
     mode,
     title: mode === "roast" ? new URL(url).hostname.replace(/^www\./, "") : brief(idea, 64),
-    input: mode === "roast" ? { url } : { idea, customer, price, ...(mode === "sharks" ? { tone, ...ask } : {}) },
-    cost: runCost(mode, panelSize ?? undefined),
+    input: mode === "roast" ? { url } : { idea, customer, price, ...(mode === "sharks" ? { tone, voice, ...ask } : {}) },
+    cost: runCost(mode, panelSize ?? undefined, voice),
     panelSize,
-    label: `${ROOMS[mode].name} run${panelSize ? ` · ${panelSize} people` : ""}`,
+    label: `${ROOMS[mode].name} run${panelSize ? ` · ${panelSize} people` : ""}${voice ? " · with voice" : ""}`,
     engine:
       mode === "roast"
         ? { url }
-        : { pitch, ...(mode === "sharks" ? { tone, ...ask } : { panel_size: panelSize ?? 25 }) },
+        : { pitch, ...(mode === "sharks" ? { tone, voice, ...ask } : { panel_size: panelSize ?? 25 }) },
   });
   if ("error" in started) return { error: started.error, values };
 
@@ -97,7 +103,7 @@ export async function replyToSharks(runId: string, text: string | null): Promise
   if (!run?.backend_id || run.mode !== "sharks" || run.status !== "running") {
     return { error: "This debate isn't waiting for an answer." };
   }
-  const clean = typeof text === "string" ? text.trim().slice(0, 500) : "";
+  const clean = typeof text === "string" ? text.trim().slice(0, 800) : "";
   if (text !== null && !clean) return { error: "Write an answer, or skip." };
   try {
     await sendFounderReply(user.id, run.backend_id, text === null ? { skip: true } : { text: clean });
@@ -105,6 +111,22 @@ export async function replyToSharks(runId: string, text: string | null): Promise
   } catch (err) {
     if (!(err instanceof BackendError)) throw err;
     return { error: err.status === 409 ? "Too late: the sharks have moved on." : err.userMessage };
+  }
+}
+
+/**
+ * Voice runs only: the founder is still hearing the sharks, or recording, so the engine
+ * restarts their clock (up to its own limit). A miss is harmless, so nothing is reported.
+ */
+export async function holdSharks(runId: string): Promise<void> {
+  const user = await getCurrentUser();
+  const run = await ownRun(user.id, String(runId));
+  if (!run?.backend_id || run.mode !== "sharks" || run.status !== "running") return;
+  if (!hit(`hold:${user.id}`, 600, 60 * 60 * 1000).ok) return;
+  try {
+    await holdClock(user.id, run.backend_id);
+  } catch (err) {
+    if (!(err instanceof BackendError)) throw err;
   }
 }
 

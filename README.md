@@ -4,8 +4,8 @@ Formerly **Pitch Panchayat**. Folder, database and other internal names still us
 
 Three ways to surface objections to a startup idea, streamed live, so you know what to test with real people:
 
-- **Sharks**: 5 invented investor characters (Meera, Arjun, Ananya, Vikram, Farah) debate your pitch over 3 rounds, in their own voices with some Hinglish. You answer between rounds, and from round 2 a shark can say "I'm out". If you give an ask (amount and equity), the sharks still in make offers (equity, debt, royalty), team up or outbid each other, and you accept one, counter once or walk away. Valuations and offer limits are enforced in code (`backend/app/debates/deals.py`); offers have their own token cap (`DEAL_RESERVE_TOKENS`). Ends in a scored verdict with risks and 30-day next steps. The characters must stay original: don't model them on real TV judges. The scored verdict is a simulation; it does not predict whether the business will raise money.
-- **Janta**: a crowd of 25, 50 or 100 Indian personas reacts in 2 rounds (round 2 hears round 1), votes, and says whether they would **pay**. If the pitch names a city (or the "Who is it for?" line names a kind of customer), 70% of the crowd is drawn from that market and the rest is a comparison group from across India; the verdict shows the two separately (`app/targeting.py`). The verdict breaks it down by city tier, age and attitude. Treat the counts as simulated reactions, not demand numbers: see `docs/05-experiments-and-findings.md`.
+- **Sharks**: 5 invented investor characters (Meera, Arjun, Ananya, Vikram, Farah) debate your pitch over 3 rounds, in their own voices with some Hinglish. You answer between rounds, and from round 2 a shark can say "I'm out" (capped at 2 exits per round). If you give an ask (amount and equity), the sharks still in make offers (equity, debt, royalty), team up or outbid each other, and you accept one, counter once or walk away. Arithmetic operands (`debates/numbers.py`), CAC payback (`debates/metrics.py`), valuations and offer/counter bounds (`debates/deals.py`) are enforced in code; offers have their own token cap (`DEAL_RESERVE_TOKENS`). Ends in a scored verdict where the panel's invest/pass/maybe label is counted from the votes (`debates/sharks.py`, no generic fallback on judge failure so credits refund). The characters must stay original: don't model them on real TV judges. The scored verdict is a simulation; it does not predict whether the business will raise money.
+- **Janta**: a crowd of 25, 50, 100, 500 or 1,000 Indian personas reacts in 2 rounds (round 2 hears round 1), votes, and says whether they would **pay**. If the pitch names a city (or the "Who is it for?" line names a kind of customer), 70% of the crowd is drawn from that market and the rest is a comparison group from across India; the verdict shows the two separately (`app/targeting.py`). Attitude labels stay hidden from prompts by default (`JANTA_SHOW_ATTITUDE=false`), and the verdict breaks votes down by city tier, age, and phone use (plus attitude when enabled). Treat the counts as simulated reactions, not demand numbers: see `docs/05-experiments-and-findings.md`.
 - **Roast**: 6 influencer personas review a landing-page URL, score clarity / trust / design / CTA, and name the fixes.
 
 Every finished run gets a share link (`/d/<id>`) that replays it.
@@ -19,6 +19,14 @@ Every finished run gets a share link (`/d/<id>`) that replays it.
   - Roast: weakest area, toughest and most generous reviewers.
 
   Everything is counted in code from the debate itself.
+
+## Voice and reports (added 27 Nov 2026, tested on fake voice only)
+
+- **Speak the pitch** (Sharks and Janta): up to 90 s, cut into parts under Sarvam's 30 s limit, written into the text box to edit before sending.
+- **Spoken sharks** (opt-in, +25 credits, `VOICE_CREDITS`): each shark has its own voice (`voice:` in `personas/sharks/*.yaml`), the founder can answer by voice, and the answer clock restarts while sharks are talking or the founder is recording (limit `VOICE_HOLD_MAX_S`). Turn-based: you can't interrupt a shark and be answered mid-line. Shared links have no voice.
+- **Reports:** every finished Sharks, Janta and Roast run has **Download report** (`/report/<run id>`, owner only), saved as PDF through the browser's print window. Reports hold only the analysis: verdict, scores, percentages, risks, suggestions and breakdown tables. They leave out the conversations (Sharks discussion and deal-table chat, each Janta person's comment, the written Roast reviews); those stay on the run page.
+- **Real voice is off by default.** Set `VOICE_PROVIDER=sarvam` in `backend/.env` (billed). With real AI models and fake voice, the app hides voice. Tried on the real API on 27 Nov 2026 with generated speech (samples in `reports/voice-test-2026-11-27/`): all five speaker IDs work; webm, mp4 and wav transcribe. `SARVAM_STT_MODE=translate` is the default because it keeps digits and English city names (`translit` wrote numbers as words; `codemix` wrote cities in Hindi script). It rewords Hindi into English, so the founder should check the text. **Not tried:** a human voice, background noise, or a full run in the app with real speech.
+- **Cost caps:** 10,000 spoken characters per run (about Rs 20 before GST), plus daily and hourly caps (`app/settings.py`).
 
 ## Database (Postgres)
 
@@ -200,7 +208,7 @@ cd backend
 .venv/bin/python -m pytest -q
 ```
 
-110 tests in `backend/tests/` (all on the fake AI provider and file store, plus 4 Postgres persistence tests when `pitch_panchayat_test` is present): personas, speaking-order supervisor, rupee arithmetic & anti-repetition checks, deal-table terms & counters, all three modes end to end, batched crowds, quality rules against real bad replies, SSRF scraper guards, internal token auth, HTTP API + share-link replay, and the fixes from the first real web run (`test_p1_fixes.py`: crowd matched to the target market, verdict reasons that follow the votes, no "never described" for something the founder said, at most 2 shark walk-outs per round).
+174 tests in `backend/tests/` (170 on the fake AI provider and file store, plus 4 Postgres persistence tests when `pitch_panchayat_test` is present): personas, speaking-order supervisor, rupee arithmetic, operand origins & code-computed CAC payback checks, deal-table terms, valuation claims & counter bounds, panel vote-counted decisions, all three modes end to end, crowd sensitivity rules (`test_crowd_sensitivity.py`), voice STT/TTS routes & timer holds (`test_voice.py`), quality rules against real bad replies, SSRF scraper guards, internal token auth, HTTP API + share-link replay, and real-run regression fixes (`test_p1_fixes.py`).
 
 ### Web (`web/`)
 ```bash
@@ -210,14 +218,15 @@ npm run lint && npx tsc --noEmit && npm run build
 
 ## Documentation (`docs/` & `reports/`)
 
-Detailed architecture, data flows, API contracts, pricing economics, and live model evaluations live in [`docs/`](docs/README.md) (with print-ready PDFs in `docs/pdf/`):
+Detailed architecture, data flows, API contracts, pricing economics, business-logic evidence, and live model evaluations live in [`docs/`](docs/README.md) (with print-ready PDFs for docs `01`–`05` in `docs/pdf/`):
 
 - [`docs/01-architecture.md`](docs/01-architecture.md) — Next.js BFF + FastAPI Engine topology, trust boundaries, LLM pipeline, and PostgreSQL schema.
 - [`docs/02-user-data-flow.md`](docs/02-user-data-flow.md) — Auth, credit reserve/settle/refund lifecycle, SSE streaming, mode flows, and deletion outbox.
 - [`docs/03-api-reference.md`](docs/03-api-reference.md) — Next.js Server Actions/routes and FastAPI internal REST + SSE event schemas.
 - [`docs/04-pricing-and-unit-economics.md`](docs/04-pricing-and-unit-economics.md) — Measured token costs, per-mode COGS/margins, infra burn, and revenue targets.
 - [`docs/05-experiments-and-findings.md`](docs/05-experiments-and-findings.md) — Persona realism experiments, live run findings, and open unknowns.
-- [`reports/`](reports/) — Live Sharks run logs and quality-fix verification reports.
+- [`docs/06-business-logic-and-evidence.md`](docs/06-business-logic-and-evidence.md) — What code enforces vs. AI judgement, token/credit guarantees, and evidence ledger (`REAL` / `REPLAY` / `TEST` / `CODE`).
+- [`reports/`](reports/) — Live Sharks run logs, raw reply traces (`real-sharks-run-2026-11-27-*.json`), quality-fix reports, Sarvam voice test clips (`voice-test-2026-11-27/`), and [`competitor-analysis-2026-11-27.md`](reports/competitor-analysis-2026-11-27.md).
 
 ## How it maps to the build guide
 
@@ -238,21 +247,22 @@ One deliberate change from the guide's code: the guide's Claude client forces a 
 ## Layout
 
 ```
-web/                Next.js 16 BFF (landing page, auth, dashboard, credits, SSE relay)
+web/                Next.js 16 BFF (landing page, auth, dashboard, credits, SSE relay, voice routes, printable /report/[id], /privacy & /terms, OG cards)
 backend/
   app/
-    settings.py, models.py, prompts.py, personas.py, budget.py
-    llm/            base (typed completion + retry), fake, anthropic, sarvam, factory (BYOK)
-    debates/        sharks, deals, numbers, janta, roast, runner
-    sessions.py     live event log + founder-reply / deal inboxes
+    settings.py, models.py, prompts.py, personas.py, targeting.py, chat.py, voice.py, budget.py
+    llm/            base (typed completion + retry), fake, anthropic, sarvam, quality, factory (BYOK)
+    debates/        sharks, deals, numbers, metrics, janta, roast, runner
+    sessions.py     live event log + founder-reply / deal inboxes + voice clock holds
     scraper.py      safe landing-page fetcher (public http(s) only, size/time caps)
     store.py        Postgres (engine.debates) or local JSON files
     api.py, main.py
   personas/         sharks/, roasters/, janta/dimensions.yaml
   scripts/          model_bakeoff.py, crowd_label_test.py, crowd_sensitivity_test.py
-  tests/            110 pytest unit & integration tests
+  tests/            174 pytest unit & integration tests
 db/migrations/      PostgreSQL schema (public.* and engine.*)
-docs/               Architecture, data flow, API, pricing, and experiments (+ pdf/)
-reports/            Live run evaluations and quality-fix reports
+design/             HTML concept & commercial storyboard sheets
+docs/               Architecture, data flow, API, pricing, experiments, and business logic (+ pdf/)
+reports/            Live run evaluations, raw traces, voice samples, and competitor analysis
 frontend/index.html Standalone prototype UI (for engine-only local runs)
 ```

@@ -137,7 +137,7 @@ def test_verdict_may_not_repeat_a_shark_misreading():
 # ---------- 4. Sharks: no walk-out cascade ----------
 
 def turn(out: bool) -> SharkTurn:
-    return SharkTurn(message="I'm out, beta: a 29 percent margin cannot carry a discount war "
+    return SharkTurn(maths=[], message="I'm out, beta: a 29 percent margin cannot carry a discount war "
                              "against bigger players in Pune.", out=out,
                      stance="pass" if out else "maybe", confidence=8)
 
@@ -214,7 +214,7 @@ def test_chat_rebuilds_the_targeted_crowd_member():
 # ---------- 6. Sharks: stance matches words; no panel-wide echo; own deal terms ----------
 
 def shark_turn(message: str, stance: str = "maybe", out: bool = False) -> SharkTurn:
-    return SharkTurn(message=message, out=out, stance=stance, confidence=6)
+    return SharkTurn(maths=[], message=message, out=out, stance=stance, confidence=6)
 
 
 def test_stance_said_out_loud_or_contradicted_is_rejected():
@@ -328,3 +328,30 @@ def test_sharks_and_judge_see_the_payback_as_a_fact():
     assert "CAC payback, worked out from the founder's numbers" in text and "1.0 months" in text
     verdict = prompts.verdict_user(DABBA, [("Founder", ANSWER)], list(load_sharks()), {})
     assert "about 1.0 months" in verdict
+
+
+# Real run of 27 Nov 2026: all three of Vikram's offers had the payback right and were
+# rejected, because a later "12 months" (the founder's time in Pune) was read as one.
+@pytest.mark.parametrize("said", [
+    "1.1 months ka CAC payback sunke mera pet nahi bhara kyunki tu 12 months mein Pune chhodne wala hai.",
+    "1.1 months ka CAC payback accha hai par 12 months ka Pune expiry risk hai, isliye valuation cut kar raha hoon.",
+    "1.1 months ka CAC payback accha lagta hai, par 12 months mein Pune se bahar koi plan nahi hai.",
+    "Payback is quick, but you leave Pune in 12 months.",
+    "Payback theek hai lekin 12 months baad kya karoge?",
+])
+def test_a_duration_about_something_else_is_not_a_payback(said):
+    from app.debates.metrics import payback_error
+    assert payback_error(said, [DABBA, ANSWER]) is None, said
+
+
+@pytest.mark.parametrize("said", [
+    "A 60-month payback is far too long for me.",
+    "CAC payback, jo aap bata rahe ho, 60 months hai.",
+    "1 month ka payback nahi hai, actual payback 60 months banta hai.",
+    "1 month ka payback bolte ho par asli payback period 5 saal hai.",
+    "Par payback to 25 months ka hai.",
+    "You will recover the CAC only after 2 years.",
+])
+def test_a_wrong_payback_is_still_rejected(said):
+    from app.debates.metrics import payback_error
+    assert payback_error(said, [DABBA, ANSWER]), said

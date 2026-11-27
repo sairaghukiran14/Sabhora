@@ -20,6 +20,7 @@ class Persona(BaseModel):
     cares_about: list[str] = []
     red_flags: list[str] = []
     risk_appetite: Literal["low", "medium", "high"] = "medium"
+    voice: str = ""  # sharks: the speech provider's speaker id
 
 
 class CrowdPersona(BaseModel):

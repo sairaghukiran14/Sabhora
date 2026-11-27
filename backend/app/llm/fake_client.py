@@ -153,7 +153,7 @@ class FakeClient:
             ids = [x.split(" = ")[0] for x in found.group(1).split(", ")] if found else []
             votes = {sid: {"stance": rng.choice(["invest", "maybe", "pass"]),
                            "reason": "Fake reason for testing."} for sid in ids}
-            return {"score": rng.randint(3, 8), "decision": "maybe",
+            return {"score": rng.randint(3, 8),
                     "one_liner": "Promising idea, unproven business.", "votes": votes,
                     "top_risks": ["No paying customers yet", "Easy for others to copy",
                                   "Customer acquisition cost is unknown"],

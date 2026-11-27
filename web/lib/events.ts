@@ -86,6 +86,7 @@ export type RunEvent = Base &
     | { type: "counter_reply"; speaker: string; name: string; text: string; action: "accept" | "revise" | "hold" | "out"; offer: Offer | null }
     | { type: "deal"; outcome: "deal" | "no_deal"; reason: DealReason; offer: Offer | null }
     | { type: "founder_turn"; wait_s: number; expires_at?: number }
+    | { type: "clock"; wait_s: number; expires_at: number }
     | { type: "founder"; round: number; text: string }
     | { type: "founder_skipped"; round: number }
     | { type: "reaction"; round: number; persona_id: string; vote: Vote; comment: string; would_pay: boolean; changed: boolean }
@@ -143,7 +144,7 @@ export type RunState = {
   round: number;
   rounds: { round: number; items: FeedItem[] }[];
   typing: { speaker: string; name: string } | null;
-  founderTurn: { waitS: number; expiresAt: number | null } | null;
+  founderTurn: { id: number; waitS: number; expiresAt: number | null } | null;
   ask: Ask | null;
   table: TableItem[] | null; // null until the sharks start making offers
   choice: Of<"founder_choice"> | null; // offers waiting for the founder
@@ -198,7 +199,11 @@ export function deriveRun(events: RunEvent[]): RunState {
         break;
       case "founder_turn":
         s.typing = null;
-        s.founderTurn = { waitS: e.wait_s, expiresAt: e.expires_at ?? null };
+        s.founderTurn = { id: e.id, waitS: e.wait_s, expiresAt: e.expires_at ?? null };
+        break;
+      case "clock": // a voice run's wait was restarted
+        if (s.founderTurn) s.founderTurn = { ...s.founderTurn, expiresAt: e.expires_at };
+        if (s.choice) s.choice = { ...s.choice, expires_at: e.expires_at };
         break;
       case "founder":
         s.founderTurn = null;

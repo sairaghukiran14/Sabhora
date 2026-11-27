@@ -5,13 +5,14 @@ import NextLink from "next/link";
 import { useFormStatus } from "react-dom";
 import { motion } from "framer-motion";
 import { createRun } from "@/app/actions/runs";
-import { ENTITLEMENTS, JANTA_SIZES, ROOMS, runCost } from "@/lib/pricing";
+import { ENTITLEMENTS, IDEA_MAX, JANTA_SIZES, ROOMS, VOICE_CREDITS, runCost } from "@/lib/pricing";
 import type { RoomMode, Tier } from "@/lib/types";
 import { money, valuationLakh } from "@/lib/money";
 import { DRAFT_KEY } from "../marketing/IdeaCapture";
 import { FormMessage, TextArea, TextInput } from "../forms";
 import { Alert, Arrow, Check, Lock } from "../icons";
 import { btn, cx, ROOM_ICON } from "../ui";
+import VoiceInput from "./VoiceInput";
 
 function StartButton({ mode, blocked }: { mode: RoomMode; blocked: boolean }) {
   const { pending } = useFormStatus();
@@ -37,27 +38,38 @@ export default function NewRunForm({
   tier,
   engine,
   maxCrowd,
+  voiceMode,
+  prefill,
 }: {
   initialRoom: RoomMode;
   balance: number;
   tier: Tier;
   engine: "live" | "demo" | "offline";
   maxCrowd: number;
+  voiceMode: "live" | "demo" | "off";
+  /** "Check with a bigger crowd" from a finished Janta run: same pitch, new crowd size. */
+  prefill?: { idea: string; customer?: string; price?: string; size: number };
 }) {
   const [state, action] = useActionState(createRun, undefined);
   const [mode, setMode] = useState<RoomMode>(initialRoom);
-  const [idea, setIdea] = useState(state?.values?.idea ?? "");
+  const [idea, setIdea] = useState(state?.values?.idea ?? prefill?.idea ?? "");
   const [url, setUrl] = useState(state?.values?.url ?? "");
-  const [size, setSize] = useState<number>(25);
+  // A size above the plan stays unselected and shows the plan note instead.
+  const prefillOk = !!prefill && prefill.size <= ENTITLEMENTS[tier].jantaMax && prefill.size <= maxCrowd;
+  const [size, setSize] = useState<number>(prefillOk ? prefill.size : 25);
   const [tone, setTone] = useState<"roast" | "serious">("roast");
-  const [lockedNote, setLockedNote] = useState(false);
+  const [lockedSize, setLockedSize] = useState<number | null>(prefill && !prefillOk && prefill.size <= maxCrowd ? prefill.size : null);
   const [askAmount, setAskAmount] = useState(state?.values?.askAmount ?? "");
   const [askEquity, setAskEquity] = useState(state?.values?.askEquity ?? "");
   const askValue = valuationLakh(Number(askAmount), Number(askEquity));
   const fe = state?.fieldErrors ?? {};
+  const [wantsVoice, setWantsVoice] = useState(state?.values?.voice === "1");
+  const [recording, setRecording] = useState(false);
+  const voice = mode === "sharks" && voiceMode !== "off" && wantsVoice;
 
   // Carry over the idea typed on the landing page.
   useEffect(() => {
+    if (prefill) return;
     const timer = setTimeout(() => {
       try {
         const raw = sessionStorage.getItem(DRAFT_KEY);
@@ -70,9 +82,9 @@ export default function NewRunForm({
       } catch {}
     }, 0);
     return () => clearTimeout(timer);
-  }, []);
+  }, [prefill]);
 
-  const cost = runCost(mode, mode === "janta" ? size : undefined);
+  const cost = runCost(mode, mode === "janta" ? size : undefined, voice);
   const short = balance < cost;
   const jantaMax = ENTITLEMENTS[tier].jantaMax;
 
@@ -81,6 +93,7 @@ export default function NewRunForm({
       <input type="hidden" name="mode" value={mode} />
       <input type="hidden" name="panelSize" value={size} />
       <input type="hidden" name="tone" value={tone} />
+      <input type="hidden" name="voice" value={voice ? "1" : ""} />
 
       <div className="space-y-6">
         {/* step 1: room */}
@@ -146,25 +159,32 @@ export default function NewRunForm({
                 name="idea"
                 value={idea}
                 onChange={(e) => setIdea(e.target.value)}
-                maxLength={600}
+                maxLength={IDEA_MAX}
                 placeholder="An app that helps kirana stores reorder stock over WhatsApp, so they never run out of fast-moving items."
                 error={fe.idea}
                 hint={
                   <span className="flex justify-between gap-3">
                     <span>What it does and who it&apos;s for, in a sentence or two.</span>
-                    <span className="tabular-nums">{idea.length}/600</span>
+                    <span className="tabular-nums">{idea.length}/{IDEA_MAX}</span>
                   </span>
                 }
               />
+              {voiceMode !== "off" && (
+                <VoiceInput
+                  label="Speak your pitch"
+                  onActiveChange={setRecording}
+                  onText={(said) => setIdea((t) => `${t.trim()} ${said}`.trim().slice(0, IDEA_MAX))}
+                />
+              )}
               <div className="grid gap-5 sm:grid-cols-2">
                 <TextInput
                   label="Who is it for?"
                   name="customer"
                   placeholder="Kirana store owners"
-                  defaultValue={state?.values?.customer}
+                  defaultValue={state?.values?.customer ?? prefill?.customer}
                   hint="Optional"
                 />
-                <TextInput label="Price" name="price" placeholder="₹299 a month" defaultValue={state?.values?.price} hint="Optional" />
+                <TextInput label="Price" name="price" placeholder="₹299 a month" defaultValue={state?.values?.price ?? prefill?.price} hint="Optional" />
               </div>
             </>
           )}
@@ -237,10 +257,36 @@ export default function NewRunForm({
             </div>
           )}
 
+          {mode === "sharks" && voiceMode !== "off" && (
+            // A switch, not a checkbox: React resets checkboxes after the form is sent, which
+            // left the box looking off while voice (and its price) stayed on.
+            <button
+              type="button"
+              role="switch"
+              aria-checked={wantsVoice}
+              onClick={() => setWantsVoice((x) => !x)}
+              className={cx(
+                "room-sharks flex w-full items-start gap-3 rounded-xl border p-3.5 text-left transition-colors",
+                wantsVoice ? "border-mode bg-mode-soft/60" : "border-edge hover:border-edge-strong",
+              )}
+            >
+              <span aria-hidden className={cx("mt-0.5 flex h-5 w-9 shrink-0 items-center rounded-full p-0.5 transition-colors", wantsVoice ? "justify-end bg-mode" : "justify-start bg-edge-strong")}>
+                <span className="h-4 w-4 rounded-full bg-white shadow" />
+              </span>
+              <span>
+                <span className="block text-sm font-medium">Sharks speak aloud · +{VOICE_CREDITS} credits</span>
+                <span className="block text-[13px] text-muted">
+                  Each shark talks in its own voice. You can answer by voice, and the timer restarts while they are still talking.
+                  {voiceMode === "demo" && " Demo AI: you'll hear a placeholder tone, not speech."}
+                </span>
+              </span>
+            </button>
+          )}
+
           {mode === "janta" && (
             <div>
               <p className="text-[13px] font-medium">Crowd size</p>
-              <div className="mt-2 grid grid-cols-3 gap-2">
+              <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-5">
                 {JANTA_SIZES.filter((n) => n <= maxCrowd).map((n) => {
                   const locked = n > jantaMax;
                   const active = size === n;
@@ -248,7 +294,7 @@ export default function NewRunForm({
                     <button
                       key={n}
                       type="button"
-                      onClick={() => (locked ? setLockedNote(true) : (setSize(n), setLockedNote(false)))}
+                      onClick={() => (locked ? setLockedSize(n) : (setSize(n), setLockedSize(null)))}
                       aria-pressed={active}
                       className={cx(
                         "room-janta flex flex-col items-center rounded-xl border px-2 py-3 transition-colors",
@@ -264,9 +310,12 @@ export default function NewRunForm({
                   );
                 })}
               </div>
-              {lockedNote && (
+              {size >= 500 && (
+                <p className="mt-2.5 text-[13px] text-muted">A crowd this large can take several minutes to finish.</p>
+              )}
+              {lockedSize && (
                 <p className="mt-2.5 flex flex-wrap items-center gap-1.5 text-[13px] text-muted">
-                  <Lock size={14} /> Crowds over {jantaMax} are part of Pro.
+                  <Lock size={14} /> Crowds of {lockedSize} are part of {lockedSize > ENTITLEMENTS.pro.jantaMax ? "Deep" : "Pro"}.
                   <NextLink href="/dashboard/billing" className="font-medium text-brand-ink hover:underline">
                     See plans
                   </NextLink>
@@ -329,7 +378,7 @@ export default function NewRunForm({
           </p>
         )}
         <FormMessage error={state?.error} />
-        <StartButton mode={mode} blocked={short || engine === "offline"} />
+        <StartButton mode={mode} blocked={short || recording || engine === "offline"} />
         <p className="text-center text-xs text-faint">Credits are held while it runs, and refunded if it doesn&apos;t finish.</p>
       </aside>
     </form>

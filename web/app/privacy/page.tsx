@@ -87,6 +87,21 @@ export default function PrivacyPage() {
           ),
         },
         {
+          id: "voice",
+          heading: "Voice",
+          body: (
+            <p>
+              The microphone is used only after you press a record button, and stops when you
+              press stop, reach the time limit or leave the page. Your recording passes through
+              our servers to our speech provider (Sarvam AI) to be turned into text. We do not
+              save the recording; the provider&apos;s terms set how long it keeps it. The text
+              is yours to edit, and is saved only as part of what you submit. When the sharks
+              speak, their lines are sent to the same provider to make the audio, which our
+              engine keeps in memory for a while and your browser may keep for up to a day.
+            </p>
+          ),
+        },
+        {
           id: "share",
           heading: "Share links",
           body: (

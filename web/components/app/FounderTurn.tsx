@@ -6,9 +6,24 @@ import { replyToSharks } from "@/app/actions/runs";
 import { Alert, Check, Clock } from "../icons";
 import { btn, cx } from "../ui";
 import { inputBase } from "../forms";
+import VoiceInput from "./VoiceInput";
 
 /** The founder's chance to answer between rounds. The engine moves on when time runs out. */
-export default function FounderTurn({ runId, waitS, expiresAt }: { runId: string; waitS: number; expiresAt: number | null }) {
+export default function FounderTurn({
+  runId,
+  waitS,
+  expiresAt,
+  voice = false,
+  onRecordingChange,
+}: {
+  runId: string;
+  waitS: number;
+  expiresAt: number | null;
+  /** The run has voice: the founder may speak the answer. */
+  voice?: boolean;
+  onRecordingChange?: (active: boolean) => void;
+}) {
+  const [recording, setRecording] = useState(false);
   const [left, setLeft] = useState(Math.round(waitS));
   const [text, setText] = useState("");
   const [state, setState] = useState<"open" | "sending" | "sent">("open");
@@ -47,7 +62,7 @@ export default function FounderTurn({ runId, waitS, expiresAt }: { runId: string
     <motion.form
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      onSubmit={(e: FormEvent) => (e.preventDefault(), text.trim() && submit(text))}
+      onSubmit={(e: FormEvent) => (e.preventDefault(), !recording && text.trim() && submit(text))}
       className="rounded-2xl border-2 border-mode bg-surface p-4 shadow-card sm:p-5"
     >
       <div className="flex items-center justify-between gap-3">
@@ -65,11 +80,24 @@ export default function FounderTurn({ runId, waitS, expiresAt }: { runId: string
         id="founder-answer"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        maxLength={500}
+        maxLength={800}
         rows={3}
         placeholder="Answer their toughest question with a fact or a number."
         className={cx(inputBase, "mt-3 resize-y border-edge-strong py-3 leading-relaxed")}
       />
+      {voice && (
+        <div className="mt-3">
+          <VoiceInput
+            label="Answer by voice"
+            maxSeconds={60}
+            onText={(said) => setText((t) => `${t.trim()} ${said}`.trim().slice(0, 800))}
+            onActiveChange={(active) => {
+              setRecording(active);
+              onRecordingChange?.(active);
+            }}
+          />
+        </div>
+      )}
       {error && (
         <p role="alert" className="mt-2 flex items-center gap-1.5 text-[13px] text-danger">
           <Alert size={14} /> {error}
@@ -79,7 +107,7 @@ export default function FounderTurn({ runId, waitS, expiresAt }: { runId: string
         <button type="button" disabled={state === "sending"} onClick={() => submit(null)} className={btn("ghost", "md")}>
           Skip this round
         </button>
-        <button type="submit" disabled={!text.trim() || state === "sending"} className={btn("brand", "md")}>
+        <button type="submit" disabled={!text.trim() || recording || state === "sending"} className={btn("brand", "md")}>
           {state === "sending" ? "Sending…" : "Send answer"}
         </button>
       </div>

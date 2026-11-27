@@ -1,0 +1,1026 @@
+{
+ "events": [
+  {
+   "id": 0,
+   "type": "start",
+   "mode": "sharks",
+   "rounds": 3,
+   "ask": {
+    "investment_lakh": 40,
+    "equity_pct": 8,
+    "valuation_lakh": 500.0
+   },
+   "panel": [
+    {
+     "id": "meera",
+     "name": "Meera Kapoor",
+     "title": "Built a D2C beauty brand to 500 crore, now invests in consumer brands"
+    },
+    {
+     "id": "arjun",
+     "name": "Arjun Reddy",
+     "title": "Partner at a Bengaluru SaaS and deep-tech venture fund"
+    },
+    {
+     "id": "ananya",
+     "name": "Ananya Iyer",
+     "title": "Angel investor and ex-founder focused on Bharat (tier-2 and tier-3 India)"
+    },
+    {
+     "id": "vikram",
+     "name": "Vikram Sethia",
+     "title": "Bootstrapped an industrial spare-parts distribution business, profit-first investor"
+    },
+    {
+     "id": "farah",
+     "name": "Farah Merchant",
+     "title": "Runs food-processing and packaging plants, invests in products that must be made well"
+    }
+   ]
+  },
+  {
+   "id": 1,
+   "type": "round",
+   "round": 1
+  },
+  {
+   "id": 2,
+   "type": "typing",
+   "speaker": "meera",
+   "name": "Meera Kapoor"
+  },
+  {
+   "id": 3,
+   "type": "message",
+   "round": 1,
+   "speaker": "meera",
+   "name": "Meera Kapoor",
+   "text": "Beta, Pune ke IT park waale professionals ke liye 22 lunches ka Rs 3,200 monthly plan sun ke accha laga, par mujhe seedha yeh batao ki 180 subscribers mein se jo 64% renew hue, unka actual second-month repeat purchase rate kya hai aur ek customer ko acquire karne mein tumhara CAC kitna aa raha hai?",
+   "stance": "maybe",
+   "confidence": 6,
+   "out": false
+  },
+  {
+   "id": 4,
+   "type": "typing",
+   "speaker": "arjun",
+   "name": "Arjun Reddy"
+  },
+  {
+   "id": 5,
+   "type": "message",
+   "round": 1,
+   "speaker": "arjun",
+   "name": "Arjun Reddy",
+   "text": "115.2 subscribers ne second month renew kiya, par tu mujhe CAC nahi bata raha, aur ye 3 partner home kitchens mein scale kaise karega jab Zomato aur Swiggy Instamart Pune ke IT parks mein already same substitute serve kar rahe hain?",
+   "stance": "maybe",
+   "confidence": 5,
+   "out": false
+  },
+  {
+   "id": 6,
+   "type": "typing",
+   "speaker": "ananya",
+   "name": "Ananya Iyer"
+  },
+  {
+   "id": 7,
+   "type": "message",
+   "round": 1,
+   "speaker": "ananya",
+   "name": "Ananya Iyer",
+   "text": "115.2 renewals toh theek hai, par tumne CAC ka number abhi tak nahi diya, aur yeh dabba model Pune ke IT parks se nikal kar kisi aur sheher mein jayega ya nahi yeh bhi clear nahi hai. Mujhe yeh bhi samajh nahi aaya ki Zomato aur Swiggy Instamart ke substitute hone ke bawajood tumhari on-ground distribution aur trust kaise scale karegi jab tumhare paas sirf 3 partner home kitchens hain.",
+   "stance": "maybe",
+   "confidence": 6,
+   "out": false
+  },
+  {
+   "id": 8,
+   "type": "typing",
+   "speaker": "vikram",
+   "name": "Vikram Sethia"
+  },
+  {
+   "id": 9,
+   "type": "message",
+   "round": 1,
+   "speaker": "vikram",
+   "name": "Vikram Sethia",
+   "text": "115.2 renewals toh theek hai, par CAC ka figure abhi bhi missing hai. Rs 42 margin per lunch ke saath 5 months mein 180 customers pe 40 lakh ki valuation 5 crore bilkul bakwaas hai, kyunki payback period bahut lamba hai.",
+   "stance": "maybe",
+   "confidence": 4,
+   "out": false
+  },
+  {
+   "id": 10,
+   "type": "typing",
+   "speaker": "farah",
+   "name": "Farah Merchant"
+  },
+  {
+   "id": 11,
+   "type": "message",
+   "round": 1,
+   "speaker": "farah",
+   "name": "Farah Merchant",
+   "text": "Arjun, 180 subscribers pe 64 percent renew matlab 115.2 log aaye, par yeh teen partner home kitchens se 180 ka volume nikalna aur Zomato jaise substitute ke beech scale karna mujhe risky lagta hai, kyunki ek bhi kitchen mein quality fail hui toh poore Pune IT park ka trust ek din mein toot jayega. Mujhe CAC ka number clear chahiye kyunki 40 lakh ki valuation 5 crore pe unpaid inventory aur single-source kitchen dependency ka risk bilkul dikh raha hai.",
+   "stance": "maybe",
+   "confidence": 6,
+   "out": false
+  },
+  {
+   "id": 12,
+   "type": "founder_turn",
+   "wait_s": 30.0,
+   "expires_at": 1795798747.893677
+  },
+  {
+   "id": 13,
+   "type": "founder",
+   "round": 1,
+   "text": "Unit economics: revenue per meal is Rs 145 (3200/22). Food 85 + delivery 18 + packaging 6 = Rs 109, so Rs 36 gross margin per meal. CAC is Rs 900 via office WhatsApp groups. Kitchens are FSSAI registered."
+  },
+  {
+   "id": 14,
+   "type": "round",
+   "round": 2
+  },
+  {
+   "id": 15,
+   "type": "typing",
+   "speaker": "arjun",
+   "name": "Arjun Reddy"
+  },
+  {
+   "id": 16,
+   "type": "message",
+   "round": 2,
+   "speaker": "arjun",
+   "name": "Arjun Reddy",
+   "text": "115.2 renewals theek hain, par CAC 900 rupees aur 1.1 months ka payback dekh ke bhi mujhe yeh sirf ek thin wrapper lagta hai Zomato aur Swiggy Instamart ke against, kyunki 3 partner home kitchens mein koi defensible moat nahi hai aur Pune ke IT parks se bahar scalability ka koi proof nahi hai.",
+   "stance": "pass",
+   "confidence": 9,
+   "out": false
+  },
+  {
+   "id": 17,
+   "type": "typing",
+   "speaker": "ananya",
+   "name": "Ananya Iyer"
+  },
+  {
+   "id": 18,
+   "type": "message",
+   "round": 2,
+   "speaker": "ananya",
+   "name": "Ananya Iyer",
+   "text": "115.2 renewals sun ke laga ki thoda traction hai, par yeh 3 partner home kitchens Pune ke IT parks tak hi simat ke rahenge kya? Zomato aur Swiggy Instamart already Pune mein substitute serve kar rahe hain, aur tumhare paas on-ground distribution ka koi moat nahi hai, toh yeh model pehli city se aage kaise travel karega? I'm out because there is zero proof that this dabba model scales beyond those 3 home kitchens in Pune.",
+   "stance": "pass",
+   "confidence": 9,
+   "out": true
+  },
+  {
+   "id": 19,
+   "type": "typing",
+   "speaker": "vikram",
+   "name": "Vikram Sethia"
+  },
+  {
+   "id": 20,
+   "type": "message",
+   "round": 2,
+   "speaker": "vikram",
+   "name": "Vikram Sethia",
+   "text": "CAC payback 1.1 months sun ke bhi 180 customers aur ₹40 lakh for 8% pe ₹5 crore valuation mujhe bilkul bakwaas lagti hai. Home kitchen pe 115.2 renewals ka base rakh ke ₹36 margin per meal aur ₹900 CAC ke saath 5 months mein 180 log sirf Pune IT parks tak simat ke baithe hain, matlab scale ka koi proof nahi. Pune ke IT parks se bahar nikalne ka koi plan nahi diya, isliye main pass karta hun.",
+   "stance": "pass",
+   "confidence": 9,
+   "out": true
+  },
+  {
+   "id": 21,
+   "type": "typing",
+   "speaker": "farah",
+   "name": "Farah Merchant"
+  },
+  {
+   "id": 22,
+   "type": "message",
+   "round": 2,
+   "speaker": "farah",
+   "name": "Farah Merchant",
+   "text": "₹900 CAC ÷ (₹36 margin per meal × 22 meals a month) = 1.1 months, yeh payback sun ke relief mila par ek baat clear karo: worst day pe jab ek partner kitchen mein koi hygiene issue aaya, toh tumhare paas backup plan kya hai, aur kya tumhare paas alternate FSSAI registered kitchen ka single source dependency cover karne ke liye koi working capital buffer hai?",
+   "stance": "maybe",
+   "confidence": 5,
+   "out": false
+  },
+  {
+   "id": 23,
+   "type": "typing",
+   "speaker": "meera",
+   "name": "Meera Kapoor"
+  },
+  {
+   "id": 24,
+   "type": "message",
+   "round": 2,
+   "speaker": "meera",
+   "name": "Meera Kapoor",
+   "text": "Beta, 1.1 months ka CAC payback sun ke accha laga, par 180 subscribers mein se 115.2 renewals ka matlab hai ki 64% retention toh hai, phir bhi yeh 3 partner home kitchens ki single-source dependency mujhe dara rahi hai kyunki ek bhi kitchen fail hua toh Pune ke IT parks ka trust turant tootega, aur mujhe abhi bhi yeh samajh nahi aaya ki discount-driven growth ke bina tum log repeat rate ko 75% se upar kaise le jaoge jab Zomato aur Swiggy Instamart already market mein baithe hain.",
+   "stance": "maybe",
+   "confidence": 6,
+   "out": false
+  },
+  {
+   "id": 25,
+   "type": "founder_turn",
+   "wait_s": 30.0,
+   "expires_at": 1795798751.822848
+  },
+  {
+   "id": 26,
+   "type": "founder",
+   "round": 2,
+   "text": "We have a 4th backup kitchen on standby and a weekly hygiene audit with photos. Renewal from month 3 onward is 88%. We are only in Pune for the next 12 months."
+  },
+  {
+   "id": 27,
+   "type": "round",
+   "round": 3
+  },
+  {
+   "id": 28,
+   "type": "typing",
+   "speaker": "arjun",
+   "name": "Arjun Reddy"
+  },
+  {
+   "id": 29,
+   "type": "message",
+   "round": 3,
+   "speaker": "arjun",
+   "name": "Arjun Reddy",
+   "text": "12 months ka timeline sun ke clear hai ki tum Pune ke IT parks se bahar scale ka koi proof nahi de rahe, aur 4th backup kitchen koi moat nahi banata kyunki Zomato aur Swiggy Instamart ke against home kitchens mein defensible technology ya switching costs nahi hain. Isliye yeh ek services disguised as SaaS ka wrapper lagta hai aur main pass karta hun. I'm out because there is zero proof that this dabba model scales beyond those 3 home kitchens in Pune.",
+   "stance": "pass",
+   "confidence": 9,
+   "out": true
+  },
+  {
+   "id": 30,
+   "type": "typing",
+   "speaker": "farah",
+   "name": "Farah Merchant"
+  },
+  {
+   "id": 31,
+   "type": "notice",
+   "text": "Farah Merchant passed on this turn."
+  },
+  {
+   "id": 32,
+   "type": "typing",
+   "speaker": "meera",
+   "name": "Meera Kapoor"
+  },
+  {
+   "id": 33,
+   "type": "message",
+   "round": 3,
+   "speaker": "meera",
+   "name": "Meera Kapoor",
+   "text": "Beta, 115.2 renewals sun ke accha laga par 88% renewal month 3 se aage aana sach mein proof hai, phir bhi 3 partner home kitchens ki dependency aur 12 months ka Pune-only timeline dekh ke mujhe lagta hai ki yeh model dusre sheher mein bina naye kitchen partnerships ke travel nahi kar sakta, isliye main pass karti hun.",
+   "stance": "pass",
+   "confidence": 8,
+   "out": true
+  },
+  {
+   "id": 34,
+   "type": "offers_open"
+  },
+  {
+   "id": 35,
+   "type": "typing",
+   "speaker": "farah",
+   "name": "Farah Merchant"
+  },
+  {
+   "id": 36,
+   "type": "offer",
+   "speaker": "farah",
+   "name": "Farah Merchant",
+   "text": "Mujhe CAC payback 1.1 months aur month 3 se 88% renewal sun ke process stability ka confidence mila, par 3 partner home kitchens ki single-source dependency aur Pune-only 12 months ka timeline abhi bhi supply chain risk hai. Isliye main ₹40 lakh ki jagah ₹50 lakh invest kar rahi hoon, par 8% equity ke bajaye 10% equity lungi, jo company ko ₹5 crore ke bajaye ₹4 crore par value karta hai, taaki worst-day kitchen backup aur working capital buffer ka risk priced in rahe.",
+   "action": "offer",
+   "offer": {
+    "id": "farah",
+    "sharks": [
+     "farah"
+    ],
+    "names": [
+     "Farah Merchant"
+    ],
+    "investment_lakh": 50.0,
+    "equity_pct": 10.0,
+    "debt_lakh": 0.0,
+    "debt_interest_pct": 0.0,
+    "royalty_pct": 0.0,
+    "royalty_until_lakh": 0.0,
+    "valuation_lakh": 500.0
+   }
+  },
+  {
+   "id": 37,
+   "type": "founder_choice",
+   "offers": [
+    {
+     "id": "farah",
+     "sharks": [
+      "farah"
+     ],
+     "names": [
+      "Farah Merchant"
+     ],
+     "investment_lakh": 50.0,
+     "equity_pct": 10.0,
+     "debt_lakh": 0.0,
+     "debt_interest_pct": 0.0,
+     "royalty_pct": 0.0,
+     "royalty_until_lakh": 0.0,
+     "valuation_lakh": 500.0
+    }
+   ],
+   "can_counter": true,
+   "wait_s": 30.0,
+   "expires_at": 1795798755.3431308
+  },
+  {
+   "id": 38,
+   "type": "founder_deal",
+   "action": "counter",
+   "offer": {
+    "id": "farah",
+    "sharks": [
+     "farah"
+    ],
+    "names": [
+     "Farah Merchant"
+    ],
+    "investment_lakh": 50.0,
+    "equity_pct": 6.0,
+    "debt_lakh": 0.0,
+    "debt_interest_pct": 0.0,
+    "royalty_pct": 0.0,
+    "royalty_until_lakh": 0.0,
+    "valuation_lakh": 833.33
+   }
+  },
+  {
+   "id": 39,
+   "type": "typing",
+   "speaker": "farah",
+   "name": "Farah Merchant"
+  },
+  {
+   "id": 40,
+   "type": "counter_reply",
+   "speaker": "farah",
+   "name": "Farah Merchant",
+   "text": "Beta, ₹50 lakh for 8% equity par ₹6.25 crore valuation bhi mujhe Pune ke IT parks ke bahar single-source kitchen dependency aur 12 months ke timeline ka risk justify nahi karta, isliye main ₹50 lakh mein 8% equity lungi aur baaki ka ₹0 debt aur ₹0 royalty ke roop mein lunga jab tak working capital buffer ka proof nahi milta.",
+   "action": "revise",
+   "offer": {
+    "id": "farah",
+    "sharks": [
+     "farah"
+    ],
+    "names": [
+     "Farah Merchant"
+    ],
+    "investment_lakh": 50.0,
+    "equity_pct": 8.0,
+    "debt_lakh": 0.0,
+    "debt_interest_pct": 0.0,
+    "royalty_pct": 0.0,
+    "royalty_until_lakh": 0.0,
+    "valuation_lakh": 625.0
+   }
+  },
+  {
+   "id": 41,
+   "type": "founder_choice",
+   "offers": [
+    {
+     "id": "farah",
+     "sharks": [
+      "farah"
+     ],
+     "names": [
+      "Farah Merchant"
+     ],
+     "investment_lakh": 50.0,
+     "equity_pct": 8.0,
+     "debt_lakh": 0.0,
+     "debt_interest_pct": 0.0,
+     "royalty_pct": 0.0,
+     "royalty_until_lakh": 0.0,
+     "valuation_lakh": 625.0
+    }
+   ],
+   "can_counter": false,
+   "wait_s": 30.0,
+   "expires_at": 1795798755.9829361
+  },
+  {
+   "id": 42,
+   "type": "founder_deal",
+   "action": "accept",
+   "offer": {
+    "id": "farah",
+    "sharks": [
+     "farah"
+    ],
+    "names": [
+     "Farah Merchant"
+    ],
+    "investment_lakh": 50.0,
+    "equity_pct": 8.0,
+    "debt_lakh": 0.0,
+    "debt_interest_pct": 0.0,
+    "royalty_pct": 0.0,
+    "royalty_until_lakh": 0.0,
+    "valuation_lakh": 625.0
+   }
+  },
+  {
+   "id": 43,
+   "type": "deal",
+   "outcome": "deal",
+   "reason": "accepted",
+   "offer": {
+    "id": "farah",
+    "sharks": [
+     "farah"
+    ],
+    "names": [
+     "Farah Merchant"
+    ],
+    "investment_lakh": 50.0,
+    "equity_pct": 8.0,
+    "debt_lakh": 0.0,
+    "debt_interest_pct": 0.0,
+    "royalty_pct": 0.0,
+    "royalty_until_lakh": 0.0,
+    "valuation_lakh": 625.0
+   }
+  },
+  {
+   "id": 44,
+   "type": "judging"
+  },
+  {
+   "id": 45,
+   "type": "verdict",
+   "verdict": {
+    "score": 5,
+    "decision": "invest",
+    "one_liner": "DabbaDost turns Pune's office lunch into a 1.1-month CAC payback subscription, but it still has to prove it can cook beyond three home kitchens.",
+    "votes": [
+     {
+      "shark": "Meera Kapoor",
+      "stance": "pass",
+      "reason": "Meera passed because the 3 partner home kitchens and the Pune-only 12-month timeline make her doubt the model can travel to another city without new kitchen partnerships, despite the 88% renewal from month 3."
+     },
+     {
+      "shark": "Arjun Reddy",
+      "stance": "pass",
+      "reason": "Arjun passed because he sees no defensible moat against Zomato and Swiggy Instamart in home-kitchen tiffin supply and no proof of scalability beyond Pune IT parks, even with the 1.1-month CAC payback."
+     },
+     {
+      "shark": "Ananya Iyer",
+      "stance": "pass",
+      "reason": "Ananya passed because there is no proof the model scales beyond the 3 Pune home kitchens and no on-ground distribution moat against existing substitutes."
+     },
+     {
+      "shark": "Vikram Sethia",
+      "stance": "pass",
+      "reason": "Vikram passed because the model has not shown it can scale beyond Pune IT parks, and he judged the payback and growth path too long to back at the valuation he was shown."
+     },
+     {
+      "shark": "Farah Merchant",
+      "stance": "invest",
+      "reason": "Farah invested Rs 50 lakh for 8% equity because the 1.1-month CAC payback and 88% month-3 renewal show process stability, while she prices in single-source kitchen risk through the deal terms."
+     }
+    ],
+    "top_risks": [
+     "A failure at any one of the 3 partner home kitchens could break trust across the Pune IT park customer base, and the 4th backup kitchen is only on standby and has not been proven.",
+     "Zomato and Swiggy Instamart already serve the same office lunch substitute, and the debate showed no defensible moat or switching cost that would keep subscribers once they compete on price or convenience.",
+     "The business is confined to Pune for the next 12 months, so growth depends on repeating kitchen partnerships and office WhatsApp CAC in new cities, which has not been demonstrated."
+    ],
+    "next_steps": [
+     "Sign a fourth partner kitchen contract and run at least two full trial weeks through it so the backup kitchen is tested before the next hygiene incident.",
+     "Track monthly CAC and month-2 renewal by office building for the next 60 days to confirm the Rs 900 CAC holds as volume grows beyond the first 180 subscribers.",
+     "Draft a working capital buffer plan that covers at least one month of food and delivery cost so a kitchen outage does not stall cash flow."
+    ]
+   }
+  },
+  {
+   "id": 46,
+   "type": "done",
+   "tokens": 51751,
+   "crowd_model": "sarvam",
+   "judge_model": "anthropic"
+  }
+ ],
+ "checks": [
+  {
+   "kind": "SharkTurn",
+   "who": "Meera Kapoor",
+   "reply": {
+    "maths": [],
+    "message": "Beta, Pune ke IT park waale professionals ke liye 22 lunches ka Rs 3,200 monthly plan sun ke accha laga, par mujhe seedha yeh batao ki 180 subscribers mein se jo 64% renew hue, unka actual second-month repeat purchase rate kya hai aur ek customer ko acquire karne mein tumhara CAC kitna aa raha hai?",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 6
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Arjun Reddy",
+   "reply": {
+    "maths": [
+     {
+      "expression": "180 * 0.64",
+      "value": 115.2
+     }
+    ],
+    "message": "115.2 subscribers ne second month renew kiya, par tu mujhe CAC nahi bata raha, aur ye 3 partner home kitchens mein scale kaise karega jab Zomato aur Swiggy Instamart Pune ke IT parks mein already same substitute serve kar rahe hain?",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 5
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Ananya Iyer",
+   "reply": {
+    "maths": [
+     {
+      "expression": "180 * 0.64",
+      "value": 115.2
+     }
+    ],
+    "message": "115.2 renewals toh theek hai, par tumne CAC ka number abhi tak nahi diya, aur yeh dabba model Pune ke IT parks se nikal kar kisi aur sheher mein jayega ya nahi yeh bhi clear nahi hai. Mujhe yeh bhi samajh nahi aaya ki Zomato aur Swiggy Instamart ke substitute hone ke bawajood tumhari on-ground distribution aur trust kaise scale karegi jab tumhare paas sirf 3 partner home kitchens hain.",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 6
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Vikram Sethia",
+   "reply": {
+    "maths": [
+     {
+      "expression": "180 * 0.64",
+      "value": 115.2
+     },
+     {
+      "expression": "3200 / 22",
+      "value": 145.45454545454547
+     },
+     {
+      "expression": "85 + 18",
+      "value": 103.0
+     },
+     {
+      "expression": "145.45454545454547 - 103",
+      "value": 42.45454545454547
+     }
+    ],
+    "message": "115.2 renewals toh theek hai, par CAC ka figure abhi bhi missing hai. Rs 42 margin per lunch ke saath 5 months mein 180 customers pe 40 lakh ki valuation 5 crore bilkul bakwaas hai, kyunki payback period bahut lamba hai.",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 4
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Farah Merchant",
+   "reply": {
+    "maths": [],
+    "message": "Arjun, 180 subscribers pe 64 percent renew matlab 115.2 log aaye, par yeh teen partner home kitchens se 180 ka volume nikalna aur Zomato jaise substitute ke beech scale karna mujhe risky lagta hai, kyunki ek bhi kitchen mein quality fail hui toh poore Pune IT park ka trust ek din mein toot jayega. Mujhe CAC ka number clear chahiye kyunki 40 lakh ki valuation 5 crore pe unpaid inventory aur single-source kitchen dependency ka risk bilkul dikh raha hai.",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 6
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Arjun Reddy",
+   "reply": {
+    "maths": [],
+    "message": "115.2 renewals theek hain, par CAC 900 rupees aur 1.1 months ka payback dekh ke bhi mujhe yeh sirf ek thin wrapper lagta hai Zomato aur Swiggy Instamart ke against, kyunki 3 partner home kitchens mein koi defensible moat nahi hai aur Pune ke IT parks se bahar scalability ka koi proof nahi hai.",
+    "out": false,
+    "stance": "pass",
+    "confidence": 9
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Ananya Iyer",
+   "reply": {
+    "maths": [],
+    "message": "115.2 renewals sun ke laga ki thoda traction hai, par yeh 3 partner home kitchens Pune ke IT parks tak hi simat ke rahenge kya? Zomato aur Swiggy Instamart already Pune mein substitute serve kar rahe hain, aur tumhare paas on-ground distribution ka koi moat nahi hai, toh yeh model pehli city se aage kaise travel karega? I'm out because there is zero proof that this dabba model scales beyond those 3 home kitchens in Pune.",
+    "out": true,
+    "stance": "pass",
+    "confidence": 9
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Vikram Sethia",
+   "reply": {
+    "maths": [
+     {
+      "expression": "3200 / 22",
+      "value": 145.45454545454547
+     },
+     {
+      "expression": "85 + 18 + 6",
+      "value": 109.0
+     },
+     {
+      "expression": "145.45454545454547 - 109",
+      "value": 36.45454545454547
+     }
+    ],
+    "message": "CAC payback 1.1 months sun ke bhi 180 customers aur ₹40 lakh for 8% pe ₹5 crore valuation mujhe bilkul bakwaas lagti hai. Home kitchen pe 115.2 renewals ka base rakh ke ₹36 margin per meal aur ₹900 CAC ke saath 5 months mein 180 log sirf Pune IT parks tak simat ke baithe hain, matlab scale ka koi proof nahi. Pune ke IT parks se bahar nikalne ka koi plan nahi diya, isliye main pass karta hun.",
+    "out": true,
+    "stance": "pass",
+    "confidence": 9
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Farah Merchant",
+   "reply": {
+    "maths": [],
+    "message": "Rs 900 CAC ÷ (Rs 36 margin per meal × 22 meals) = 1.1 months, and yeh 1.1 months ka payback toh best-case scenario hai jab churn zero ho. Par tumhare 115.2 renewals mein se kitne actually month 3 mein aaye, yeh nahi bataya, aur Zomato ya Swiggy Instamart jaise substitutes ke beech ek hi city mein 3 partner home kitchens pe depend karna mere liye supply chain ka red flag hai kyunki ek kitchen fail hua toh poora Pune IT park ka trust toot jayega. Mujhe yeh bhi nahi dikha ki working capital se unpaid inventory ya rider payments kaise manage karoge jab orders peak par honge, isliye abhi mera stance maybe hai aur confidence 4 hai.",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 4
+   },
+   "error": "don't say your stance or confidence out loud; they go in their own fields. Just say what you think"
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Farah Merchant",
+   "reply": {
+    "maths": [],
+    "message": "₹900 CAC ÷ (₹36 margin per meal × 22 meals a month) = 1.1 months, yeh payback sun ke relief mila par ek baat clear karo: worst day pe jab ek partner kitchen mein koi hygiene issue aaya, toh tumhare paas backup plan kya hai, aur kya tumhare paas alternate FSSAI registered kitchen ka single source dependency cover karne ke liye koi working capital buffer hai?",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 5
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Meera Kapoor",
+   "reply": {
+    "maths": [],
+    "message": "Beta, 1.1 months ka CAC payback sun ke accha laga, par 180 subscribers mein se 115.2 renewals ka matlab hai ki 64% retention toh hai, phir bhi yeh 3 partner home kitchens ki single-source dependency mujhe dara rahi hai kyunki ek bhi kitchen fail hua toh Pune ke IT parks ka trust turant tootega, aur mujhe abhi bhi yeh samajh nahi aaya ki discount-driven growth ke bina tum log repeat rate ko 75% se upar kaise le jaoge jab Zomato aur Swiggy Instamart already market mein baithe hain.",
+    "out": false,
+    "stance": "maybe",
+    "confidence": 6
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Arjun Reddy",
+   "reply": {
+    "maths": [],
+    "message": "12 months ka timeline sun ke clear hai ki tum Pune ke IT parks se bahar scale ka koi proof nahi de rahe, aur 4th backup kitchen koi moat nahi banata kyunki Zomato aur Swiggy Instamart ke against home kitchens mein defensible technology ya switching costs nahi hain. Isliye yeh ek services disguised as SaaS ka wrapper lagta hai aur main pass karta hun. I'm out because there is zero proof that this dabba model scales beyond those 3 home kitchens in Pune.",
+    "out": true,
+    "stance": "pass",
+    "confidence": 9
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Farah Merchant",
+   "reply": {
+    "maths": [],
+    "message": "115.2 renewals aur 88 percent month-3 retention sun ke thoda confidence aaya, par worst day pe jab tumhara primary kitchen FSSAI audit fail karega, tab 4th backup kitchen ka working capital buffer kitna hai yeh abhi clear nahi hai; aur Pune ke IT parks mein Zomato jaise substitute already baithe hain, toh 12 months ka single-city plan mujhe defensible nahi lagta, isliye main pass kar rahi hun.",
+    "out": true,
+    "stance": "pass",
+    "confidence": 8
+   },
+   "error": "'moat' has already been argued by Ananya Iyer and Arjun Reddy. Leave it to them and judge this pitch through what you personally care about"
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Farah Merchant",
+   "reply": {
+    "maths": [],
+    "message": "4th backup kitchen sun ke thoda saans aaya, par worst day pe jab tumhara primary kitchen fail karega toh us 4th kitchen ko ramp up karne mein kitna working capital lagega? 12 months ka Pune-only plan mujhe supply chain ke liye risky lagta hai kyunki ek city mein simat ke rehne se tumhare unpaid inventory aur single-source dependency ka risk aur badh jayega, aur mujhe yeh convince nahi hua ki tumhare paas quality checks ka system hai jo 10,000 units tak scale ho sake.",
+    "out": false,
+    "stance": "pass",
+    "confidence": 7
+   },
+   "error": "you said '10,000', which is not in the pitch, the ask, the founder's answers or your own maths. Either show how you get it by adding the arithmetic to maths (for example 18 * 299), or leave the figure out. Never estimate a total in your head"
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Farah Merchant",
+   "reply": {
+    "maths": [],
+    "message": "115.2 se 88 percent renewal month 3 onward matlab roughly 101 log aage ja rahe hain, par yeh 3 partner home kitchens aur ek standby backup pe 12 months ka Pune-only plan mujhe operational risk lagta hai. Mere plants mein ek kharab batch 10,000 units tak kharab kar deta hai, aur tumhare paas unpaid inventory ya safety stock ka buffer nahi hai. Agar worst day pe woh 4th kitchen bhi fail ho gaya toh working capital kahan se aayega? Isliye main pass kar rahi hoon.",
+    "out": true,
+    "stance": "pass",
+    "confidence": 8
+   },
+   "error": "you said '10,000', which is not in the pitch, the ask, the founder's answers or your own maths. Either show how you get it by adding the arithmetic to maths (for example 18 * 299), or leave the figure out. Never estimate a total in your head"
+  },
+  {
+   "kind": "SharkTurn",
+   "who": "Meera Kapoor",
+   "reply": {
+    "maths": [],
+    "message": "Beta, 115.2 renewals sun ke accha laga par 88% renewal month 3 se aage aana sach mein proof hai, phir bhi 3 partner home kitchens ki dependency aur 12 months ka Pune-only timeline dekh ke mujhe lagta hai ki yeh model dusre sheher mein bina naye kitchen partnerships ke travel nahi kar sakta, isliye main pass karti hun.",
+    "out": true,
+    "stance": "pass",
+    "confidence": 8
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkOffer",
+   "who": "Farah Merchant",
+   "reply": {
+    "decision": "offer",
+    "partner_id": "",
+    "terms": {
+     "investment_lakh": 50.0,
+     "equity_pct": 10.0,
+     "debt_lakh": 0.0,
+     "debt_interest_pct": 0.0,
+     "royalty_pct": 0.0,
+     "royalty_until_lakh": 0.0
+    },
+    "message": "Mujhe CAC payback 1.1 months aur month 3 se 88% renewal sun ke process stability ka confidence mila, par 3 partner home kitchens ki single-source dependency aur Pune-only 12 months ka timeline abhi bhi supply chain risk hai. Isliye main ₹40 lakh ki jagah ₹50 lakh invest kar rahi hoon, par 8% equity ke bajaye 10% equity lungi, jo company ko ₹5 crore ke bajaye ₹4 crore par value karta hai, taaki worst-day kitchen backup aur working capital buffer ka risk priced in rahe."
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkCounterReply",
+   "who": "Farah Merchant",
+   "reply": {
+    "decision": "revise",
+    "terms": {
+     "investment_lakh": 50.0,
+     "equity_pct": 8.0,
+     "debt_lakh": 0.0,
+     "debt_interest_pct": 0.0,
+     "royalty_pct": 0.0,
+     "royalty_until_lakh": 0.0
+    },
+    "message": "Beta, ₹50 lakh for 8% equity par ₹6.25 crore valuation bhi mujhe Pune ke IT parks ke bahar single-source kitchen dependency aur 12 months ke timeline ka risk justify nahi karta, isliye main ₹50 lakh mein 8% equity lungi aur baaki ka ₹0 debt aur ₹0 royalty ke roop mein lunga jab tak working capital buffer ka proof nahi milta."
+   },
+   "error": null
+  },
+  {
+   "kind": "SharkVerdictKeyed",
+   "who": "the impartial judge of Sabhora",
+   "reply": {
+    "votes": {
+     "meera": {
+      "reason": "Meera passed because the 3 partner home kitchens and the Pune-only 12-month timeline make her doubt the model can travel without new kitchen partnerships, despite the 88% renewal from month 3.",
+      "stance": "pass"
+     },
+     "arjun": {
+      "reason": "Arjun passed because he sees no defensible moat against Zomato and Swiggy Instamart and no proof the model scales beyond Pune IT parks.",
+      "stance": "pass"
+     },
+     "ananya": {
+      "reason": "Ananya passed because there is no evidence the dabba model scales beyond the 3 Pune home kitchens and no on-ground distribution moat.",
+      "stance": "pass"
+     },
+     "vikram": {
+      "reason": "Vikram passed because even with the 1.1 month CAC payback and Rs 36 margin, a Rs 5 crore valuation on 180 Pune-only customers has no proof of scale.",
+      "stance": "pass"
+     },
+     "farah": {
+      "reason": "Farah invested Rs 50 lakh for 8 percent because the 1.1 month CAC payback and 88 percent renewal from month 3 show process stability, though single-source kitchen risk remains and she wants it priced in.",
+      "stance": "invest"
+     }
+    },
+    "top_risks": [
+     "Single-source dependency on 3 partner home kitchens means one hygiene failure could collapse Pune IT park trust, and the 4th backup kitchen is only on standby.",
+     "Zomato and Swiggy Instamart already serve the same IT park customers, so the company has no proven moat or switching costs to protect its 88 percent renewal base.",
+     "The Pune-only 12-month timeline leaves scaling to other cities unproven, since each new city would likely need new kitchen partnerships and fresh CAC."
+    ],
+    "next_steps": [
+     "Run a documented 30-day test of the backup kitchen by moving one week of subscriber meals to it and recording food quality, delivery time and customer complaints.",
+     "Track CAC and renewal separately for the office WhatsApp group channel versus any other channel over the next 30 days to confirm the Rs 900 CAC holds beyond referral-driven signups.",
+     "Draft a working capital plan that covers at least one month of food and delivery costs for a kitchen failure, and show it to Farah before the Rs 50 lakh investment closes."
+    ],
+    "one_liner": "DabbaDost turns Pune IT park lunches into 88 percent renewing subscriptions with a 1.1 month CAC payback, but it still has to prove it can survive a kitchen failure and travel beyond Pune.",
+    "decision": "maybe",
+    "score": 5
+   },
+   "error": "the reason for vikram quotes Rs 5 crore, which is another shark's offer, not theirs. Give each shark only their own terms"
+  },
+  {
+   "kind": "SharkVerdictKeyed",
+   "who": "the impartial judge of Sabhora",
+   "reply": {
+    "votes": {
+     "meera": {
+      "reason": "Meera passed because the 3 partner home kitchens and the Pune-only 12-month timeline make her doubt the model can travel to another city without new kitchen partnerships, despite the 88% renewal from month 3.",
+      "stance": "pass"
+     },
+     "arjun": {
+      "reason": "Arjun passed because he sees no defensible moat against Zomato and Swiggy Instamart in home-kitchen tiffin supply and no proof of scalability beyond Pune IT parks, even with the 1.1-month CAC payback.",
+      "stance": "pass"
+     },
+     "ananya": {
+      "reason": "Ananya passed because there is no proof the model scales beyond the 3 Pune home kitchens and no on-ground distribution moat against existing substitutes.",
+      "stance": "pass"
+     },
+     "vikram": {
+      "reason": "Vikram passed because the model has not shown it can scale beyond Pune IT parks, and he judged the payback and growth path too long to back at the valuation he was shown.",
+      "stance": "pass"
+     },
+     "farah": {
+      "reason": "Farah invested Rs 50 lakh for 8% equity because the 1.1-month CAC payback and 88% month-3 renewal show process stability, while she prices in single-source kitchen risk through the deal terms.",
+      "stance": "invest"
+     }
+    },
+    "top_risks": [
+     "A failure at any one of the 3 partner home kitchens could break trust across the Pune IT park customer base, and the 4th backup kitchen is only on standby and has not been proven.",
+     "Zomato and Swiggy Instamart already serve the same office lunch substitute, and the debate showed no defensible moat or switching cost that would keep subscribers once they compete on price or convenience.",
+     "The business is confined to Pune for the next 12 months, so growth depends on repeating kitchen partnerships and office WhatsApp CAC in new cities, which has not been demonstrated."
+    ],
+    "next_steps": [
+     "Sign a fourth partner kitchen contract and run at least two full trial weeks through it so the backup kitchen is tested before the next hygiene incident.",
+     "Track monthly CAC and month-2 renewal by office building for the next 60 days to confirm the Rs 900 CAC holds as volume grows beyond the first 180 subscribers.",
+     "Draft a working capital buffer plan that covers at least one month of food and delivery cost so a kitchen outage does not stall cash flow."
+    ],
+    "one_liner": "DabbaDost turns Pune's office lunch into a 1.1-month CAC payback subscription, but it still has to prove it can cook beyond three home kitchens.",
+    "decision": "invest",
+    "score": 5
+   },
+   "error": null
+  }
+ ],
+ "calls": [
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1115,
+   "out": 120,
+   "text": "{\n  \"maths\": [],\n  \"message\": \"Beta, Pune ke IT park waale professionals ke liye 22 lunches ka Rs 3,200 monthly plan sun ke accha laga, par mujhe seedha yeh batao ki 180 subscribers mein se jo 64% renew hue, unka actual second-month repeat purchase rate kya hai aur ek customer ko acquire karne mein tumhara CAC kitna aa raha hai?\",\n  \"out\": false,\n  \"stance\": \"maybe\",\n  \"confidence\": 6\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1161,
+   "out": 131,
+   "text": "{\n  \"maths\": [\n    {\n      \"expression\": \"180 * 0.64\",\n      \"value\": 115.2\n    }\n  ],\n  \"message\": \"115.2 subscribers ne second month renew kiya, par tu mujhe CAC nahi bata raha, aur ye 3 partner home kitchens mein scale kaise karega jab Zomato aur Swiggy Instamart Pune ke IT parks mein already same substitute serve kar rahe hain?\",\n  \"out\": false,\n  \"stance\": \"maybe\",\n  \"confidence\": 5\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1249,
+   "out": 177,
+   "text": "{\n  \"maths\": [\n    {\n      \"expression\": \"180 * 0.64\",\n      \"value\": 115.2\n    }\n  ],\n  \"message\": \"115.2 renewals toh theek hai, par tumne CAC ka number abhi tak nahi diya, aur yeh dabba model Pune ke IT parks se nikal kar kisi aur sheher mein jayega ya nahi yeh bhi clear nahi hai. Mujhe yeh bhi samajh nahi aaya ki Zomato aur Swiggy Instamart ke substitute hone ke bawajood tumhari on-ground distribution aur trust kaise scale karegi jab tumhare paas sirf 3 partner home kitchens hain.\",\n  \"out\": false,\n  \"stance\": \"maybe\",\n  \"confidence\": 6\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1344,
+   "out": 272,
+   "text": "{\n  \"maths\": [\n    {\n      \"expression\": \"180 * 0.64\",\n      \"value\": 115.2\n    },\n    {\n      \"expression\": \"3200 / 22\",\n      \"value\": 145.45454545454547\n    },\n    {\n      \"expression\": \"85 + 18\",\n      \"value\": 103\n    },\n    {\n      \"expression\": \"145.45454545454547 - 103\",\n      \"value\": 42.45454545454547\n    }\n  ],\n  \"message\": \"115.2 renewals toh theek hai, par CAC ka figure abhi bhi missing hai. Rs 42 margin per lunch ke saath 5 months mein 180 customers pe 40 lakh ki valuation 5 crore bilkul bakwaas hai, kyunki payback period bahut lamba hai.\",\n  \"out\": false,\n  \"stance\": \"maybe\",\n  \"confidence\": 4\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1415,
+   "out": 155,
+   "text": "{\n  \"maths\": [],\n  \"message\": \"Arjun, 180 subscribers pe 64 percent renew matlab 115.2 log aaye, par yeh teen partner home kitchens se 180 ka volume nikalna aur Zomato jaise substitute ke beech scale karna mujhe risky lagta hai, kyunki ek bhi kitchen mein quality fail hui toh poore Pune IT park ka trust ek din mein toot jayega. Mujhe CAC ka number clear chahiye kyunki 40 lakh ki valuation 5 crore pe unpaid inventory aur single-source kitchen dependency ka risk bilkul dikh raha hai.\",\n  \"out\": false,\n  \"stance\": \"maybe\",\n  \"confidence\": 6\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1736,
+   "out": 119,
+   "text": "{\n  \"maths\": [],\n  \"message\": \"115.2 renewals theek hain, par CAC 900 rupees aur 1.1 months ka payback dekh ke bhi mujhe yeh sirf ek thin wrapper lagta hai Zomato aur Swiggy Instamart ke against, kyunki 3 partner home kitchens mein koi defensible moat nahi hai aur Pune ke IT parks se bahar scalability ka koi proof nahi hai.\",\n  \"out\": false,\n  \"stance\": \"pass\",\n  \"confidence\": 9\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1847,
+   "out": 135,
+   "text": "{\"maths\": [], \"message\": \"115.2 renewals sun ke laga ki thoda traction hai, par yeh 3 partner home kitchens Pune ke IT parks tak hi simat ke rahenge kya? Zomato aur Swiggy Instamart already Pune mein substitute serve kar rahe hain, aur tumhare paas on-ground distribution ka koi moat nahi hai, toh yeh model pehli city se aage kaise travel karega? I'm out because there is zero proof that this dabba model scales beyond those 3 home kitchens in Pune.\", \"out\": true, \"stance\": \"pass\", \"confidence\": 9}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 1975,
+   "out": 295,
+   "text": "{\n  \"maths\": [\n    {\n      \"expression\": \"3200 / 22\",\n      \"value\": 145.45454545454547\n    },\n    {\n      \"expression\": \"85 + 18 + 6\",\n      \"value\": 109\n    },\n    {\n      \"expression\": \"145.45454545454547 - 109\",\n      \"value\": 36.45454545454547\n    }\n  ],\n  \"message\": \"CAC payback 1.1 months sun ke bhi 180 customers aur ₹40 lakh for 8% pe ₹5 crore valuation mujhe bilkul bakwaas lagti hai. Home kitchen pe 115.2 renewals ka base rakh ke ₹36 margin per meal aur ₹900 CAC ke saath 5 months mein 180 log sirf Pune IT parks tak simat ke baithe hain, matlab scale ka koi proof nahi. Pune ke IT parks se bahar nikalne ka koi plan nahi diya, isliye main pass karta hun.\",\n  \"out\": true,\n  \"stance\": \"pass\",\n  \"confidence\": 9\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 2098,
+   "out": 207,
+   "text": "{\n  \"maths\": [],\n  \"message\": \"Rs 900 CAC ÷ (Rs 36 margin per meal × 22 meals) = 1.1 months, and yeh 1.1 months ka payback toh best-case scenario hai jab churn zero ho. Par tumhare 115.2 renewals mein se kitne actually month 3 mein aaye, yeh nahi bataya, aur Zomato ya Swiggy Instamart jaise substitutes ke beech ek hi city mein 3 partner home kitchens pe depend karna mere liye supply chain ka red flag hai kyunki ek kitchen fail hua toh poora Pune IT park ka trust toot jayega. Mujhe yeh bhi nahi dikha ki working capital se unpaid inventory ya rider payments kaise manage karoge jab orders peak par honge, isliye abhi mera stance maybe hai aur confidence 4 hai.\",\n  \"out\": false,\n  \"stance\": \"maybe\",\n  \"confidence\": 4\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 2141,
+   "out": 129,
+   "text": "{\n  \"maths\": [],\n  \"message\": \"₹900 CAC ÷ (₹36 margin per meal × 22 meals a month) = 1.1 months, yeh payback sun ke relief mila par ek baat clear karo: worst day pe jab ek partner kitchen mein koi hygiene issue aaya, toh tumhare paas backup plan kya hai, aur kya tumhare paas alternate FSSAI registered kitchen ka single source dependency cover karne ke liye koi working capital buffer hai?\",\n  \"out\": false,\n  \"stance\": \"maybe\",\n  \"confidence\": 5\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 2212,
+   "out": 169,
+   "text": "{\n  \"maths\": [],\n  \"message\": \"Beta, 1.1 months ka CAC payback sun ke accha laga, par 180 subscribers mein se 115.2 renewals ka matlab hai ki 64% retention toh hai, phir bhi yeh 3 partner home kitchens ki single-source dependency mujhe dara rahi hai kyunki ek bhi kitchen fail hua toh Pune ke IT parks ka trust turant tootega, aur mujhe abhi bhi yeh samajh nahi aaya ki discount-driven growth ke bina tum log repeat rate ko 75% se upar kaise le jaoge jab Zomato aur Swiggy Instamart already market mein baithe hain.\",\n  \"out\": false,\n  \"stance\": \"maybe\",\n  \"confidence\": 6\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 2385,
+   "out": 145,
+   "text": "{\n  \"maths\": [],\n  \"message\": \"12 months ka timeline sun ke clear hai ki tum Pune ke IT parks se bahar scale ka koi proof nahi de rahe, aur 4th backup kitchen koi moat nahi banata kyunki Zomato aur Swiggy Instamart ke against home kitchens mein defensible technology ya switching costs nahi hain. Isliye yeh ek services disguised as SaaS ka wrapper lagta hai aur main pass karta hun. I'm out because there is zero proof that this dabba model scales beyond those 3 home kitchens in Pune.\",\n  \"out\": true,\n  \"stance\": \"pass\",\n  \"confidence\": 9\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 2536,
+   "out": 140,
+   "text": "{\n  \"maths\": [],\n  \"message\": \"115.2 renewals aur 88 percent month-3 retention sun ke thoda confidence aaya, par worst day pe jab tumhara primary kitchen FSSAI audit fail karega, tab 4th backup kitchen ka working capital buffer kitna hai yeh abhi clear nahi hai; aur Pune ke IT parks mein Zomato jaise substitute already baithe hain, toh 12 months ka single-city plan mujhe defensible nahi lagta, isliye main pass kar rahi hun.\",\n  \"out\": true,\n  \"stance\": \"pass\",\n  \"confidence\": 8\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 2585,
+   "out": 157,
+   "text": "{\n  \"maths\": [],\n  \"message\": \"4th backup kitchen sun ke thoda saans aaya, par worst day pe jab tumhara primary kitchen fail karega toh us 4th kitchen ko ramp up karne mein kitna working capital lagega? 12 months ka Pune-only plan mujhe supply chain ke liye risky lagta hai kyunki ek city mein simat ke rehne se tumhare unpaid inventory aur single-source dependency ka risk aur badh jayega, aur mujhe yeh convince nahi hua ki tumhare paas quality checks ka system hai jo 10,000 units tak scale ho sake.\",\n  \"out\": false,\n  \"stance\": \"pass\",\n  \"confidence\": 7\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 2623,
+   "out": 164,
+   "text": "{\n  \"maths\": [],\n  \"message\": \"115.2 se 88 percent renewal month 3 onward matlab roughly 101 log aage ja rahe hain, par yeh 3 partner home kitchens aur ek standby backup pe 12 months ka Pune-only plan mujhe operational risk lagta hai. Mere plants mein ek kharab batch 10,000 units tak kharab kar deta hai, aur tumhare paas unpaid inventory ya safety stock ka buffer nahi hai. Agar worst day pe woh 4th kitchen bhi fail ho gaya toh working capital kahan se aayega? Isliye main pass kar rahi hoon.\",\n  \"out\": true,\n  \"stance\": \"pass\",\n  \"confidence\": 8\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkTurn",
+   "in": 2556,
+   "out": 124,
+   "text": "{\n  \"maths\": [],\n  \"message\": \"Beta, 115.2 renewals sun ke accha laga par 88% renewal month 3 se aage aana sach mein proof hai, phir bhi 3 partner home kitchens ki dependency aur 12 months ka Pune-only timeline dekh ke mujhe lagta hai ki yeh model dusre sheher mein bina naye kitchen partnerships ke travel nahi kar sakta, isliye main pass karti hun.\",\n  \"out\": true,\n  \"stance\": \"pass\",\n  \"confidence\": 8\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkOffer",
+   "in": 2352,
+   "out": 230,
+   "text": "{\n  \"decision\": \"offer\",\n  \"partner_id\": \"\",\n  \"terms\": {\n    \"investment_lakh\": 50,\n    \"equity_pct\": 10,\n    \"debt_lakh\": 0,\n    \"debt_interest_pct\": 0,\n    \"royalty_pct\": 0,\n    \"royalty_until_lakh\": 0\n  },\n  \"message\": \"Mujhe CAC payback 1.1 months aur month 3 se 88% renewal sun ke process stability ka confidence mila, par 3 partner home kitchens ki single-source dependency aur Pune-only 12 months ka timeline abhi bhi supply chain risk hai. Isliye main ₹40 lakh ki jagah ₹50 lakh invest kar rahi hoon, par 8% equity ke bajaye 10% equity lungi, jo company ko ₹5 crore ke bajaye ₹4 crore par value karta hai, taaki worst-day kitchen backup aur working capital buffer ka risk priced in rahe.\"\n}"
+  },
+  {
+   "model": "crowd",
+   "kind": "SharkCounterReply",
+   "in": 2637,
+   "out": 186,
+   "text": "{\n  \"decision\": \"revise\",\n  \"terms\": {\n    \"investment_lakh\": 50,\n    \"equity_pct\": 8,\n    \"debt_lakh\": 0,\n    \"debt_interest_pct\": 0,\n    \"royalty_pct\": 0,\n    \"royalty_until_lakh\": 0\n  },\n  \"message\": \"Beta, ₹50 lakh for 8% equity par ₹6.25 crore valuation bhi mujhe Pune ke IT parks ke bahar single-source kitchen dependency aur 12 months ke timeline ka risk justify nahi karta, isliye main ₹50 lakh mein 8% equity lungi aur baaki ka ₹0 debt aur ₹0 royalty ke roop mein lunga jab tak working capital buffer ka proof nahi milta.\"\n}"
+  },
+  {
+   "model": "judge",
+   "kind": "SharkVerdictKeyed",
+   "in": 5476,
+   "out": 848,
+   "text": "{\"votes\":{\"meera\":{\"reason\":\"Meera passed because the 3 partner home kitchens and the Pune-only 12-month timeline make her doubt the model can travel without new kitchen partnerships, despite the 88% renewal from month 3.\",\"stance\":\"pass\"},\"arjun\":{\"reason\":\"Arjun passed because he sees no defensible moat against Zomato and Swiggy Instamart and no proof the model scales beyond Pune IT parks.\",\"stance\":\"pass\"},\"ananya\":{\"reason\":\"Ananya passed because there is no evidence the dabba model scales beyond the 3 Pune home kitchens and no on-ground distribution moat.\",\"stance\":\"pass\"},\"vikram\":{\"reason\":\"Vikram passed because even with the 1.1 month CAC payback and Rs 36 margin, a Rs 5 crore valuation on 180 Pune-only customers has no proof of scale.\",\"stance\":\"pass\"},\"farah\":{\"reason\":\"Farah invested Rs 50 lakh for 8 percent because the 1.1 month CAC payback and 88 percent renewal from month 3 show process stability, though single-source kitchen risk remains and she wants it priced in.\",\"stance\":\"invest\"}},\"top_risks\":[\"Single-source dependency on 3 partner home kitchens means one hygiene failure could collapse Pune IT park trust, and the 4th backup kitchen is only on standby.\",\"Zomato and Swiggy Instamart already serve the same IT park customers, so the company has no proven moat or switching costs to protect its 88 percent renewal base.\",\"The Pune-only 12-month timeline leaves scaling to other cities unproven, since each new city would likely need new kitchen partnerships and fresh CAC.\"],\"next_steps\":[\"Run a documented 30-day test of the backup kitchen by moving one week of subscriber meals to it and recording food quality, delivery time and customer complaints.\",\"Track CAC and renewal separately for the office WhatsApp group channel versus any other channel over the next 30 days to confirm the Rs 900 CAC holds beyond referral-driven signups.\",\"Draft a working capital plan that covers at least one month of food and delivery costs for a kitchen failure, and show it to Farah before the Rs 50 lakh investment closes.\"],\"one_liner\":\"DabbaDost turns Pune IT park lunches into 88 percent renewing subscriptions with a 1.1 month CAC payback, but it still has to prove it can survive a kitchen failure and travel beyond Pune.\",\"decision\":\"maybe\",\"score\":5}"
+  },
+  {
+   "model": "judge",
+   "kind": "SharkVerdictKeyed",
+   "in": 5552,
+   "out": 853,
+   "text": "{\"votes\":{\"meera\":{\"reason\":\"Meera passed because the 3 partner home kitchens and the Pune-only 12-month timeline make her doubt the model can travel to another city without new kitchen partnerships, despite the 88% renewal from month 3.\",\"stance\":\"pass\"},\"arjun\":{\"reason\":\"Arjun passed because he sees no defensible moat against Zomato and Swiggy Instamart in home-kitchen tiffin supply and no proof of scalability beyond Pune IT parks, even with the 1.1-month CAC payback.\",\"stance\":\"pass\"},\"ananya\":{\"reason\":\"Ananya passed because there is no proof the model scales beyond the 3 Pune home kitchens and no on-ground distribution moat against existing substitutes.\",\"stance\":\"pass\"},\"vikram\":{\"reason\":\"Vikram passed because the model has not shown it can scale beyond Pune IT parks, and he judged the payback and growth path too long to back at the valuation he was shown.\",\"stance\":\"pass\"},\"farah\":{\"reason\":\"Farah invested Rs 50 lakh for 8% equity because the 1.1-month CAC payback and 88% month-3 renewal show process stability, while she prices in single-source kitchen risk through the deal terms.\",\"stance\":\"invest\"}},\"top_risks\":[\"A failure at any one of the 3 partner home kitchens could break trust across the Pune IT park customer base, and the 4th backup kitchen is only on standby and has not been proven.\",\"Zomato and Swiggy Instamart already serve the same office lunch substitute, and the debate showed no defensible moat or switching cost that would keep subscribers once they compete on price or convenience.\",\"The business is confined to Pune for the next 12 months, so growth depends on repeating kitchen partnerships and office WhatsApp CAC in new cities, which has not been demonstrated.\"],\"next_steps\":[\"Sign a fourth partner kitchen contract and run at least two full trial weeks through it so the backup kitchen is tested before the next hygiene incident.\",\"Track monthly CAC and month-2 renewal by office building for the next 60 days to confirm the Rs 900 CAC holds as volume grows beyond the first 180 subscribers.\",\"Draft a working capital buffer plan that covers at least one month of food and delivery cost so a kitchen outage does not stall cash flow.\"],\"one_liner\":\"DabbaDost turns Pune's office lunch into a 1.1-month CAC payback subscription, but it still has to prove it can cook beyond three home kitchens.\",\"decision\":\"invest\",\"score\":5}"
+  }
+ ]
+}

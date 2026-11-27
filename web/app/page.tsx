@@ -88,7 +88,7 @@ const compareCols = ["Sabhora", "Asking friends", "Online surveys", "Focus group
 const faqs = [
   { q: "Are the personas real people?", a: "No. They're AI personas on hand-written profiles across Indian city tiers, ages and jobs. They are not based on survey data. Treat their replies as starting points for conversations with real customers, not as market research." },
   { q: "Can I trust an AI verdict?", a: "No. Treat it as a way to surface questions, risks and objections you may not have considered. It does not predict whether people will buy. Our own tests show that one persona's vote is unsteady and that overall support leans on persona traits, so don't read the counts as market signal. Validate the important objections with real customers." },
-  { q: "How much does a run cost?", a: "Everything is priced in credits, and 1 credit is roughly ₹1. A Roast is 5 credits, a Sharks debate is 15, and a Janta crowd is 10 to 30 depending on size. You get 50 free credits when you sign up." },
+  { q: "How much does a run cost?", a: "Everything is priced in credits, and 1 credit is roughly ₹1. A Roast is 5 credits, a Sharks debate is 15, and a Janta crowd is 10 to 180 depending on size. You get 50 free credits when you sign up." },
   { q: "Do I need a credit card to start?", a: "No. Sign up with your email, get 50 credits, and run your first verdict right away. Paid credits and plans are coming soon." },
   { q: "Is my idea kept private?", a: "Runs are visible only to you. To write the debate, your pitch or page is sent to the AI providers we use. If you share a verdict, it gets a read-only link you can switch off at any time, and deleting a run erases it." },
   { q: "What languages do the personas speak?", a: "English, Hinglish and Hindi. Janta personas reply the way people across India actually talk, so the quotes feel real." },
@@ -463,7 +463,7 @@ export default function Home() {
                 <span className="flex flex-wrap justify-center gap-x-5 gap-y-1">
                   <span>Roast · 5</span>
                   <span>Sharks · 15</span>
-                  <span>Janta · 10 to 30</span>
+                  <span>Janta · 10 to 180</span>
                 </span>
               </div>
             </Reveal>

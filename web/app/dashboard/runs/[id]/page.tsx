@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import NextLink from "next/link";
 import { notFound } from "next/navigation";
-import { getRun } from "@/lib/dal";
+import { getCurrentUser, getRun } from "@/lib/dal";
 import { getEngineConfig } from "@/lib/backend";
-import { ROOMS } from "@/lib/pricing";
+import { ENTITLEMENTS, JANTA_SIZES, ROOMS, runCost } from "@/lib/pricing";
 import type { RoomMode } from "@/lib/types";
 import RunView from "@/components/app/RunView";
 import ShareControls from "@/components/app/ShareControls";
-import { Arrow, ArrowLeft, Globe } from "@/components/icons";
-import { formatDate, RoomBadge, RoomIcon } from "@/components/ui";
+import { Arrow, ArrowLeft, Download, Globe, Lock, Users } from "@/components/icons";
+import { btn, formatDate, RoomBadge, RoomIcon } from "@/components/ui";
 
 export const metadata: Metadata = { title: "Run · Sabhora" };
 
@@ -16,13 +16,16 @@ type Props = { params: Promise<{ id: string }> };
 
 export default async function RunPage({ params }: Props) {
   const { id } = await params;
-  const run = await getRun(id);
+  const [run, user] = await Promise.all([getRun(id), getCurrentUser()]);
   if (!run) notFound();
   const input = run.input;
   // A finished run knows what produced it; a live one has to ask the engine.
   const engine = run.status === "running" ? await getEngineConfig() : null;
   const demo = run.demo || engine?.crowd_provider === "fake";
   const others = (Object.keys(ROOMS) as RoomMode[]).filter((m) => m !== run.mode);
+  // After a Janta verdict: the next two crowd sizes up, to check the result holds.
+  const bigger = run.mode === "janta" && run.status === "done" && run.panelSize ? JANTA_SIZES.filter((n) => n > run.panelSize!).slice(0, 2) : [];
+  const jantaMax = ENTITLEMENTS[user.tier].jantaMax;
 
   return (
     <div className={`${ROOMS[run.mode].cls} space-y-6`}>
@@ -48,7 +51,14 @@ export default async function RunPage({ params }: Props) {
           </p>
         </div>
         {run.status !== "running" && (
-          <ShareControls runId={run.id} shareId={run.shareId} isPublic={run.isPublic} canShare={run.status === "done"} />
+          <div className="flex flex-col items-start gap-3 lg:items-end">
+            {run.status === "done" && (
+              <NextLink href={`/report/${run.id}`} className={btn("brand", "sm")}>
+                <Download size={15} /> Download report
+              </NextLink>
+            )}
+            <ShareControls runId={run.id} shareId={run.shareId} isPublic={run.isPublic} canShare={run.status === "done"} />
+          </div>
         )}
       </header>
 
@@ -81,8 +91,42 @@ export default async function RunPage({ params }: Props) {
         error={run.error}
         cost={run.cost}
         demo={demo}
+        voice={!!input.voice}
         owner
       />
+
+      {bigger.length > 0 && (
+        <section className="rounded-2xl border border-edge bg-surface p-5 shadow-soft sm:p-6">
+          <p className="font-display text-lg">Check this with a bigger crowd</p>
+          <p className="mt-1 text-[15px] text-muted">
+            {run.panelSize} people is a quick first read, and a small crowd can swing a lot from one run to the next. Ask more
+            people the same pitch to see if the would-pay figure and the main objections hold.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {bigger.map((n) => {
+              const locked = n > jantaMax;
+              return (
+                <NextLink
+                  key={n}
+                  href={locked ? "/dashboard/billing" : `/dashboard/new?from=${run.id}&size=${n}`}
+                  className="group flex items-center gap-3 rounded-xl border border-edge p-3.5 transition-colors hover:border-mode/40 hover:bg-mode-soft/40"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-mode-soft text-mode-ink">
+                    {locked ? <Lock size={16} /> : <Users size={18} />}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-medium">Test with {n} people</span>
+                    <span className="block truncate text-[13px] text-muted">
+                      {locked ? `Part of ${n > ENTITLEMENTS.pro.jantaMax ? "Deep" : "Pro"} · see plans` : `${runCost("janta", n)} credits · same pitch, you confirm first`}
+                    </span>
+                  </span>
+                  <Arrow size={16} className="shrink-0 text-mode-ink transition-transform group-hover:translate-x-0.5" />
+                </NextLink>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       <section className="rounded-2xl border border-edge bg-surface p-5 shadow-soft sm:p-6">
         <p className="font-display text-lg">Get the full picture</p>

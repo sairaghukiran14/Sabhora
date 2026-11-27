@@ -1,6 +1,7 @@
 """The Sharks deal table, on the free fake provider and on scripted shark moves."""
 import asyncio
 import json
+from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
@@ -10,12 +11,14 @@ from app.budget import DailyBudget
 from app.chat import find_persona
 from app.debates import deals
 from app.debates.runner import run_debate
-from app.debates.sharks import round_check
-from app.llm.base import LLMResult
+from app.debates.sharks import (NO_VERDICT, panel_decision, round_check, to_verdict,
+                                verdict_check)
+from app.llm.base import LLMError, LLMResult
 from app.llm.factory import LLMs, UserKeys, build_llms
 from app.llm.fake_client import FakeClient
 from app.main import create_app
-from app.models import CreateDebate, FounderDeal, SharkTurn
+from app.models import CreateDebate, FounderDeal, SharkTurn, SharkVote, shark_verdict_model
+from app.personas import load_sharks
 from app.sessions import DebateSession
 from app.settings import Settings
 
@@ -194,7 +197,7 @@ def test_term_limits_and_improvement_rule():
 
 
 def test_nobody_leaves_in_round_one_and_requests_are_validated():
-    turn = SharkTurn(message="x" * 60, out=True, stance="pass", confidence=5)
+    turn = SharkTurn(maths=[], message="x" * 60, out=True, stance="pass", confidence=5)
     with pytest.raises(ValueError, match="round 1"):
         round_check(1, lambda t: None)(turn)
     round_check(2, lambda t: None)(turn)
@@ -313,3 +316,110 @@ def test_counter_prompt_states_the_range():
     text = prompts.counter_user(PITCH, ask, [], {**zero, "investment_lakh": 40, "equity_pct": 16},
                                 {**zero, "investment_lakh": 40, "equity_pct": 10}, "Farah Merchant")
     assert "equity between 16% and 10%" in text and "never worse for the founder" in text
+
+
+class DeadJudge(FakeClient):
+    async def complete(self, system, user, *, max_tokens, output=None):
+        raise LLMError("judge is down")
+
+
+@pytest.mark.parametrize("request_data", [ASK, {"pitch": PITCH, "tone": "roast"}])
+async def test_a_failed_judge_gives_no_verdict_so_the_run_is_refunded(settings, request_data):
+    """The web app keeps credits only when there is a "verdict" event (web/lib/runs.ts)."""
+    session = DebateSession("sharks", dict(request_data))
+    llms = LLMs(crowd=Scripted({}), judge=DeadJudge())
+    await run_debate(session, llms, settings, DailyBudget(10**9), byok=False)
+    types = [e["type"] for e in session.events]
+    assert "verdict" not in types
+    assert [e["message"] for e in session.events if e["type"] == "error"] == [NO_VERDICT]
+    assert "message" in types and types[-1] == "done"  # what the sharks said is kept
+
+
+# ---------- real run of 27 Nov 2026: a false valuation, and a wrongly rejected judge ----------
+
+ASK_40 = {"investment_lakh": 40, "equity_pct": 8, "valuation_lakh": 500}
+
+
+def table_for(settings) -> deals.Table:
+    session = DebateSession("sharks", {"pitch": PITCH})
+    llms = LLMs(crowd=FakeClient(), judge=FakeClient())
+    return deals.Table(session, llms, settings, load_sharks(), PITCH, ASK_40, [], set())
+
+
+@pytest.mark.parametrize("said", [
+    "10% equity lungi, jo company ko ₹5 crore ke bajaye ₹4 crore par value karta hai",
+    "This values the company at ₹4 crore, not what you asked.",
+    "Yeh ₹4 crore ki valuation hai, tumhare risk ke hisaab se.",
+    "My offer puts the valuation at Rs 4 crore.",
+])
+def test_a_false_valuation_is_rejected_with_the_right_one(settings, said):
+    error = table_for(settings).check_valuations(said, terms(50, 10))
+    assert error and "4 crore" in error and "₹5 crore" in error
+
+
+@pytest.mark.parametrize("said", [
+    "Is offer par company ki valuation ₹4 crore hai.",  # 40 for 10% really is 4 crore
+    "5 crore ki valuation bakwaas hai; main ₹4 crore par value karta hoon.",
+    "180 customers pe 40 lakh ki valuation 5 crore bilkul bakwaas hai.",  # real wording
+    "I will put in ₹40 lakh, which values the company at ₹4 crore.",
+    "No view on price: I just want the money back in two years.",
+])
+def test_true_valuations_pass(settings, said):
+    assert table_for(settings).check_valuations(said, terms(40, 10)) is None
+
+
+def test_an_earlier_or_countered_valuation_may_still_be_quoted(settings):
+    table = table_for(settings)
+    table.shown.append(terms(36, 20))  # ₹1.8 crore, since replaced
+    assert table.check_valuations("Pehle ₹1.8 crore ki valuation thi.", terms(40, 10)) is None
+
+
+def judged(reason: str):
+    """A verdict where only Vikram's reason varies."""
+    body = SimpleNamespace(reason=reason, stance="pass")
+    return SimpleNamespace(one_liner="A sharp payback but no moat yet at all.",
+                           top_risks=["Three kitchens are a single point of failure"],
+                           next_steps=["Test the backup kitchen for two weeks"],
+                           votes=[("vikram", body)])
+
+
+def test_the_judge_may_quote_the_ask_even_when_an_offer_matches_it():
+    offers = {"farah": {50e5, 500e5, 625e5}}  # her first offer was also worth ₹5 crore
+    check = verdict_check(offers=offers, ask=ASK_40)
+    check(judged("Vikram would not back a ₹5 crore valuation resting on one city."))
+    check(judged("Vikram said ₹40 lakh was too much to risk on three kitchens."))
+    with pytest.raises(ValueError, match="another"):  # a figure only Farah put forward
+        check(judged("Vikram offered to value the business at ₹6.25 crore today."))
+
+
+# ---------- the panel's decision is counted, not chosen by the judge ----------
+
+@pytest.mark.parametrize("stances, expected", [
+    ("invest pass pass pass pass", "pass"),        # the real run said "invest" here
+    ("invest invest invest pass pass", "invest"),
+    ("pass pass pass invest invest", "pass"),
+    ("invest invest pass pass maybe", "maybe"),    # tie
+    ("invest invest maybe maybe maybe", "maybe"),  # no majority to invest
+    ("pass pass maybe maybe invest", "maybe"),
+    ("maybe maybe maybe maybe maybe", "maybe"),
+    ("invest invest invest maybe pass", "invest"),
+])
+def test_the_decision_needs_more_than_half_the_panel(stances, expected):
+    votes = [SharkVote(shark=str(i), stance=s, reason="A specific reason.")
+             for i, s in enumerate(stances.split())]
+    assert panel_decision(votes) == expected
+
+
+def test_the_judge_is_not_asked_for_a_decision_and_facts_override_its_votes():
+    panel = load_sharks()
+    model = shark_verdict_model([p.id for p in panel])
+    assert "decision" not in model.model_fields
+    raw = model.model_validate({
+        "votes": {p.id: {"reason": "A specific reason here.", "stance": "invest"} for p in panel},
+        "top_risks": ["Three kitchens are one point of failure"] * 3,
+        "next_steps": ["Test the backup kitchen for two weeks"] * 3,
+        "one_liner": "A sharp payback with no moat yet.", "score": 8,
+    })
+    fixed = {p.id: "pass" for p in panel[:4]}  # four are facts: they went out
+    verdict = to_verdict(raw, panel, fixed)
+    assert verdict.decision == "pass" and verdict.score == 8

@@ -169,14 +169,14 @@ def test_quality_checks_reject_bad_replies():
                 "I pause, looking at the founder with a calm, analytical gaze."):
         with pytest.raises(ValueError):  # model_construct: test the check, not the schema
             check(SharkTurn.model_construct(message=bad, stance="maybe", confidence=5))
-    check(SharkTurn(message="Forty shops in one city is a pilot, not traction. Show me a second city.",
+    check(SharkTurn(maths=[], message="Forty shops in one city is a pilot, not traction. Show me a second city.",
                     out=False, stance="pass", confidence=8))
     assert clean_message("Your margin is pocket change. Stance: Pass Confidence: 9/10") == \
         "Your margin is pocket change."
     repeat = "Founder, 32 of 40 weekly in Indore still doesn't tell me this works in Patna."
     with pytest.raises(ValueError):  # a shark repeating a line already said in the debate
         turn_check(PITCH, [("Ananya Iyer", repeat)])(
-            SharkTurn(message=repeat + " Show me.", out=False, stance="pass", confidence=7))
+            SharkTurn(maths=[], message=repeat + " Show me.", out=False, stance="pass", confidence=7))
     for bad in ("Neha's comment in her own voice", "Ravi said: .... .... .... ....",
                 "....//....//....//....//....//",
                 "1-2 sentences in their own words, light Hinglish or regional flavour is fine"):

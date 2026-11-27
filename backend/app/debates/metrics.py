@@ -101,8 +101,13 @@ def payback(record: Iterable[str]) -> Payback | None:
 # A payback stated as a duration: "payback period 60 months", "5 saal ka payback",
 # "a 60-month payback", "pays back in 25 weeks".
 _DUR = r"(\d+(?:\.\d+)?)[\s-]*(months?|mahine|mahina|years?|saal|weeks?|hafte|hafta|days?|din)\b"
-_PAYBACK_AFTER = re.compile(rf"\b(?:pay\s?back|paid back|pays back|recover)\w*\b[^.?!\n]{{0,60}}?{_DUR}",
-                            re.IGNORECASE)
+_PAYBACK_WORD = r"\b(?:pay\s?back|paid back|pays back|recover)"
+# The words between "payback" and its duration may not start a new thought ("..., par tu 12
+# months mein Pune chhodne wala hai") or reach another "payback", which is matched on its own.
+_NEW_THOUGHT = r"\b(?:but|par|lekin|magar|kyunki|kyonki|because|although|though|however|while|whereas)\b"
+_PAYBACK_AFTER = re.compile(
+    rf"{_PAYBACK_WORD}\w*\b(?:(?!{_NEW_THOUGHT}|{_PAYBACK_WORD})[^.?!\n]){{0,60}}?{_DUR}",
+    re.IGNORECASE)
 _PAYBACK_BEFORE = re.compile(rf"{_DUR}\s*(?:ka|ki|of|ke)?\s*(?:CAC\s+)?(?:pay\s?back|recovery)", re.IGNORECASE)
 _TO_MONTHS = {"month": 1, "mahin": 1, "year": 12, "saal": 12, "week": 12 / 52, "haft": 12 / 52,
               "day": 1 / 30, "din": 1 / 30}
@@ -114,11 +119,16 @@ def _months(n: str, unit: str) -> float:
 
 
 def stated_paybacks(text: str) -> list[tuple[str, float]]:
-    found = []
-    for rx in (_PAYBACK_AFTER, _PAYBACK_BEFORE):
-        for m in rx.finditer(text):
-            found.append((m.group(0), _months(m.group(1), m.group(2))))
-    return found
+    """Every (words, months) the text gives as a payback.
+
+    A "payback" that already has its figure in front ("1.1 months ka CAC payback") is not
+    read again with whatever duration follows it. On the real run of 27 Nov 2026 that took
+    the founder's "12 months" in Pune for a 12-month payback and rejected all three tries
+    at the only offer."""
+    before = list(_PAYBACK_BEFORE.finditer(text))
+    after = [m for m in _PAYBACK_AFTER.finditer(text)
+             if not any(b.start() <= m.start() < b.end() for b in before)]
+    return [(m.group(0), _months(m.group(1), m.group(2))) for m in (*after, *before)]
 
 
 def payback_error(text: str, record: Iterable[str]) -> str | None:

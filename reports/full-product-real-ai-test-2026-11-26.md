@@ -348,3 +348,110 @@ Farah's real revision (₹40 lakh for 20% after offering 16% and being countered
 **Still open from section 15:**
 - The verdict inverted "115 renewed" as "115 dropped".
 - Occasional dropped turns for invented figures.
+
+## 17. Real-AI check of the stricter maths rule (27 Nov 2026)
+
+One Sharks run on real AI, **engine only** (not through the web app; nothing written to the database; no app credits). Same pitch, ask and founder answers as `KLxJt-yry45qMfL4`. 25 calls, 52,931 tokens, **about ₹0.60** (estimated from token counts at the section 1 prices). Raw replies and every rejection: [real-sharks-run-2026-11-27-maths-check.json](real-sharks-run-2026-11-27-maths-check.json).
+
+**The maths rule was not tested.** All 21 shark replies left `maths` empty, so the new rule never ran and rejected nothing.
+- Possible causes, none tested: `maths` is optional in the reply schema (`SharkTurn.maths` has a default, and `OfferTerms` notes that some models skip optional fields); or the new prompt sentence discourages it. Earlier runs did not save replies, so there is no baseline for how often it was filled.
+- With `maths` empty, rupee figures still had to be on the record or one step from it. Replies quoting ₹1.1 lakh, 18540 and 3097 were rejected.
+
+**The payback check wrongly blocked the only offer.** Vikram tried three offers (the first: ₹30 lakh for 18%). Each said the payback was 1.1 months, which is correct, and also mentioned the founder's 12 months in Pune. `metrics.stated_paybacks` read "payback ... 12 months" as a 12-month payback. All three were rejected, so he made no move and the run ended with no offers. This check existed before today's changes.
+
+**Wrong statements that passed:**
+- Arjun: "180 * 3200 / 100 gives 576000". That sum is 5,760; 576,000 is 180 × 3,200. Sums spoken in the message are not recalculated.
+- Arjun, same turn: "185 rupees cost per meal" (the cost is ₹103). "185 rupees" has no ₹ or Rs in front and is under 1,000, so it is not checked.
+
+**Other results:**
+- 11 shark turns spoke and 2 were dropped, plus 1 deal-table move. None of the drops came from the maths rule.
+- Vikram's round-1 drop included "Ludhiana", which is in his persona background, not in the pitch. The city check rejected it.
+- The judge wrote a full verdict (4/10, pass), so the refund path was not exercised.
+
+## 18. Payback check false rejection fixed (27 Nov 2026)
+
+Tests and replay only; **not run on real AI since the fix**. 144 backend tests pass.
+
+**Change** (`metrics.stated_paybacks`):
+- A "payback" with its figure in front ("1.1 months ka CAC payback") is not read again with a later duration.
+- The words between "payback" and a duration cannot include "but", "par", "lekin", "kyunki", "because", "while" and similar, or a second "payback".
+
+**Replay**, old rule against new, on 917 distinct texts (section 17's replies, local saved debates, which may include fake-AI text, and the 2 Sharks runs in the current database, read-only): 26 had a payback duration under either rule and 4 were read differently.
+- 3 are Vikram's blocked offers: the false 12-month reading is gone. All three now also pass the other opening-offer checks (terms, valuation stance, speech). That does not show a deal would have followed.
+- 1 is an earlier real turn with a wrong "5 saal ka payback": still caught; only its extra false 12-month reading is gone.
+
+**Still wrong** (probed with made-up sentences):
+- Wrongly rejected: a payback with no figure, joined to another duration by "aur" or "and" ("Payback accha hai aur tum 12 months mein Pune chhod doge").
+- Now missed: a wrong figure straight after a correct one ("1.1 months ka payback nahi, 60 months lagenge") or after "but" ("Payback is not fast but 60 months").
+
+## 19. The sharks' maths field is now required (27 Nov 2026)
+
+Fake AI only; **not run on real AI**. 145 backend tests pass and one full fake debate finished.
+
+- **Finding (from section 17's saved replies):** all 21 shark replies left the `maths` key out entirely (not an empty list), and each began with `message`, although `maths` is first in the schema.
+- **Change:** `SharkTurn.maths` has no default, so the key is required. An empty list is still allowed. Its description now says to always include it, before the message.
+- **What this can't show:** whether Sarvam follows the requirement; whether it writes real sums or just `[]`; how many sums the stricter operand rule then rejects.
+- **Risk:** if the model keeps leaving the key out, each such reply is now rejected and retried (3 attempts), which would cost more and could drop turns.
+
+## 20. Real-AI check of the required maths field (27 Nov 2026)
+
+One Sharks run, engine only, same input and script as section 17. 20 calls, 51,751 tokens, **about ₹0.60**. Raw replies: [real-sharks-run-2026-11-27-required-maths.json](real-sharks-run-2026-11-27-required-maths.json).
+
+| | Section 17 (field optional) | This run (required) |
+|---|---|---|
+| Shark replies with the `maths` key | 0 of 21 | **16 of 16** |
+| of those, with sums in it | 0 | **4** (12 were `[]`) |
+| Rejected by the stricter operand rule | rule never ran | 0 |
+| Rejected for the payback check | 3 (all false) | 0 |
+| Shark turns spoke / dropped | 11 / 2 (plus 1 deal move) | 12 / 1 |
+| Deal | none | **offer, counter, revision, accepted** |
+
+- **The required field was followed** on every reply, so there were no rejections for a missing key.
+- **All sums passed**, including multi-line ones (3200/22, then 85+18+6, then the difference). So the operand rule ran on real sums and rejected nothing. It has **not** been seen rejecting anything on real AI.
+- **Dropped turn:** Farah, round 3: one repeated objection ("moat"), then twice an invented "10,000 units".
+- **Offer revision:** offer 10% equity, counter 6%, revision 8%: inside the range. The range check did not need to reject.
+- **Payback:** sharks quoted 1.1 months. No payback rejections, so the section 18 fix was not specifically exercised.
+- The judge worked, so the refund path was not exercised. One run only.
+
+**Wrong, found in this run (not fixed):**
+1. **The offer's valuation claim was false and passed.** Farah said ₹50 lakh for 10% values the company at ₹4 crore instead of ₹5 crore. It is **₹5 crore**, the same as the ask. The app's own offer card shows ₹5 crore. The figure check allowed "₹4 crore" (a one-step result), and `check_valuation_stance` did not fire because the message does not call the valuation too high in its listed words.
+2. **The judge was wrongly rejected once.** `verdict_check` rejected Vikram's reason for quoting "Rs 5 crore" as "another shark's offer". It is the founder's own ask valuation; Farah's offer happened to have the same value. The retry passed. Three such rejections would now mean no verdict and a refund.
+3. **Verdict reason partly stale:** it says Vikram judged the payback "too long". He said that in round 1 before the CAC was given, and later accepted 1.1 months.
+4. **Verdict decision is "invest" (5/10) with 1 shark investing and 4 passing.** Nothing in code ties the decision to the votes.
+5. Farah's counter reply contradicts itself: it says 8% does not justify the risk, then takes 8%.
+
+## 21. False valuations and the wrong judge rejection fixed (27 Nov 2026)
+
+Tests and replay only; **not run on real AI since the fix**. 156 backend tests pass.
+
+**Spoken valuations** (`deals.valuation_claim_error`, deal-table messages only): a rupee figure in lakh or crore written as a valuation must equal the value of the ask, or of an offer or counter put on the table (earlier ones too). A figure that is money on the table is left alone, so "40 lakh ki valuation 5 crore" is not misread. The rejection gives the speaker's real valuation.
+
+**Judge** (`sharks.verdict_check`): the ask's amount and valuation, and figures from the pitch and the founder's answers, may appear in any shark's reason, even when an offer has the same value.
+
+**Replay** of the deal-table messages from sections 17 and 20 (including the three offers wrongly blocked in 17) and the 2 Sharks runs in the current database: 10 messages, **1 flagged: Farah's false "₹4 crore"**. The saved rejected verdict from section 20 is now accepted; with the old arguments it is still rejected. The patterns were written with that message in view, so this shows no new false flags on these 10, not how well they catch new wording.
+
+**Still passes** (probed with made-up sentences):
+- Other wording: "your company is worth only ₹4 crore", or "company ₹4 crore ki hai".
+- A true figure given to the wrong terms: saying "valuation ₹5 crore" (the ask) when the shark's offer is worth ₹4 crore.
+- A false valuation equal to money on the table ("a ₹50 lakh valuation").
+- Valuations said during the question rounds or in chat are not checked by this rule.
+- In the judge check, if another shark's offer figure equals one of the founder's figures (often the amount invested), giving it to the wrong shark is no longer caught by that figure.
+
+## 22. The panel's decision now follows the votes (27 Nov 2026)
+
+Product decision by the founder. Tests, a fake debate and replay only; **not run on real AI since the change**. 165 backend tests pass.
+
+- **Rule** (`sharks.panel_decision`): "invest" or "pass" only when more than half of the whole panel votes that way (at least 3 of 5); otherwise "maybe", including ties and splits. The web page shows this as "The panel would invest", "would pass" or "is on the fence".
+- The judge is no longer asked for a decision. It still chooses the **score**, the one-line summary and the reasons, so these can differ in tone from the counted label.
+- Final votes: a shark who went out is "pass" and one with a standing offer is "invest", set by code. Without an ask there is no deal table, so the votes of sharks who stayed in are the judge's choice.
+- **A deal does not change the rule:** one shark can make a deal while the panel's label is "pass".
+- Applies to new runs only; saved runs keep their old label.
+
+**Four saved real verdicts**, old label and counted label:
+
+| Run | Votes | Judge said | Counted | Score |
+|---|---|---|---|---|
+| Section 17 | 5 pass | pass | pass | 4 |
+| Section 20 | 4 pass, 1 invest | invest | **pass** | 5 |
+| `mFsxty8LjME90Pcb` | 5 pass | pass | pass | 4 |
+| `KLxJt-yry45qMfL4` | 4 pass, 1 invest | maybe | **pass** | 4 |

@@ -5,9 +5,11 @@ invented "₹4,812 a month" for 18 shops at ₹299, called a four-month payback 
 reworded each other, and all opened at "pass" before the founder had answered anything.
 """
 import pytest
+from pydantic import ValidationError
 
 from app.debates import numbers
 from app.debates.sharks import round_check, turn_check
+from app.llm.base import inline_refs
 from app.llm.quality import repeats_point
 from app.models import Calc, SharkTurn
 
@@ -83,8 +85,9 @@ def test_rounding_a_figure_you_established_is_fine():
 
 
 def test_established_and_computed_payback_months_pass_untouched():
-    allowed = numbers.established(PITCH, [ANSWER], ASK)
-    turn_check(PITCH, [("Founder", ANSWER)], allowed)(turn(
+    answer = ANSWER + " Gross margin is 70%."  # a shark may not assume this for itself
+    allowed = numbers.established(PITCH, [answer], ASK)
+    turn_check(PITCH, [("Founder", answer)], allowed)(turn(
         "₹900 to win a shop against ₹209 of margin is about 4.3 months of payback, not decades.",
         [Calc(expression="299 * 0.7", value=209.3),
          Calc(expression="900 / (299 * 0.7)", value=4.3)]))
@@ -173,3 +176,74 @@ def test_meals_called_months_are_caught():
                  "After 5 months you have 180 subscribers",
                  "36% churn ka matlab hai 8 mahine mein aadha customer chala jayega"]:
         assert numbers.unit_mixup(fine, record) is None, fine
+
+
+# ---------- the numbers inside the maths must be established too ----------
+# "4812000 * 1" is correct arithmetic, and it used to turn any invented figure into a
+# checked one.
+
+@pytest.mark.parametrize("expression", [
+    "4812000 * 1", "4812000", "4812 * 1000", "481.2 * 10000", "4800000 + 12000",
+    "12 * 1000",           # constants only: nothing from the record
+    "180 * 26733",         # one real figure does not vouch for an invented one
+])
+def test_maths_cannot_launder_an_invented_figure(expression):
+    calc = Calc(expression=expression, value=numbers.evaluate(expression))
+    with pytest.raises(ValueError, match="your maths"):
+        numbers.check_calcs([calc], dabba_allowed())
+
+
+def test_the_bypass_is_closed_for_a_whole_turn_and_nothing_is_recorded():
+    allowed = numbers.established(PITCH, [ANSWER], ASK)
+    before = set(allowed)
+    check = turn_check(PITCH, [("Founder", ANSWER)], allowed)
+    with pytest.raises(ValueError, match="your maths"):
+        check(turn("Your market has 4812000 kirana shops waiting, so how will you reach them?",
+                   [Calc(expression="4812000 * 1", value=4812000)]))
+    assert allowed == before
+
+
+@pytest.mark.parametrize("expression", [
+    "180 * 3200", "180 * 0.64", "900 / 36 / 22", "900 / (36 * 22)", "3200 / 22 - 85 - 18 - 6",
+    "(85 + 18 + 6) * 22", "109 * 22", "103 * 22",   # 103 = 85 + 18
+    "40 * 100 / 8",        # the ask, in lakh and percent
+    "36 * 22 * 12",
+])
+def test_sums_built_from_the_record_still_pass(expression):
+    calc = Calc(expression=expression, value=numbers.evaluate(expression))
+    numbers.check_calcs([calc], numbers.established(DABBA, [DABBA_ANSWER], ASK | {
+        "investment_lakh": 40, "equity_pct": 8, "valuation_lakh": 500}))
+
+
+def test_a_later_maths_line_may_use_an_earlier_result_even_rounded():
+    numbers.check_calcs([Calc(expression="3200 / 22", value=145.4545),
+                         Calc(expression="145.45 - 109", value=36.45),
+                         Calc(expression="900 / 36.45", value=24.69)], dabba_allowed())
+    with pytest.raises(ValueError, match="your maths"):  # not before the line that makes it
+        numbers.check_calcs([Calc(expression="145.45 - 109", value=36.45)],
+                            numbers.established(DABBA, [], None))
+
+
+def test_a_middle_step_must_be_shown_on_its_own_line():
+    allowed = numbers.established(DABBA, [DABBA_ANSWER], ASK)
+    with pytest.raises(ValueError, match="uses 25"):
+        numbers.check_calcs([Calc(expression="25 / 22", value=1.136)], allowed)
+    numbers.check_calcs([Calc(expression="900 / 36", value=25),
+                         Calc(expression="25 / 22", value=1.136)], allowed)
+
+
+def test_a_shark_may_not_assume_its_own_margin():
+    check = turn_check(PITCH, [("Founder", ANSWER)], numbers.established(PITCH, [ANSWER], ASK))
+    with pytest.raises(ValueError, match="0.7"):
+        check(turn("At my guess of a 70 percent margin, each shop earns you about ₹209.",
+                   [Calc(expression="299 * 0.7", value=209.3)]))
+
+
+def test_a_reply_must_include_maths_though_it_may_be_empty():
+    """Left optional, the real model skipped it in 21 of 21 replies (27 Nov 2026)."""
+    schema = inline_refs(SharkTurn.model_json_schema())
+    assert "maths" in schema["required"] and list(schema["properties"])[0] == "maths"
+    reply = {"message": "x" * 60, "out": False, "stance": "maybe", "confidence": 5}
+    with pytest.raises(ValidationError, match="maths"):
+        SharkTurn.model_validate(reply)
+    assert SharkTurn.model_validate(reply | {"maths": []}).maths == []

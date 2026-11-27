@@ -15,6 +15,7 @@ from .ratelimit import RateLimiter
 from .sessions import SessionStore
 from .settings import Settings, get_settings
 from .store import close_store, open_store
+from .voice import VoiceService
 
 FRONTEND = Path(__file__).resolve().parents[2] / "frontend" / "index.html"
 
@@ -37,6 +38,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.daily = DailyBudget(s.daily_token_limit)
     app.state.limiter = RateLimiter(s.rate_limit_per_hour)
     app.state.chat_limiter = RateLimiter(s.chat_rate_per_hour)
+    app.state.voice = VoiceService(s)
+    app.state.clip_limiter = RateLimiter(s.voice_clip_rate_per_hour)
     app.add_middleware(CORSMiddleware, allow_origins=s.cors_origins, allow_methods=["*"],
                        allow_headers=["*"])
     app.include_router(router)

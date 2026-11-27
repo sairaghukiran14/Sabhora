@@ -6,7 +6,8 @@ const securityHeaders = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), payment=()",
+    // The microphone is for speaking a pitch, on our own pages only.
+    value: "camera=(), microphone=(self), geolocation=(), payment=()",
   },
   ...(process.env.NODE_ENV === "production"
     ? [
